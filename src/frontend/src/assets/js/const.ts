@@ -15,16 +15,26 @@ export const POLLING_INTERVAL_LIST = [
 export const DEFAULT_DURATION_TIME = 5 * 60;
 
 export const DURATION_TIME_LIST = [
-  { value: 1 * 60, name: 'last 1 minutes' },
+  { value: 3 * 60, name: 'last 3 minutes' },
   { value: 5 * 60, name: 'last 5 minutes' },
   { value: 10 * 60, name: 'last 10 minutes' },
   { value: 30 * 60, name: 'last 30 minutes' },
+  { value: 60 * 60, name: 'last 1 hour' },
 ];
 
-export const momentFormatData = (time: Date | string, isInput = false, spanTime = 0): string => {
+export enum TIME_TYPE {
+  SECOND = 'SECOND',
+  WITH_YEAR = 'WITH_YEAR',
+  MINUTE = 'MINUTE',
+}
+
+export const momentFormatData = (time: Date | string, isInput = TIME_TYPE.SECOND, spanTime = 0): string => {
   let formatStr = 'MM-DD HH:mm:ss';
-  if (isInput) {
+  if (isInput === TIME_TYPE.WITH_YEAR) {
     formatStr = 'yyyy-MM-DD HH:mm:ss';
+  }
+  if (isInput === TIME_TYPE.MINUTE) {
+    formatStr = 'MM-DD HH:mm';
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let tmpTime: any = time;

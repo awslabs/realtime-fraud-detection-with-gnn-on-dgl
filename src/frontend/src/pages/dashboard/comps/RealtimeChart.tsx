@@ -10,7 +10,6 @@ interface DataProps {
 
 const RealtimeChart: React.FC<DataProps> = (props: DataProps) => {
   const { height, series, categories } = props;
-  console.info('height:', height);
 
   const chartData = {
     series: [
