@@ -1,6 +1,6 @@
 # Real-time Fraud Detection with Graph Neural Network on DGL
 
-It's a end-to-end solution for **real-time** fraud detection using  [Amazon SageMaker][sagemaker] and [Deep Graph Library (DGL)][dgl] to construct a heterogeneous graph from tabular data and train a Graph Neural Network(GNN) model to detect fraudulent transactions in the [IEEE-CIS dataset][ieee-fraud-detection].
+It's a end-to-end solution for **real-time** fraud detection using graph database [Amazon Neptune][neptune], [Amazon SageMaker][sagemaker] and [Deep Graph Library (DGL)][dgl] to construct a heterogeneous graph from tabular data and train a Graph Neural Network(GNN) model to detect fraudulent transactions in the [IEEE-CIS Fraud detection dataset][ieee-fraud-detection].
 
 ## Architecutre of solution
 
@@ -16,6 +16,11 @@ This solution consists of below [stacks][cfn-stack],
 The model training & deployment pipeline is orchestrated by [AWS Step Functions][step-functions] like below graph,
 ![model training](./docs/model-training.png)
 
+### Dashboard stack
+
+It creates a React based web portal that observes the recent fraud transactions detected by this solution. This web application also is orchestrated by [Amazon CloudFront][cloudfront], [AWS Amplify][amplify], [AWS AppSync][appsync], [Amazon API Gateway][api], [AWS Step Functions][step-functions] and [Amazon DocumentDB][docdb].
+![business system](./docs/system-arch.png)
+
 #### How to train model and deploy inference endpoint
 
 After [deploying](#how-to-deploy-the-solution) this solution, go to AWS Step Functions in AWS console, then start the state machine starting with `ModelTrainingPipeline`.
@@ -26,7 +31,9 @@ You can input below parameters to overrride the default parameters of model trai
 {
   "trainingJob": {
     "hyperparameters": {
-      "n-epochs": "1"
+    "n-hidden": "64",
+    "n-epochs": "1",
+    "lr":"1e-3"
     },
     "instanceType": "ml.c5.9xlarge"
   }
@@ -58,11 +65,17 @@ The deployment will create a new VPC acrossing two AZs at least and NAT gateways
 yarn deploy
 ```
 
-### Deploy it into existing default VPC
-Please make sure your default VPC having both public subnets and private subnets with NAT gateway.
+### Deploy it into existing VPC
+If you want to deploy the solution to default VPC, use below command.
 ```shell
 yarn deploy-to-default-vpc
 ```
+Or deploy an existing VPC by specifying the VPC Id,
+```shell
+npx cdk deploy -c vpcId=<your vpc id>
+```
+
+**NOTE: please make sure your existing VPC having both public subnets and private subnets with NAT gateway.**
 
 ### Deploy it with custom Neptune instance class and replica count
 
@@ -73,7 +86,7 @@ npx cdk deploy --parameters NeptuneInstaneType=db.r5.12xlarge -c NeptuneReplicaC
 ```
 
 ### Deploy it to China regions
-Add below context parameters
+Add below additional context parameters,
 ```
 npx cdk deploy -c targetPartition=aws-cn
 ```
@@ -86,10 +99,24 @@ yarn test
 ## FAQ
 TBA
 
+## Security
+
+See [CONTRIBUTING](CONTRIBUTING.md#security-issue-notifications) for more information.
+
+## License
+
+This project is licensed under the Apache-2.0 License.
+
 [dgl]: https://www.dgl.ai/
+[neptune]: https://aws.amazon.com/neptune/
 [sagemaker]: https://aws.amazon.com/sagemaker/
+[cloudfront]: https://aws.amazon.com/cloudfront/
+[amplify]: https://aws.amazon.com/amplify/
+[appsync]: https://aws.amazon.com/appsync/
+[docdb]: https://aws.amazon.com/documentdb/
+[api]: https://aws.amazon.com/api-gateway/
+[step-functions]: https://aws.amazon.com/stepfunctions/
 [ieee-fraud-detection]: https://www.kaggle.com/c/ieee-fraud-detection/
 [configure-aws-cli]: https://docs.aws.amazon.com/zh_cn/cli/latest/userguide/cli-chap-configure.html
 [aws-cdk]: https://aws.amazon.com/cdk/
 [cfn-stack]: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/stacks.html
-[step-functions]: https://aws.amazon.com/step-functions/
