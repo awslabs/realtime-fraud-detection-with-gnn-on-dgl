@@ -1,0 +1,25 @@
+{
+  "features": {
+    "graphqltransformer": {
+      "addmissingownerfields": true,
+      "validatetypenamereservedwords": true,
+      "useexperimentalpipelinedtransformer": false,
+      "enableiterativegsiupdates": false,
+      "secondarykeyasgsi": true
+    },
+    "frontend-ios": {
+      "enablexcodeintegration": true
+    },
+    "auth": {
+      "enablecaseinsensitivity": true
+    },
+    "codegen": {
+      "useappsyncmodelgenplugin": true,
+      "usedocsgeneratorplugin": true,
+      "usetypesgeneratorplugin": true
+    },
+    "appsync": {
+      "generategraphqlpermissions": true
+    }
+  }
+}

@@ -1,0 +1,809 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`fraud detection stack Snapshot 1`] = `
+Object {
+  "Parameters": Object {
+    "AssetParameters237c2e9c53b6938b2e334b1d6e28a125208cb13e4f010d45349300133aa619dbArtifactHashF4BDF5F3": Object {
+      "Description": "Artifact hash for asset \\"237c2e9c53b6938b2e334b1d6e28a125208cb13e4f010d45349300133aa619db\\"",
+      "Type": "String",
+    },
+    "AssetParameters237c2e9c53b6938b2e334b1d6e28a125208cb13e4f010d45349300133aa619dbS3Bucket855BB8C0": Object {
+      "Description": "S3 bucket for asset \\"237c2e9c53b6938b2e334b1d6e28a125208cb13e4f010d45349300133aa619db\\"",
+      "Type": "String",
+    },
+    "AssetParameters237c2e9c53b6938b2e334b1d6e28a125208cb13e4f010d45349300133aa619dbS3VersionKey8B020FCB": Object {
+      "Description": "S3 key for asset version \\"237c2e9c53b6938b2e334b1d6e28a125208cb13e4f010d45349300133aa619db\\"",
+      "Type": "String",
+    },
+    "AssetParameters4cd61014b71160e8c66fe167e43710d5ba068b80b134e9bd84508cf9238b2392ArtifactHashE56CD69A": Object {
+      "Description": "Artifact hash for asset \\"4cd61014b71160e8c66fe167e43710d5ba068b80b134e9bd84508cf9238b2392\\"",
+      "Type": "String",
+    },
+    "AssetParameters4cd61014b71160e8c66fe167e43710d5ba068b80b134e9bd84508cf9238b2392S3BucketBF7A7F3F": Object {
+      "Description": "S3 bucket for asset \\"4cd61014b71160e8c66fe167e43710d5ba068b80b134e9bd84508cf9238b2392\\"",
+      "Type": "String",
+    },
+    "AssetParameters4cd61014b71160e8c66fe167e43710d5ba068b80b134e9bd84508cf9238b2392S3VersionKeyFAF93626": Object {
+      "Description": "S3 key for asset version \\"4cd61014b71160e8c66fe167e43710d5ba068b80b134e9bd84508cf9238b2392\\"",
+      "Type": "String",
+    },
+    "AssetParameters62ba450e29370045d0b8cad2a9897475c9d73c9608a0960b5d21ab3c8d55c562ArtifactHashF9D609A0": Object {
+      "Description": "Artifact hash for asset \\"62ba450e29370045d0b8cad2a9897475c9d73c9608a0960b5d21ab3c8d55c562\\"",
+      "Type": "String",
+    },
+    "AssetParameters62ba450e29370045d0b8cad2a9897475c9d73c9608a0960b5d21ab3c8d55c562S3Bucket569E6171": Object {
+      "Description": "S3 bucket for asset \\"62ba450e29370045d0b8cad2a9897475c9d73c9608a0960b5d21ab3c8d55c562\\"",
+      "Type": "String",
+    },
+    "AssetParameters62ba450e29370045d0b8cad2a9897475c9d73c9608a0960b5d21ab3c8d55c562S3VersionKeyEAD63CBA": Object {
+      "Description": "S3 key for asset version \\"62ba450e29370045d0b8cad2a9897475c9d73c9608a0960b5d21ab3c8d55c562\\"",
+      "Type": "String",
+    },
+    "AssetParameters6def8e1593405945ef7294b7497c96fe1cfb8aa1ec937b4c46c3b6b0f1f42c99ArtifactHashAB8EC1D0": Object {
+      "Description": "Artifact hash for asset \\"6def8e1593405945ef7294b7497c96fe1cfb8aa1ec937b4c46c3b6b0f1f42c99\\"",
+      "Type": "String",
+    },
+    "AssetParameters6def8e1593405945ef7294b7497c96fe1cfb8aa1ec937b4c46c3b6b0f1f42c99S3Bucket54D5E7A0": Object {
+      "Description": "S3 bucket for asset \\"6def8e1593405945ef7294b7497c96fe1cfb8aa1ec937b4c46c3b6b0f1f42c99\\"",
+      "Type": "String",
+    },
+    "AssetParameters6def8e1593405945ef7294b7497c96fe1cfb8aa1ec937b4c46c3b6b0f1f42c99S3VersionKey66EC4A49": Object {
+      "Description": "S3 key for asset version \\"6def8e1593405945ef7294b7497c96fe1cfb8aa1ec937b4c46c3b6b0f1f42c99\\"",
+      "Type": "String",
+    },
+    "AssetParameters7e0747b41c8fed3ae2294ac958e5e47c0716507efe50d535527b6cabbf24f9ecArtifactHash3F6F462B": Object {
+      "Description": "Artifact hash for asset \\"7e0747b41c8fed3ae2294ac958e5e47c0716507efe50d535527b6cabbf24f9ec\\"",
+      "Type": "String",
+    },
+    "AssetParameters7e0747b41c8fed3ae2294ac958e5e47c0716507efe50d535527b6cabbf24f9ecS3Bucket2F47CA69": Object {
+      "Description": "S3 bucket for asset \\"7e0747b41c8fed3ae2294ac958e5e47c0716507efe50d535527b6cabbf24f9ec\\"",
+      "Type": "String",
+    },
+    "AssetParameters7e0747b41c8fed3ae2294ac958e5e47c0716507efe50d535527b6cabbf24f9ecS3VersionKeyF7C363AE": Object {
+      "Description": "S3 key for asset version \\"7e0747b41c8fed3ae2294ac958e5e47c0716507efe50d535527b6cabbf24f9ec\\"",
+      "Type": "String",
+    },
+    "AssetParameters8bda025b845a88fbeb54ef75e52048aa9f3378463116cb413f12f6014673a59aArtifactHash595EC1E7": Object {
+      "Description": "Artifact hash for asset \\"8bda025b845a88fbeb54ef75e52048aa9f3378463116cb413f12f6014673a59a\\"",
+      "Type": "String",
+    },
+    "AssetParameters8bda025b845a88fbeb54ef75e52048aa9f3378463116cb413f12f6014673a59aS3BucketFD1BBE00": Object {
+      "Description": "S3 bucket for asset \\"8bda025b845a88fbeb54ef75e52048aa9f3378463116cb413f12f6014673a59a\\"",
+      "Type": "String",
+    },
+    "AssetParameters8bda025b845a88fbeb54ef75e52048aa9f3378463116cb413f12f6014673a59aS3VersionKey6E54DC76": Object {
+      "Description": "S3 key for asset version \\"8bda025b845a88fbeb54ef75e52048aa9f3378463116cb413f12f6014673a59a\\"",
+      "Type": "String",
+    },
+    "AssetParametersbf49f044a93db2f0cb00247718a2024be235f0d7aa615e20e83096bf6f5aaeddArtifactHash12AFA9B3": Object {
+      "Description": "Artifact hash for asset \\"bf49f044a93db2f0cb00247718a2024be235f0d7aa615e20e83096bf6f5aaedd\\"",
+      "Type": "String",
+    },
+    "AssetParametersbf49f044a93db2f0cb00247718a2024be235f0d7aa615e20e83096bf6f5aaeddS3Bucket8A70661D": Object {
+      "Description": "S3 bucket for asset \\"bf49f044a93db2f0cb00247718a2024be235f0d7aa615e20e83096bf6f5aaedd\\"",
+      "Type": "String",
+    },
+    "AssetParametersbf49f044a93db2f0cb00247718a2024be235f0d7aa615e20e83096bf6f5aaeddS3VersionKey8B83178C": Object {
+      "Description": "S3 key for asset version \\"bf49f044a93db2f0cb00247718a2024be235f0d7aa615e20e83096bf6f5aaedd\\"",
+      "Type": "String",
+    },
+    "AssetParametersc8a16e9c8b33618af3c6d4d9889a75e5020205e5b4c66ea747c212fb1d45eb0aArtifactHashC93884A0": Object {
+      "Description": "Artifact hash for asset \\"c8a16e9c8b33618af3c6d4d9889a75e5020205e5b4c66ea747c212fb1d45eb0a\\"",
+      "Type": "String",
+    },
+    "AssetParametersc8a16e9c8b33618af3c6d4d9889a75e5020205e5b4c66ea747c212fb1d45eb0aS3Bucket07C1BEDA": Object {
+      "Description": "S3 bucket for asset \\"c8a16e9c8b33618af3c6d4d9889a75e5020205e5b4c66ea747c212fb1d45eb0a\\"",
+      "Type": "String",
+    },
+    "AssetParametersc8a16e9c8b33618af3c6d4d9889a75e5020205e5b4c66ea747c212fb1d45eb0aS3VersionKey6CE878F4": Object {
+      "Description": "S3 key for asset version \\"c8a16e9c8b33618af3c6d4d9889a75e5020205e5b4c66ea747c212fb1d45eb0a\\"",
+      "Type": "String",
+    },
+    "AssetParameterse9882ab123687399f934da0d45effe675ecc8ce13b40cb946f3e1d6141fe8d68ArtifactHashD9A515C3": Object {
+      "Description": "Artifact hash for asset \\"e9882ab123687399f934da0d45effe675ecc8ce13b40cb946f3e1d6141fe8d68\\"",
+      "Type": "String",
+    },
+    "AssetParameterse9882ab123687399f934da0d45effe675ecc8ce13b40cb946f3e1d6141fe8d68S3BucketAEADE8C7": Object {
+      "Description": "S3 bucket for asset \\"e9882ab123687399f934da0d45effe675ecc8ce13b40cb946f3e1d6141fe8d68\\"",
+      "Type": "String",
+    },
+    "AssetParameterse9882ab123687399f934da0d45effe675ecc8ce13b40cb946f3e1d6141fe8d68S3VersionKeyE415415F": Object {
+      "Description": "S3 key for asset version \\"e9882ab123687399f934da0d45effe675ecc8ce13b40cb946f3e1d6141fe8d68\\"",
+      "Type": "String",
+    },
+  },
+  "Resources": Object {
+    "ClusterParamGroup": Object {
+      "Properties": Object {
+        "Description": "Neptune Cluster Param Group",
+        "Family": "neptune1",
+        "Parameters": Object {
+          "neptune_enable_audit_log": 1,
+        },
+      },
+      "Type": "AWS::Neptune::DBClusterParameterGroup",
+    },
+    "DBParamGroup": Object {
+      "Properties": Object {
+        "Description": "Neptune DB Param Group",
+        "Family": "neptune1",
+        "Parameters": Object {
+          "neptune_query_timeout": 600000,
+        },
+      },
+      "Type": "AWS::Neptune::DBParameterGroup",
+    },
+    "DBSubnetGroup": Object {
+      "Properties": Object {
+        "DBSubnetGroupDescription": "Neptune Subnet Group",
+        "SubnetIds": Array [
+          Object {
+            "Ref": "FraudDetectionVpcPrivateSubnet1SubnetC2667FEC",
+          },
+          Object {
+            "Ref": "FraudDetectionVpcPrivateSubnet2Subnet899E11FB",
+          },
+        ],
+      },
+      "Type": "AWS::Neptune::DBSubnetGroup",
+    },
+    "FraudDetectionDataBucketD44FA8F5": Object {
+      "DeletionPolicy": "Retain",
+      "Properties": Object {
+        "BucketEncryption": Object {
+          "ServerSideEncryptionConfiguration": Array [
+            Object {
+              "ServerSideEncryptionByDefault": Object {
+                "SSEAlgorithm": "AES256",
+              },
+            },
+          ],
+        },
+      },
+      "Type": "AWS::S3::Bucket",
+      "UpdateReplacePolicy": "Retain",
+    },
+    "FraudDetectionVpc5B01149C": Object {
+      "Properties": Object {
+        "CidrBlock": "10.0.0.0/16",
+        "EnableDnsHostnames": true,
+        "EnableDnsSupport": true,
+        "InstanceTenancy": "default",
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "TestStack/FraudDetectionVpc",
+          },
+        ],
+      },
+      "Type": "AWS::EC2::VPC",
+    },
+    "FraudDetectionVpcIGWDCDD003D": Object {
+      "Properties": Object {
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "TestStack/FraudDetectionVpc",
+          },
+        ],
+      },
+      "Type": "AWS::EC2::InternetGateway",
+    },
+    "FraudDetectionVpcPrivateSubnet1DefaultRouteCC1AC902": Object {
+      "Properties": Object {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": Object {
+          "Ref": "FraudDetectionVpcPublicSubnet1NATGatewayC45FD88C",
+        },
+        "RouteTableId": Object {
+          "Ref": "FraudDetectionVpcPrivateSubnet1RouteTable418DC940",
+        },
+      },
+      "Type": "AWS::EC2::Route",
+    },
+    "FraudDetectionVpcPrivateSubnet1RouteTable418DC940": Object {
+      "Properties": Object {
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "TestStack/FraudDetectionVpc/PrivateSubnet1",
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "FraudDetectionVpc5B01149C",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "FraudDetectionVpcPrivateSubnet1RouteTableAssociation2A8EF4EB": Object {
+      "Properties": Object {
+        "RouteTableId": Object {
+          "Ref": "FraudDetectionVpcPrivateSubnet1RouteTable418DC940",
+        },
+        "SubnetId": Object {
+          "Ref": "FraudDetectionVpcPrivateSubnet1SubnetC2667FEC",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "FraudDetectionVpcPrivateSubnet1SubnetC2667FEC": Object {
+      "Properties": Object {
+        "AvailabilityZone": Object {
+          "Fn::Select": Array [
+            0,
+            Object {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "CidrBlock": "10.0.128.0/18",
+        "MapPublicIpOnLaunch": false,
+        "Tags": Array [
+          Object {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Private",
+          },
+          Object {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Private",
+          },
+          Object {
+            "Key": "Name",
+            "Value": "TestStack/FraudDetectionVpc/PrivateSubnet1",
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "FraudDetectionVpc5B01149C",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "FraudDetectionVpcPrivateSubnet2DefaultRoute380AE6DC": Object {
+      "Properties": Object {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "NatGatewayId": Object {
+          "Ref": "FraudDetectionVpcPublicSubnet2NATGatewayEB97D28A",
+        },
+        "RouteTableId": Object {
+          "Ref": "FraudDetectionVpcPrivateSubnet2RouteTableE4A96159",
+        },
+      },
+      "Type": "AWS::EC2::Route",
+    },
+    "FraudDetectionVpcPrivateSubnet2RouteTableAssociation523D3CD0": Object {
+      "Properties": Object {
+        "RouteTableId": Object {
+          "Ref": "FraudDetectionVpcPrivateSubnet2RouteTableE4A96159",
+        },
+        "SubnetId": Object {
+          "Ref": "FraudDetectionVpcPrivateSubnet2Subnet899E11FB",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "FraudDetectionVpcPrivateSubnet2RouteTableE4A96159": Object {
+      "Properties": Object {
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "TestStack/FraudDetectionVpc/PrivateSubnet2",
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "FraudDetectionVpc5B01149C",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "FraudDetectionVpcPrivateSubnet2Subnet899E11FB": Object {
+      "Properties": Object {
+        "AvailabilityZone": Object {
+          "Fn::Select": Array [
+            1,
+            Object {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "CidrBlock": "10.0.192.0/18",
+        "MapPublicIpOnLaunch": false,
+        "Tags": Array [
+          Object {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Private",
+          },
+          Object {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Private",
+          },
+          Object {
+            "Key": "Name",
+            "Value": "TestStack/FraudDetectionVpc/PrivateSubnet2",
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "FraudDetectionVpc5B01149C",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "FraudDetectionVpcPublicSubnet1DefaultRoute02C9BA34": Object {
+      "DependsOn": Array [
+        "FraudDetectionVpcVPCGW7C294FD9",
+      ],
+      "Properties": Object {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": Object {
+          "Ref": "FraudDetectionVpcIGWDCDD003D",
+        },
+        "RouteTableId": Object {
+          "Ref": "FraudDetectionVpcPublicSubnet1RouteTableA365E6B8",
+        },
+      },
+      "Type": "AWS::EC2::Route",
+    },
+    "FraudDetectionVpcPublicSubnet1EIP0223A8BA": Object {
+      "Properties": Object {
+        "Domain": "vpc",
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "TestStack/FraudDetectionVpc/PublicSubnet1",
+          },
+        ],
+      },
+      "Type": "AWS::EC2::EIP",
+    },
+    "FraudDetectionVpcPublicSubnet1NATGatewayC45FD88C": Object {
+      "Properties": Object {
+        "AllocationId": Object {
+          "Fn::GetAtt": Array [
+            "FraudDetectionVpcPublicSubnet1EIP0223A8BA",
+            "AllocationId",
+          ],
+        },
+        "SubnetId": Object {
+          "Ref": "FraudDetectionVpcPublicSubnet1Subnet38A3B3CD",
+        },
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "TestStack/FraudDetectionVpc/PublicSubnet1",
+          },
+        ],
+      },
+      "Type": "AWS::EC2::NatGateway",
+    },
+    "FraudDetectionVpcPublicSubnet1RouteTableA365E6B8": Object {
+      "Properties": Object {
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "TestStack/FraudDetectionVpc/PublicSubnet1",
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "FraudDetectionVpc5B01149C",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "FraudDetectionVpcPublicSubnet1RouteTableAssociation66523D9E": Object {
+      "Properties": Object {
+        "RouteTableId": Object {
+          "Ref": "FraudDetectionVpcPublicSubnet1RouteTableA365E6B8",
+        },
+        "SubnetId": Object {
+          "Ref": "FraudDetectionVpcPublicSubnet1Subnet38A3B3CD",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "FraudDetectionVpcPublicSubnet1Subnet38A3B3CD": Object {
+      "Properties": Object {
+        "AvailabilityZone": Object {
+          "Fn::Select": Array [
+            0,
+            Object {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "CidrBlock": "10.0.0.0/18",
+        "MapPublicIpOnLaunch": true,
+        "Tags": Array [
+          Object {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Public",
+          },
+          Object {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Public",
+          },
+          Object {
+            "Key": "Name",
+            "Value": "TestStack/FraudDetectionVpc/PublicSubnet1",
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "FraudDetectionVpc5B01149C",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "FraudDetectionVpcPublicSubnet2DefaultRoute4AE11CF9": Object {
+      "DependsOn": Array [
+        "FraudDetectionVpcVPCGW7C294FD9",
+      ],
+      "Properties": Object {
+        "DestinationCidrBlock": "0.0.0.0/0",
+        "GatewayId": Object {
+          "Ref": "FraudDetectionVpcIGWDCDD003D",
+        },
+        "RouteTableId": Object {
+          "Ref": "FraudDetectionVpcPublicSubnet2RouteTable1691B2A3",
+        },
+      },
+      "Type": "AWS::EC2::Route",
+    },
+    "FraudDetectionVpcPublicSubnet2EIP12C1F949": Object {
+      "Properties": Object {
+        "Domain": "vpc",
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "TestStack/FraudDetectionVpc/PublicSubnet2",
+          },
+        ],
+      },
+      "Type": "AWS::EC2::EIP",
+    },
+    "FraudDetectionVpcPublicSubnet2NATGatewayEB97D28A": Object {
+      "Properties": Object {
+        "AllocationId": Object {
+          "Fn::GetAtt": Array [
+            "FraudDetectionVpcPublicSubnet2EIP12C1F949",
+            "AllocationId",
+          ],
+        },
+        "SubnetId": Object {
+          "Ref": "FraudDetectionVpcPublicSubnet2SubnetF52AA47A",
+        },
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "TestStack/FraudDetectionVpc/PublicSubnet2",
+          },
+        ],
+      },
+      "Type": "AWS::EC2::NatGateway",
+    },
+    "FraudDetectionVpcPublicSubnet2RouteTable1691B2A3": Object {
+      "Properties": Object {
+        "Tags": Array [
+          Object {
+            "Key": "Name",
+            "Value": "TestStack/FraudDetectionVpc/PublicSubnet2",
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "FraudDetectionVpc5B01149C",
+        },
+      },
+      "Type": "AWS::EC2::RouteTable",
+    },
+    "FraudDetectionVpcPublicSubnet2RouteTableAssociation04E69202": Object {
+      "Properties": Object {
+        "RouteTableId": Object {
+          "Ref": "FraudDetectionVpcPublicSubnet2RouteTable1691B2A3",
+        },
+        "SubnetId": Object {
+          "Ref": "FraudDetectionVpcPublicSubnet2SubnetF52AA47A",
+        },
+      },
+      "Type": "AWS::EC2::SubnetRouteTableAssociation",
+    },
+    "FraudDetectionVpcPublicSubnet2SubnetF52AA47A": Object {
+      "Properties": Object {
+        "AvailabilityZone": Object {
+          "Fn::Select": Array [
+            1,
+            Object {
+              "Fn::GetAZs": "",
+            },
+          ],
+        },
+        "CidrBlock": "10.0.64.0/18",
+        "MapPublicIpOnLaunch": true,
+        "Tags": Array [
+          Object {
+            "Key": "aws-cdk:subnet-name",
+            "Value": "Public",
+          },
+          Object {
+            "Key": "aws-cdk:subnet-type",
+            "Value": "Public",
+          },
+          Object {
+            "Key": "Name",
+            "Value": "TestStack/FraudDetectionVpc/PublicSubnet2",
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "FraudDetectionVpc5B01149C",
+        },
+      },
+      "Type": "AWS::EC2::Subnet",
+    },
+    "FraudDetectionVpcVPCGW7C294FD9": Object {
+      "Properties": Object {
+        "InternetGatewayId": Object {
+          "Ref": "FraudDetectionVpcIGWDCDD003D",
+        },
+        "VpcId": Object {
+          "Ref": "FraudDetectionVpc5B01149C",
+        },
+      },
+      "Type": "AWS::EC2::VPCGatewayAttachment",
+    },
+    "FraudDetectionVpcs39F947E2E": Object {
+      "Properties": Object {
+        "RouteTableIds": Array [
+          Object {
+            "Ref": "FraudDetectionVpcPrivateSubnet1RouteTable418DC940",
+          },
+          Object {
+            "Ref": "FraudDetectionVpcPrivateSubnet2RouteTableE4A96159",
+          },
+          Object {
+            "Ref": "FraudDetectionVpcPublicSubnet1RouteTableA365E6B8",
+          },
+          Object {
+            "Ref": "FraudDetectionVpcPublicSubnet2RouteTable1691B2A3",
+          },
+        ],
+        "ServiceName": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "com.amazonaws.",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              ".s3",
+            ],
+          ],
+        },
+        "VpcEndpointType": "Gateway",
+        "VpcId": Object {
+          "Ref": "FraudDetectionVpc5B01149C",
+        },
+      },
+      "Type": "AWS::EC2::VPCEndpoint",
+    },
+    "NeptuneSG31D2E08E": Object {
+      "Properties": Object {
+        "GroupDescription": "TestStack/NeptuneSG",
+        "SecurityGroupEgress": Array [
+          Object {
+            "CidrIp": "255.255.255.255/32",
+            "Description": "Disallow all traffic",
+            "FromPort": 252,
+            "IpProtocol": "icmp",
+            "ToPort": 86,
+          },
+        ],
+        "VpcId": Object {
+          "Ref": "FraudDetectionVpc5B01149C",
+        },
+      },
+      "Type": "AWS::EC2::SecurityGroup",
+    },
+    "NeptuneSGfromTestStacktrainingETLCompGlueJobSG4839C5648182A587F81C": Object {
+      "Properties": Object {
+        "Description": "access from glue job.",
+        "FromPort": 8182,
+        "GroupId": Object {
+          "Fn::GetAtt": Array [
+            "NeptuneSG31D2E08E",
+            "GroupId",
+          ],
+        },
+        "IpProtocol": "tcp",
+        "SourceSecurityGroupId": Object {
+          "Fn::GetAtt": Array [
+            "trainingNestedStacktrainingNestedStackResourceAA446BCB",
+            "Outputs.TestStacktrainingETLCompGlueJobSG3879196AGroupId",
+          ],
+        },
+        "ToPort": 8182,
+      },
+      "Type": "AWS::EC2::SecurityGroupIngress",
+    },
+    "TransactionGraphCluster": Object {
+      "DependsOn": Array [
+        "ClusterParamGroup",
+        "DBSubnetGroup",
+      ],
+      "Properties": Object {
+        "DBClusterParameterGroupName": Object {
+          "Ref": "ClusterParamGroup",
+        },
+        "DBSubnetGroupName": Object {
+          "Ref": "DBSubnetGroup",
+        },
+        "IamAuthEnabled": true,
+        "Port": 8182,
+        "StorageEncrypted": true,
+        "VpcSecurityGroupIds": Array [
+          Object {
+            "Fn::GetAtt": Array [
+              "NeptuneSG31D2E08E",
+              "GroupId",
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::Neptune::DBCluster",
+    },
+    "primaryinstance": Object {
+      "DependsOn": Array [
+        "DBParamGroup",
+        "TransactionGraphCluster",
+      ],
+      "Properties": Object {
+        "DBClusterIdentifier": Object {
+          "Ref": "TransactionGraphCluster",
+        },
+        "DBInstanceClass": "db.r5.xlarge",
+        "DBParameterGroupName": Object {
+          "Ref": "DBParamGroup",
+        },
+      },
+      "Type": "AWS::Neptune::DBInstance",
+    },
+    "replica0": Object {
+      "DependsOn": Array [
+        "primaryinstance",
+        "TransactionGraphCluster",
+      ],
+      "Properties": Object {
+        "DBClusterIdentifier": Object {
+          "Ref": "TransactionGraphCluster",
+        },
+        "DBInstanceClass": "db.r5.xlarge",
+        "DBInstanceIdentifier": "replica-0",
+      },
+      "Type": "AWS::Neptune::DBInstance",
+    },
+    "trainingNestedStacktrainingNestedStackResourceAA446BCB": Object {
+      "Properties": Object {
+        "Parameters": Object {
+          "referencetoTestStackAssetParameters237c2e9c53b6938b2e334b1d6e28a125208cb13e4f010d45349300133aa619dbS3Bucket7730ADC7Ref": Object {
+            "Ref": "AssetParameters237c2e9c53b6938b2e334b1d6e28a125208cb13e4f010d45349300133aa619dbS3Bucket855BB8C0",
+          },
+          "referencetoTestStackAssetParameters237c2e9c53b6938b2e334b1d6e28a125208cb13e4f010d45349300133aa619dbS3VersionKey30EAB118Ref": Object {
+            "Ref": "AssetParameters237c2e9c53b6938b2e334b1d6e28a125208cb13e4f010d45349300133aa619dbS3VersionKey8B020FCB",
+          },
+          "referencetoTestStackAssetParameters4cd61014b71160e8c66fe167e43710d5ba068b80b134e9bd84508cf9238b2392S3Bucket3CE9010DRef": Object {
+            "Ref": "AssetParameters4cd61014b71160e8c66fe167e43710d5ba068b80b134e9bd84508cf9238b2392S3BucketBF7A7F3F",
+          },
+          "referencetoTestStackAssetParameters4cd61014b71160e8c66fe167e43710d5ba068b80b134e9bd84508cf9238b2392S3VersionKey92D2B161Ref": Object {
+            "Ref": "AssetParameters4cd61014b71160e8c66fe167e43710d5ba068b80b134e9bd84508cf9238b2392S3VersionKeyFAF93626",
+          },
+          "referencetoTestStackAssetParameters62ba450e29370045d0b8cad2a9897475c9d73c9608a0960b5d21ab3c8d55c562S3BucketA428D07ERef": Object {
+            "Ref": "AssetParameters62ba450e29370045d0b8cad2a9897475c9d73c9608a0960b5d21ab3c8d55c562S3Bucket569E6171",
+          },
+          "referencetoTestStackAssetParameters62ba450e29370045d0b8cad2a9897475c9d73c9608a0960b5d21ab3c8d55c562S3VersionKey0FBB518FRef": Object {
+            "Ref": "AssetParameters62ba450e29370045d0b8cad2a9897475c9d73c9608a0960b5d21ab3c8d55c562S3VersionKeyEAD63CBA",
+          },
+          "referencetoTestStackAssetParameters6def8e1593405945ef7294b7497c96fe1cfb8aa1ec937b4c46c3b6b0f1f42c99S3Bucket9191B54ARef": Object {
+            "Ref": "AssetParameters6def8e1593405945ef7294b7497c96fe1cfb8aa1ec937b4c46c3b6b0f1f42c99S3Bucket54D5E7A0",
+          },
+          "referencetoTestStackAssetParameters6def8e1593405945ef7294b7497c96fe1cfb8aa1ec937b4c46c3b6b0f1f42c99S3VersionKeyE7DA8F65Ref": Object {
+            "Ref": "AssetParameters6def8e1593405945ef7294b7497c96fe1cfb8aa1ec937b4c46c3b6b0f1f42c99S3VersionKey66EC4A49",
+          },
+          "referencetoTestStackAssetParameters8bda025b845a88fbeb54ef75e52048aa9f3378463116cb413f12f6014673a59aS3BucketE520C8ACRef": Object {
+            "Ref": "AssetParameters8bda025b845a88fbeb54ef75e52048aa9f3378463116cb413f12f6014673a59aS3BucketFD1BBE00",
+          },
+          "referencetoTestStackAssetParameters8bda025b845a88fbeb54ef75e52048aa9f3378463116cb413f12f6014673a59aS3VersionKey3934ACEFRef": Object {
+            "Ref": "AssetParameters8bda025b845a88fbeb54ef75e52048aa9f3378463116cb413f12f6014673a59aS3VersionKey6E54DC76",
+          },
+          "referencetoTestStackAssetParametersbf49f044a93db2f0cb00247718a2024be235f0d7aa615e20e83096bf6f5aaeddS3Bucket40824A28Ref": Object {
+            "Ref": "AssetParametersbf49f044a93db2f0cb00247718a2024be235f0d7aa615e20e83096bf6f5aaeddS3Bucket8A70661D",
+          },
+          "referencetoTestStackAssetParametersbf49f044a93db2f0cb00247718a2024be235f0d7aa615e20e83096bf6f5aaeddS3VersionKey66A57989Ref": Object {
+            "Ref": "AssetParametersbf49f044a93db2f0cb00247718a2024be235f0d7aa615e20e83096bf6f5aaeddS3VersionKey8B83178C",
+          },
+          "referencetoTestStackAssetParametersc8a16e9c8b33618af3c6d4d9889a75e5020205e5b4c66ea747c212fb1d45eb0aS3Bucket22082DCCRef": Object {
+            "Ref": "AssetParametersc8a16e9c8b33618af3c6d4d9889a75e5020205e5b4c66ea747c212fb1d45eb0aS3Bucket07C1BEDA",
+          },
+          "referencetoTestStackAssetParametersc8a16e9c8b33618af3c6d4d9889a75e5020205e5b4c66ea747c212fb1d45eb0aS3VersionKey68CD6494Ref": Object {
+            "Ref": "AssetParametersc8a16e9c8b33618af3c6d4d9889a75e5020205e5b4c66ea747c212fb1d45eb0aS3VersionKey6CE878F4",
+          },
+          "referencetoTestStackAssetParameterse9882ab123687399f934da0d45effe675ecc8ce13b40cb946f3e1d6141fe8d68S3BucketA804A5FBRef": Object {
+            "Ref": "AssetParameterse9882ab123687399f934da0d45effe675ecc8ce13b40cb946f3e1d6141fe8d68S3BucketAEADE8C7",
+          },
+          "referencetoTestStackAssetParameterse9882ab123687399f934da0d45effe675ecc8ce13b40cb946f3e1d6141fe8d68S3VersionKey4AAED7CARef": Object {
+            "Ref": "AssetParameterse9882ab123687399f934da0d45effe675ecc8ce13b40cb946f3e1d6141fe8d68S3VersionKeyE415415F",
+          },
+          "referencetoTestStackFraudDetectionDataBucket5074DA03Arn": Object {
+            "Fn::GetAtt": Array [
+              "FraudDetectionDataBucketD44FA8F5",
+              "Arn",
+            ],
+          },
+          "referencetoTestStackFraudDetectionDataBucket5074DA03Ref": Object {
+            "Ref": "FraudDetectionDataBucketD44FA8F5",
+          },
+          "referencetoTestStackFraudDetectionVpc77C1D240Ref": Object {
+            "Ref": "FraudDetectionVpc5B01149C",
+          },
+          "referencetoTestStackFraudDetectionVpcPrivateSubnet1Subnet5026A86ARef": Object {
+            "Ref": "FraudDetectionVpcPrivateSubnet1SubnetC2667FEC",
+          },
+          "referencetoTestStackTransactionGraphCluster8DEA1354ClusterResourceId": Object {
+            "Fn::GetAtt": Array [
+              "TransactionGraphCluster",
+              "ClusterResourceId",
+            ],
+          },
+          "referencetoTestStackTransactionGraphCluster8DEA1354Endpoint": Object {
+            "Fn::GetAtt": Array [
+              "TransactionGraphCluster",
+              "Endpoint",
+            ],
+          },
+        },
+        "TemplateURL": Object {
+          "Fn::Join": Array [
+            "",
+            Array [
+              "https://s3.",
+              Object {
+                "Ref": "AWS::Region",
+              },
+              ".",
+              Object {
+                "Ref": "AWS::URLSuffix",
+              },
+              "/",
+              Object {
+                "Ref": "AssetParameters7e0747b41c8fed3ae2294ac958e5e47c0716507efe50d535527b6cabbf24f9ecS3Bucket2F47CA69",
+              },
+              "/",
+              Object {
+                "Fn::Select": Array [
+                  0,
+                  Object {
+                    "Fn::Split": Array [
+                      "||",
+                      Object {
+                        "Ref": "AssetParameters7e0747b41c8fed3ae2294ac958e5e47c0716507efe50d535527b6cabbf24f9ecS3VersionKeyF7C363AE",
+                      },
+                    ],
+                  },
+                ],
+              },
+              Object {
+                "Fn::Select": Array [
+                  1,
+                  Object {
+                    "Fn::Split": Array [
+                      "||",
+                      Object {
+                        "Ref": "AssetParameters7e0747b41c8fed3ae2294ac958e5e47c0716507efe50d535527b6cabbf24f9ecS3VersionKeyF7C363AE",
+                      },
+                    ],
+                  },
+                ],
+              },
+            ],
+          ],
+        },
+      },
+      "Type": "AWS::CloudFormation::Stack",
+    },
+  },
+}
+`;
