@@ -1,0 +1,31 @@
+type Transaction @aws_iam @aws_api_key {
+  id: String!
+  amount: Float!
+  timestamp: AWSTimestamp!
+  productCD: String
+  card1: String
+  card2: String
+  card3: String
+  card4: String
+  card5: String
+  card6: String
+  addr1: String
+  addr2: String
+  dist1: String
+  dist2: String
+  pEmaildomain: String
+  rEmaildomain: String
+  isFraud: Boolean!
+}
+
+type TransactionStats @aws_iam @aws_api_key {
+  totalCount: Int!
+  totalAmount: Float!
+  fraudCount: Int!
+  totalFraudAmount: Float!
+}
+
+type Query @aws_iam @aws_api_key {
+  getTransactionStats(start: Int, end: Int): TransactionStats
+  getFraudTransactions(start: Int, end: Int): [ Transaction ]
+}
