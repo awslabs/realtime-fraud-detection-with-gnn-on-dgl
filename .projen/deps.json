@@ -104,6 +104,11 @@
       "type": "runtime"
     },
     {
+      "name": "@aws-cdk/aws-certificatemanager",
+      "version": "1.91.0",
+      "type": "runtime"
+    },
+    {
       "name": "@aws-cdk/aws-cloudfront-origins",
       "version": "1.91.0",
       "type": "runtime"
@@ -180,6 +185,16 @@
     },
     {
       "name": "@aws-cdk/aws-neptune",
+      "version": "1.91.0",
+      "type": "runtime"
+    },
+    {
+      "name": "@aws-cdk/aws-route53-targets",
+      "version": "1.91.0",
+      "type": "runtime"
+    },
+    {
+      "name": "@aws-cdk/aws-route53",
       "version": "1.91.0",
       "type": "runtime"
     },
