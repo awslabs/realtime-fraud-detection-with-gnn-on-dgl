@@ -76,19 +76,44 @@ export class FraudDetectionStack extends Stack {
       visibilityTimeout: Duration.seconds(60),
     });
 
+    const interParameterGroups = [
+      {
+        Label: { default: 'The configuration of graph database Neptune' },
+        Parameters: [neptuneInstanceType.logicalId],
+      },
+    ];
+
+    let customDomain: string | undefined;
+    let r53HostZoneId: string | undefined;
+    if ('aws-cn' === this.node.tryGetContext('TargetPartition') ||
+      (/true/i).test(this.node.tryGetContext('EnableDashboardCustomDomain'))) {
+      const dashboardDomainNamePara = new CfnParameter(this, 'DashboardDomain', {
+        description: 'Custom domain name for dashboard',
+        type: 'String',
+        allowedPattern: '(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]',
+      });
+      const r53HostZoneIdPara = new CfnParameter(this, 'Route53HostedZoneId', {
+        type: 'AWS::Route53::HostedZone::Id',
+        description: 'Route53 public hosted zone ID of given domain',
+      });
+      interParameterGroups.push({
+        Label: { default: 'The dashboard configuration' },
+        Parameters: [dashboardDomainNamePara.logicalId, r53HostZoneIdPara.logicalId],
+      });
+      customDomain = dashboardDomainNamePara.valueAsString;
+      r53HostZoneId = r53HostZoneIdPara.valueAsString;
+    }
+
     new TransactionDashboardStack(this, 'dashboard', {
       vpc,
       queue: tranQueue,
+      customDomain: customDomain,
+      r53HostZoneId: r53HostZoneId,
     });
 
     this.templateOptions.metadata = {
       'AWS::CloudFormation::Interface': {
-        ParameterGroups: [
-          {
-            Label: { default: 'The configuration of graph database Neptune' },
-            Parameters: [neptuneInstanceType.logicalId],
-          },
-        ],
+        ParameterGroups: interParameterGroups,
       },
     };
     this.templateOptions.description = `(SO8013) - Real-time Fraud Detection with Graph Neural Network on DGL. Template version ${pjson.version}`;
