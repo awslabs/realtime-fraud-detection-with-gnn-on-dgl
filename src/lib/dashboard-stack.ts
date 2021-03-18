@@ -527,6 +527,7 @@ export class TransactionDashboardStack extends NestedStack {
             errorCachingMinTtl: 0,
           },
         ],
+        viewerProtocolPolicy: ViewerProtocolPolicy.ALLOW_ALL,
         originConfigs: [
           {
             s3OriginSource: {
@@ -559,7 +560,6 @@ export class TransactionDashboardStack extends NestedStack {
               compress: true,
               pathPattern: `/${stageName}/*`,
             }],
-            originPath: `/${stageName}/*`,
           },
         ],
       });
