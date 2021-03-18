@@ -151,38 +151,37 @@ def query_target_subgraph(target_id, neighbor_cols, dummied_col):
     
     neighbor_cols = neighbor_cols.split(',') + dummied_col.split(',')
     
-    neighbor_list = set(neighbor_list)
-    for node in neighbor_list:
-        node_dict = g.V().has(id,'t-'+str(node)).valueMap().toList()[0]
-        node_dict = [node_dict.get(key)[0] for key in neighbor_cols]
-        neighbor_dict[str(node)] = node_dict
-    
-    e_t = dt.now()
-    logger.info(f'INSIDE query_target_subgraph: neighbor_dict by 2 step for loop a list, used {(e_t - new_s_t).total_seconds()} seconds. Total test cost {(e_t - s_t).total_seconds()} seconds.')
-    new_s_t = e_t
+    if MAX_FEATURE_NODE < 50:
+        neighbor_list = set(neighbor_list)
+        for node in neighbor_list:
+            node_dict = g.V().has(id,'t-'+str(node)).valueMap().toList()[0]
+            node_dict = [node_dict.get(key)[0] for key in neighbor_cols]
+            neighbor_dict[str(node)] = node_dict
+        
+        e_t = dt.now()
+        logger.info(f'INSIDE query_target_subgraph: neighbor_dict by 2 step for loop a list, used {(e_t - new_s_t).total_seconds()} seconds. Total test cost {(e_t - s_t).total_seconds()} seconds.')
+        new_s_t = e_t
+    else:
+        neighbor_dict = {}
+        target_node_dict = g.V().has(id,'t-'+str(target_name)).valueMap().toList()[0]
+        neighbor_dict[str(target_name)] = [target_node_dict.get(key)[0] for key in neighbor_cols]
 
-
-    # neighbor_dict = {}
-    # target_node_dict = g.V().has(id,'t-'+str(target_name)).valueMap().toList()[0]
-    # neighbor_dict[str(target_name)] = [target_node_dict.get(key)[0] for key in neighbor_cols]
-
-    # node_dict = g.V().has(id,target_id).repeat(both().limit(MAX_FEATURE_NODE)).times(2).elementMap().toList()
-    # for item in node_dict:
-    #     node = item.get(list(item)[0])
-    #     node_value = node[(node.find('-')+1):]
-    #     neighbor_dict[node_value] = [item.get(key) for key in neighbor_cols]
-    # logger.info(len(neighbor_dict))
-    
-    # e_t = dt.now()
-    # logger.info(f'INSIDE query_target_subgraph: neighbor_dict by query once then ETL, used {(e_t - new_s_t).total_seconds()} seconds. Total test cost {(e_t - s_t).total_seconds()} seconds.')
-    # new_s_t = e_t
+        node_dict = g.V().has(id,target_id).repeat(both().limit(MAX_FEATURE_NODE)).times(2).elementMap().toList()
+        for item in node_dict:
+            node = item.get(list(item)[0])
+            node_value = node[(node.find('-')+1):]
+            neighbor_dict[node_value] = [item.get(key) for key in neighbor_cols]
+        logger.info(len(neighbor_dict))
+        
+        e_t = dt.now()
+        logger.info(f'INSIDE query_target_subgraph: neighbor_dict by query once then ETL, used {(e_t - new_s_t).total_seconds()} seconds. Total test cost {(e_t - s_t).total_seconds()} seconds.')
+        new_s_t = e_t
     
     attr_cols = ['val'+str(x) for x in range(1,391)]
     for attr in feature_list:
         attr_name = attr[:attr.find('-')]
         attr_value = attr[(attr.find('-')+1):]
         attr_dict = g.V().has(id,attr).valueMap().toList()[0]
-        # print(attr_dict)
         attr_dict = [attr_dict.get(key)[0] for key in attr_cols]
         attr_input_dict = {}
         attr_input_dict[attr_value] =  attr_dict
@@ -227,7 +226,6 @@ def invoke_endpoint_with_idx(endpointname, target_id, subgraph_dict, n_feats):
     results = json.loads(res_body)
 
     pred_prob = results
-    # print(pred_prob)
 
     return pred_prob
 
@@ -259,7 +257,6 @@ def handler(event, context):
     G_new_s_t = G_e_t
 
     transaction_id = int(target_id[(target_id.find('-')+1):])
-    
     
     pred_prob = invoke_endpoint_with_idx(endpointname = ENDPOINT_NAME, target_id = transaction_id, subgraph_dict = subgraph_dict, n_feats = transaction_embed_value_dict)
     
