@@ -15,7 +15,7 @@ import TextField from '@material-ui/core/TextField';
 import WbIncandescentIcon from '@material-ui/icons/WbIncandescent';
 
 import { API } from 'aws-amplify';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { createQueue } from 'best-queue';
@@ -28,6 +28,7 @@ import {
   SYS_GATEWAY_API_URL,
   DEFAULT_PULLING_INTERVAL,
   DEFAULT_DURATION_TIME,
+  TIME_TYPE,
 } from '../../assets/js/const';
 import { getTransactionStats, getFraudTransactions } from '../../graphql/queries';
 import useWindowSize from '../../hooks/useWindowSize';
@@ -44,6 +45,7 @@ interface FraudType {
   isNew?: boolean;
 }
 
+const CHART_INIT_COUNT = 10;
 // const TIME_INTEVAL = 20 * 1000;
 
 const Dashboard: React.FC = () => {
@@ -62,6 +64,7 @@ const Dashboard: React.FC = () => {
   const [openDialog, setOpenDialog] = useState(false);
   // const [disabledSimulate, setDisabledSimulate] = useState(false);
   const [pollingInterval, setPollingInterval] = useState(DEFAULT_PULLING_INTERVAL);
+  const [pollingChartInterval, setPollingChartInterval] = useState((DEFAULT_DURATION_TIME * 1000) / CHART_INIT_COUNT);
   const [dataDurationTime, setDataDurationTime] = useState(DEFAULT_DURATION_TIME);
 
   // Simulate Input Data
@@ -109,7 +112,6 @@ const Dashboard: React.FC = () => {
   };
 
   const getTransStatData = async (start: number, end: number) => {
-    console.info('start:', start, 'End:', end);
     const statData: any = await API.graphql({
       query: getTransactionStats,
       variables: {
@@ -127,10 +129,10 @@ const Dashboard: React.FC = () => {
     const now = new Date();
     const endTime = now.getTime() / 1000;
     // console.info('endTime:', endTime);
-    const avgTime = dataDurationTime / 10;
+    const avgTime = dataDurationTime / CHART_INIT_COUNT;
     // console.info('avgTime:', avgTime);
     const asyncTasks = [];
-    for (let i = 1; i <= 10; i++) {
+    for (let i = 1; i <= CHART_INIT_COUNT; i++) {
       asyncTasks.push(getTransStatData(endTime - avgTime * i, endTime - avgTime * (i - 1)));
     }
     const queue = createQueue(asyncTasks, {
@@ -141,6 +143,10 @@ const Dashboard: React.FC = () => {
     // console.info('queue:', queue);
     queue.resume();
     queue.then((result) => {
+      let formatStr = TIME_TYPE.SECOND;
+      if (avgTime >= 60) {
+        formatStr = TIME_TYPE.MINUTE;
+      }
       result.sort((a: any, b: any) => (a.start > b.start ? 1 : -1));
       const tmpFraudCountArr: any = [];
       const tmpTotalCountArr: any = [];
@@ -148,7 +154,7 @@ const Dashboard: React.FC = () => {
       result.forEach((element) => {
         tmpFraudCountArr.push(element.fraudCount);
         tmpTotalCountArr.push(element.totalCount);
-        tmpDataTimeArr.push(momentFormatData(new Date(element.end * 1000)));
+        tmpDataTimeArr.push(momentFormatData(new Date(element.end * 1000), formatStr));
       });
       setFraudCountArr(tmpFraudCountArr);
       setTotalCountArr(tmpTotalCountArr);
@@ -156,13 +162,47 @@ const Dashboard: React.FC = () => {
     });
   };
 
-  const getDashboardData = async (isChart = false) => {
+  // Get Chart Data By Interval: durationTime/10
+  // const getChartNextData = async () => {
+
+  // };
+  const getChartNextData = useCallback(async () => {
     const now = new Date();
     // now.setTime(now.getSeconds - )
-    const prevTime = momentFormatData(new Date(), true, -dataDurationTime);
-    const prevChartTime = momentFormatData(new Date(), true, -pollingInterval / 1000);
-    const startTime = new Date(prevTime).getTime();
+    const prevChartTime = momentFormatData(new Date(), TIME_TYPE.WITH_YEAR, -pollingChartInterval / 1000);
     const startChartTime = new Date(prevChartTime).getTime();
+    const endTime = now.getTime();
+    console.info('start:end:', prevChartTime, endTime);
+    const chartData: any = await API.graphql({
+      query: getTransactionStats,
+      variables: {
+        start: Math.floor(startChartTime / 1000),
+        end: Math.round(endTime / 1000),
+      },
+    });
+    setFraudCountArr((prev) => {
+      return [...prev, chartData.data.getTransactionStats.fraudCount];
+    });
+    setTotalCountArr((prev) => {
+      return [...prev, chartData.data.getTransactionStats.totalCount];
+    });
+    setDateTimeArr((prev) => {
+      let formatStr = TIME_TYPE.SECOND;
+      console.info('pollingChartInterval:', pollingChartInterval);
+      if (pollingChartInterval >= 60 * 1000) {
+        formatStr = TIME_TYPE.MINUTE;
+      }
+      return [...prev, momentFormatData(new Date(endTime), formatStr)];
+    });
+  }, [pollingChartInterval]);
+
+  const getDashboardData = async () => {
+    const now = new Date();
+    // now.setTime(now.getSeconds - )
+    const prevTime = momentFormatData(new Date(), TIME_TYPE.WITH_YEAR, -dataDurationTime);
+    // const prevChartTime = momentFormatData(new Date(), true, -pollingInterval / 1000);
+    const startTime = new Date(prevTime).getTime();
+    // const startChartTime = new Date(prevChartTime).getTime();
     const endTime = now.getTime();
     console.info('getTransStats: timeTIME:', startTime, endTime);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -174,13 +214,6 @@ const Dashboard: React.FC = () => {
       },
     });
 
-    const chartData: any = await API.graphql({
-      query: getTransactionStats,
-      variables: {
-        start: Math.floor(startChartTime / 1000),
-        end: Math.round(endTime / 1000),
-      },
-    });
     // if (statData.data.getTransactionStats && statData.data.getTransactionStats.totalCount) {
     //   setDisabledSimulate(true);
     // } else {
@@ -188,17 +221,6 @@ const Dashboard: React.FC = () => {
     // }
 
     if (statData && statData.data && statData.data.getTransactionStats) {
-      if (isChart) {
-        setFraudCountArr((prev) => {
-          return [...prev, chartData.data.getTransactionStats.fraudCount];
-        });
-        setTotalCountArr((prev) => {
-          return [...prev, chartData.data.getTransactionStats.totalCount];
-        });
-        setDateTimeArr((prev) => {
-          return [...prev, momentFormatData(new Date(endTime))];
-        });
-      }
       setFraudCount(statData.data.getTransactionStats.fraudCount);
       setTotalCount(statData.data.getTransactionStats.totalCount);
       setFraudAmount(statData.data.getTransactionStats.totalFraudAmount);
@@ -245,14 +267,25 @@ const Dashboard: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Interval to polling data
+  // Interval to polling Dashboard data
   useEffect(() => {
     const id = setInterval(() => {
-      getDashboardData(true);
+      console.info('GET DATA');
+      getDashboardData();
     }, pollingInterval);
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pollingInterval]);
+
+  // Interval to Polling Chart Data
+  useEffect(() => {
+    const chartIntervalId = setInterval(() => {
+      console.info('GET CHART DATA');
+      getChartNextData();
+    }, pollingChartInterval);
+    return () => clearInterval(chartIntervalId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pollingChartInterval]);
 
   // Change Duration
   const handleChangeDuration = (event: any) => {
@@ -282,8 +315,9 @@ const Dashboard: React.FC = () => {
 
   // Get Dashboard Date when duration changed
   useEffect(() => {
-    getDashboardData(false);
+    getDashboardData();
     buildQueueList();
+    setPollingChartInterval((dataDurationTime / CHART_INIT_COUNT) * 1000);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataDurationTime]);
 
