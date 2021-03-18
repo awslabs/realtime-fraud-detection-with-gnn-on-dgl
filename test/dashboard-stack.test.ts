@@ -996,10 +996,12 @@ function initializeStackWithContextsAndEnvs(context: {} | undefined, env?: {} | 
     removalPolicy: RemovalPolicy.DESTROY,
     visibilityTimeout: Duration.seconds(60),
   });
+  const inferenceArn = new String();
 
   const stack = new TransactionDashboardStack(parentStack, 'DashboardStack', {
     vpc,
     queue,
+    inferenceArn,
   });
   return { stack };
 }

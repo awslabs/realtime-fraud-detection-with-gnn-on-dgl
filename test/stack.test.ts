@@ -191,7 +191,7 @@ describe('fraud detection stack', () => {
   });
 
   test('nested stacks', () => {
-    expect(stack).toCountResources('AWS::CloudFormation::Stack', 2);
+    expect(stack).toCountResources('AWS::CloudFormation::Stack', 3);
   });
 
   test('report error when the specified vpc is without private subnet', () => {

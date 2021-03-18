@@ -83,6 +83,7 @@ import {
   Aws,
   Expiration,
   Fn,
+  Stack,
 } from '@aws-cdk/core';
 import {
   Provider,
@@ -96,6 +97,7 @@ import { artifactsHash } from './utils';
 export interface TransactionDashboardStackStackProps extends NestedStackProps {
   readonly vpc: IVpc;
   readonly queue: IQueue;
+  readonly inferenceArn: String;
 }
 
 export class TransactionDashboardStack extends NestedStack {
@@ -334,6 +336,7 @@ export class TransactionDashboardStack extends NestedStack {
       index: 'gen.py',
       runtime: Runtime.PYTHON_3_8,
       environment: {
+        INFERENCE_ARN: String(props.inferenceArn),
         QUEUE_URL: props.queue.queueUrl,
         DATASET_URL: getDatasetMapping(this).findInMap(Aws.PARTITION, IEEE),
       },
@@ -341,6 +344,16 @@ export class TransactionDashboardStack extends NestedStack {
       memorySize: 3008,
     });
     props.queue.grantSendMessages(tranSimFn);
+    tranSimFn.addToRolePolicy(new PolicyStatement({
+      actions: ['lambda:InvokeFunction'],
+      resources: [
+        Stack.of(this).formatArn({
+          service: 'lambda',
+          resource: '*',
+        }),
+      ],
+    }),
+    );
     const tranSimTask = new (class extends LambdaInvoke {
       public toStateJson(): object {
         return {

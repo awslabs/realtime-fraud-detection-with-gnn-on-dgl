@@ -6,6 +6,7 @@ import { Queue, QueueEncryption } from '@aws-cdk/aws-sqs';
 import { Construct, RemovalPolicy, Stack, StackProps, Duration, CfnParameter } from '@aws-cdk/core';
 import * as pjson from '../../package.json';
 import { TransactionDashboardStack } from './dashboard-stack';
+import { InferenceStack } from './inference-stack';
 import { TrainingStack } from './training-stack';
 
 export class FraudDetectionStack extends Stack {
@@ -76,9 +77,21 @@ export class FraudDetectionStack extends Stack {
       visibilityTimeout: Duration.seconds(60),
     });
 
+    const inferenceStack = new InferenceStack(this, 'inference', {
+      vpc,
+      neptune: neptuneInfo,
+      queue: tranQueue,
+    });
+
+    neptuneInfo.neptuneSG.addIngressRule(inferenceStack.inferenceSG,
+      Port.tcp(Number(neptuneInfo.port)), 'access from inference job.');
+
+    const inferenceStatsFnArn = String(inferenceStack.inferenceStatsFn.functionArn);
+
     new TransactionDashboardStack(this, 'dashboard', {
       vpc,
       queue: tranQueue,
+      inferenceArn: inferenceStatsFnArn,
     });
 
     this.templateOptions.metadata = {
