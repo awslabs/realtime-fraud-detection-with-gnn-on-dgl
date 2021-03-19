@@ -32,11 +32,7 @@ dummied_col = os.environ['DUMMIED_COL']
 sqs = boto3.client('sqs')
 runtime = boto3.client('runtime.sagemaker')
 
-# GremlinUtils.init_statics(globals())
 endpoints = Endpoints(neptune_endpoint = CLUSTER_ENDPOINT, neptune_port = CLUSTER_PORT, region_name = CLUSTER_REGION)
-# gremlin_utils = GremlinUtils(endpoints)
-# conn = gremlin_utils.remote_connection()
-# g = gremlin_utils.traversal_source(connection=conn)
 
 def load_data_from_event(input_event, transactions_id_cols, identities_cols, neighbor_cols, dummied_col):
     """Load and transform event data into correct format for next step subgraph loading and model inference input. 
@@ -304,5 +300,3 @@ def handler(event, context):
     )
     
     return f"Done. with flag:{pred_prob> MODEL_BTW} and pred_prob:  {pred_prob}"
-
-# gremlin_utils.close() 
