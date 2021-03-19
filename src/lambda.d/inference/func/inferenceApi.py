@@ -305,5 +305,4 @@ def handler(event, context):
     
     return f"Done. with flag:{pred_prob> MODEL_BTW} and pred_prob:  {pred_prob}"
 
-
 # gremlin_utils.close() 
