@@ -83,7 +83,6 @@ import {
   Aws,
   Expiration,
   Fn,
-  Stack,
 } from '@aws-cdk/core';
 import {
   Provider,
@@ -325,6 +324,8 @@ export class TransactionDashboardStack extends NestedStack {
 
     const simEnd = new Pass(this, 'Stop generation');
 
+    const inferenceStatsFnArn = String(props.inferenceArn);
+
     const tranSimFn = new PythonFunction(this, 'TransactionSimulatorFunc', {
       entry: path.join(__dirname, '../lambda.d/simulator'),
       layers: [
@@ -336,22 +337,15 @@ export class TransactionDashboardStack extends NestedStack {
       index: 'gen.py',
       runtime: Runtime.PYTHON_3_8,
       environment: {
-        INFERENCE_ARN: String(props.inferenceArn),
-        QUEUE_URL: props.queue.queueUrl,
+        INFERENCE_ARN: inferenceStatsFnArn,
         DATASET_URL: getDatasetMapping(this).findInMap(Aws.PARTITION, IEEE),
       },
       timeout: Duration.minutes(15),
       memorySize: 3008,
     });
-    props.queue.grantSendMessages(tranSimFn);
     tranSimFn.addToRolePolicy(new PolicyStatement({
       actions: ['lambda:InvokeFunction'],
-      resources: [
-        Stack.of(this).formatArn({
-          service: 'lambda',
-          resource: '*',
-        }),
-      ],
+      resources: [inferenceStatsFnArn],
     }),
     );
     const tranSimTask = new (class extends LambdaInvoke {

@@ -36,8 +36,7 @@ endpoints = Endpoints(neptune_endpoint = CLUSTER_ENDPOINT, neptune_port = CLUSTE
 
 def load_data_from_event(input_event, transactions_id_cols, identities_cols, neighbor_cols, dummied_col):
     """Load and transform event data into correct format for next step subgraph loading and model inference input. 
-        input event keys should come from related dataset and following the requirement 
-        from ['https://quip-amazon.com/gWm8AydvuN5O/Data-Schema-Details']
+        input event keys should come from related dataset.]
     
     Example:
     >>> load_data_from_event(event = {"TransactionID":"3163166", "V1":1, ...}, 'card1,card2,,...', 'id_01,id_02,,...', 'C1,C2,C3,C4,C5,C6,...', 'M2_T,M3_F,M3_T,...')

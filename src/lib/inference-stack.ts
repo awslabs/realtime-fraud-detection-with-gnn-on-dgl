@@ -48,7 +48,7 @@ export class InferenceStack extends NestedStack {
         CLUSTER_PORT: props.neptune.port,
         CLUSTER_REGION: String(this.region),
         ENDPOINT_NAME: endpointName,
-        MODEL_BTW: String(0.5),
+        MODEL_BTW: String(0.9),
         QUEUE_URL: props.queue.queueUrl,
         TRANSACTION_ID_COLS: 'card1,card2,card3,card4,card5,card6,ProductCD,addr1,addr2,P_emaildomain,R_emaildomain',
         IDENTITIES_COLS: 'id_01,id_02,id_03,id_04,id_05,id_06,id_07,id_08,id_09,id_10,id_11,id_12,id_13,id_14,id_15,id_16,id_17,id_18,id_19,id_20,id_21,id_22,id_23,id_24,id_25,id_26,id_27,id_28,id_29,id_30,id_31,id_32,id_33,id_34,id_35,id_36,id_37,id_38',

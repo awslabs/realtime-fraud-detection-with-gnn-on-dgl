@@ -246,9 +246,7 @@ describe('training stack', () => {
     expect(stack).toHaveResourceLike('AWS::Lambda::Function', {
       Environment: {
         Variables: {
-          QUEUE_URL: {
-            Ref: 'referencetoTestStackTransQueue6E481EC7Ref',
-          },
+          INFERENCE_ARN: '',
           DATASET_URL: {
             'Fn::FindInMap': [
               'DataSet',

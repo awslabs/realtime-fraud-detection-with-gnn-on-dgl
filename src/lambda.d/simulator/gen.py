@@ -11,10 +11,8 @@ import random
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-sqs = boto3.client('sqs')
 inference = boto3.client('lambda')
 
-QUEUE_URL = environ['QUEUE_URL']
 RAW_DATA_URL = environ['DATASET_URL']
 INFERENCE_ARN = environ['INFERENCE_ARN']
 
