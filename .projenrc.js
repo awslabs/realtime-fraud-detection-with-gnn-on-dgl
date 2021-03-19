@@ -144,13 +144,13 @@ const project = new AwsCdkTypeScriptApp({
   // projenUpgradeSchedule: [ '0 6 * * *' ],                                   /* Customize the projenUpgrade schedule in cron expression. */
   // projenUpgradeSecret: undefined,                                           /* Periodically submits a pull request for projen upgrades (executes `yarn projen:upgrade`). */
   // projenVersion: Semver.latest(),                                           /* Version of projen to install. */
-  pullRequestTemplate: true, /* Include a GitHub pull request template. */
+  pullRequestTemplate: true /* Include a GitHub pull request template. */,
   pullRequestTemplateContents: [
     '',
     '----',
     '',
     '*By submitting this pull request, I confirm that my contribution is made under the terms of the Apache-2.0 license*',
-  ], /* The contents of the pull request template. */
+  ] /* The contents of the pull request template. */,
   // rebuildBot: undefined,                                                    /* Installs a GitHub workflow which is triggered when the comment "@projen rebuild" is added to a pull request. */
   // rebuildBotCommand: 'rebuild',                                             /* The pull request bot command to use in order to trigger a rebuild and commit of the contents of the branch. */
   // releaseBranches: [ 'master' ],                                            /* Branches which trigger a release. */
@@ -210,6 +210,9 @@ const reactPrj = new web.ReactTypeScriptProject({
     '@types/react@^17.0.0',
     '@types/react-dom@^17.0.0',
     'apexcharts@^3.25.0',
+    'aws-sdk@^2.141.0',
+    'aws-appsync@^1.0.0',
+    'graphql-tag@^2.5.0',
     'axios@^0.21.1',
     'aws-amplify@^3.3.22',
     'best-queue@^2.0.1',
