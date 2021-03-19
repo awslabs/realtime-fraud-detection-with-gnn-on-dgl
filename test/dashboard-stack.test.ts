@@ -891,7 +891,7 @@ describe('training stack', () => {
             MaxTTL: 0,
             PathPattern: '/api/*',
             TargetOriginId: 'origin2',
-            ViewerProtocolPolicy: 'redirect-to-https',
+            ViewerProtocolPolicy: 'allow-all',
           },
         ],
         DefaultCacheBehavior: {
@@ -906,7 +906,7 @@ describe('training stack', () => {
           },
           MaxTTL: 2592000,
           TargetOriginId: 'origin1',
-          ViewerProtocolPolicy: 'redirect-to-https',
+          ViewerProtocolPolicy: 'allow-all',
         },
         DefaultRootObject: 'index.html',
         Enabled: true,
@@ -974,8 +974,6 @@ describe('training stack', () => {
               ],
             },
             Id: 'origin2',
-            OriginPath: '/api/*',
-
           },
         ],
       },

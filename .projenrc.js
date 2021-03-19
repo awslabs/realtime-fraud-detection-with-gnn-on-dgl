@@ -144,8 +144,13 @@ const project = new AwsCdkTypeScriptApp({
   // projenUpgradeSchedule: [ '0 6 * * *' ],                                   /* Customize the projenUpgrade schedule in cron expression. */
   // projenUpgradeSecret: undefined,                                           /* Periodically submits a pull request for projen upgrades (executes `yarn projen:upgrade`). */
   // projenVersion: Semver.latest(),                                           /* Version of projen to install. */
-  // pullRequestTemplate: true,                                                /* Include a GitHub pull request template. */
-  // pullRequestTemplateContents: undefined,                                   /* The contents of the pull request template. */
+  pullRequestTemplate: true, /* Include a GitHub pull request template. */
+  pullRequestTemplateContents: [
+    '',
+    '----',
+    '',
+    '*By submitting this pull request, I confirm that my contribution is made under the terms of the Apache-2.0 license*',
+  ], /* The contents of the pull request template. */
   // rebuildBot: undefined,                                                    /* Installs a GitHub workflow which is triggered when the comment "@projen rebuild" is added to a pull request. */
   // rebuildBotCommand: 'rebuild',                                             /* The pull request bot command to use in order to trigger a rebuild and commit of the contents of the branch. */
   // releaseBranches: [ 'master' ],                                            /* Branches which trigger a release. */
