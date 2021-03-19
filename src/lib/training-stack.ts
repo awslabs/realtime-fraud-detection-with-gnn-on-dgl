@@ -651,7 +651,7 @@ export class TrainingStack extends NestedStack {
       ignoreMode: IgnoreMode.GLOB,
       buildArgs: {
         IMAGE_REPO: this.node.tryGetContext('TRAINING_IMAGE_REPO') ??
-          (this.node.tryGetContext('targetPartition') === 'aws-cn' ? '727897471807.dkr.ecr.cn-northwest-1.amazonaws.com.cn' : undefined),
+          (this.node.tryGetContext('TargetPartition') === 'aws-cn' ? '727897471807.dkr.ecr.cn-northwest-1.amazonaws.com.cn' : undefined),
       },
     };
   }

@@ -2,7 +2,7 @@ import '@aws-cdk/assert/jest';
 import { ResourcePart } from '@aws-cdk/assert/lib/assertions/have-resource';
 import { Vpc } from '@aws-cdk/aws-ec2';
 import { Queue, QueueEncryption } from '@aws-cdk/aws-sqs';
-import { App, Stack, RemovalPolicy, Duration } from '@aws-cdk/core';
+import { App, Stack, RemovalPolicy, Duration, CfnParameter } from '@aws-cdk/core';
 import { TransactionDashboardStack } from '../src/lib/dashboard-stack';
 
 describe('training stack', () => {
@@ -793,10 +793,62 @@ describe('training stack', () => {
     }, ResourcePart.CompleteDefinition);
   });
 
+  test('cloudfront with custom domain in standarnd partition', () => {
+    const app = new App({});
+    const parentStack = new Stack(app, 'TestStack');
+    const dashboardDomainNamePara = new CfnParameter(parentStack, 'DashboardDomain', {
+      type: 'String',
+    });
+    const r53HostZoneIdPara = new CfnParameter(parentStack, 'Route53HostedZoneId', {
+      type: 'AWS::Route53::HostedZone::Id',
+    });
+
+    ({ stack } = initializeStackWithContextsAndEnvs({}, undefined, parentStack,
+      dashboardDomainNamePara.valueAsString, r53HostZoneIdPara.valueAsString));
+
+    expect(stack).toHaveResourceLike('AWS::CloudFront::Distribution', {
+      DistributionConfig: {
+        ViewerCertificate: {
+          AcmCertificateArn: {
+            'Fn::GetAtt': [
+              'CustomDomainCertificateForCloudFrontCertificateRequestorResource54BD7C29',
+              'Arn',
+            ],
+          },
+          MinimumProtocolVersion: 'TLSv1.2_2019',
+          SslSupportMethod: 'sni-only',
+        },
+      },
+    });
+
+    //TODO: Stack.resolve does not work if there is no a precede expection!!!
+    expect(stack).toHaveResourceLike('AWS::CloudFront::Distribution', {
+      DistributionConfig: {
+        Aliases: [
+          stack.resolve(dashboardDomainNamePara.valueAsString),
+        ],
+
+      },
+    });
+  });
+
   test('distributed dashboard website by s3 and cloudfront in aws-cn regions', () => {
+    const app = new App({
+      context: {
+        TargetPartition: 'aws-cn',
+      },
+    });
+    const parentStack = new Stack(app, 'TestStack');
+    const dashboardDomainNamePara = new CfnParameter(parentStack, 'DashboardDomain', {
+      type: 'String',
+    });
+    const r53HostZoneIdPara = new CfnParameter(parentStack, 'Route53HostedZoneId', {
+      type: 'AWS::Route53::HostedZone::Id',
+    });
+
     ({ stack } = initializeStackWithContextsAndEnvs({
-      targetPartition: 'aws-cn',
-    }));
+      TargetPartition: 'aws-cn',
+    }, undefined, parentStack, dashboardDomainNamePara.valueAsString, r53HostZoneIdPara.valueAsString));
 
     expect(stack).toHaveResourceLike('AWS::S3::BucketPolicy', {
       PolicyDocument: {
@@ -872,6 +924,12 @@ describe('training stack', () => {
 
     expect(stack).toHaveResourceLike('AWS::CloudFront::Distribution', {
       DistributionConfig: {
+        Aliases: [
+          stack.resolve(dashboardDomainNamePara.valueAsString),
+        ],
+        ViewerCertificate: {
+          CloudFrontDefaultCertificate: true,
+        },
         CacheBehaviors: [
           {
             AllowedMethods: [
@@ -978,14 +1036,47 @@ describe('training stack', () => {
         ],
       },
     });
+
+    expect(stack).toHaveResourceLike('AWS::Route53::RecordSet', {
+      Name: {
+        'Fn::Join': [
+          '',
+          [
+            stack.resolve(dashboardDomainNamePara.valueAsString),
+            '.',
+          ],
+        ],
+      },
+      Type: 'A',
+      AliasTarget: {
+        DNSName: {
+          'Fn::GetAtt': [
+            'DashboardDistributionCFDistributionEFC4B3CE',
+            'DomainName',
+          ],
+        },
+        HostedZoneId: {
+          'Fn::FindInMap': [
+            'AWSCloudFrontPartitionHostedZoneIdMap',
+            {
+              Ref: 'AWS::Partition',
+            },
+            'zoneId',
+          ],
+        },
+      },
+      HostedZoneId: stack.resolve(r53HostZoneIdPara),
+    });
+
   });
 });
 
-function initializeStackWithContextsAndEnvs(context: {} | undefined, env?: {} | undefined) {
+function initializeStackWithContextsAndEnvs(context: {} | undefined, env?: {} | undefined,
+  _parentStack?: Stack, customDomain?: string, r53HostZoneId?: string) {
   const app = new App({
     context,
   });
-  const parentStack = new Stack(app, 'TestStack', { env: env });
+  const parentStack = _parentStack ?? new Stack(app, 'TestStack', { env: env });
   const vpc = new Vpc(parentStack, 'Vpc');
   const queue = new Queue(parentStack, 'TransQueue', {
     contentBasedDeduplication: true,
@@ -998,6 +1089,8 @@ function initializeStackWithContextsAndEnvs(context: {} | undefined, env?: {} | 
   const stack = new TransactionDashboardStack(parentStack, 'DashboardStack', {
     vpc,
     queue,
+    customDomain,
+    r53HostZoneId,
   });
   return { stack };
 }
