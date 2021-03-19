@@ -19,6 +19,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { createQueue } from 'best-queue';
+import Loader from 'react-loader-spinner';
 
 import {
   momentFormatData,
@@ -196,9 +197,10 @@ const Dashboard: React.FC = () => {
     });
   }, [pollingChartInterval]);
 
-  const getDashboardData = async () => {
+  const getDashboardData = useCallback(async () => {
     const now = new Date();
     // now.setTime(now.getSeconds - )
+    console.info('dataDurationTime:dataDurationTime:dataDurationTime:', dataDurationTime);
     const prevTime = momentFormatData(new Date(), TIME_TYPE.WITH_YEAR, -dataDurationTime);
     // const prevChartTime = momentFormatData(new Date(), true, -pollingInterval / 1000);
     const startTime = new Date(prevTime).getTime();
@@ -213,12 +215,6 @@ const Dashboard: React.FC = () => {
         end: Math.round(endTime / 1000),
       },
     });
-
-    // if (statData.data.getTransactionStats && statData.data.getTransactionStats.totalCount) {
-    //   setDisabledSimulate(true);
-    // } else {
-    //   setDisabledSimulate(false);
-    // }
 
     if (statData && statData.data && statData.data.getTransactionStats) {
       setFraudCount(statData.data.getTransactionStats.fraudCount);
@@ -253,29 +249,21 @@ const Dashboard: React.FC = () => {
         }
       });
     }
-  };
+  }, [dataDurationTime]);
 
   // Resize window
   useEffect(() => {
     setDataHeight(size.height - size.height * 0.42 - 40);
   }, [size]);
 
-  // Get Dashboard Data
-  useEffect(() => {
-    getDashboardData();
-    buildQueueList();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   // Interval to polling Dashboard data
   useEffect(() => {
     const id = setInterval(() => {
-      console.info('GET DATA');
       getDashboardData();
     }, pollingInterval);
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pollingInterval]);
+  }, [pollingInterval, dataDurationTime]);
 
   // Interval to Polling Chart Data
   useEffect(() => {
@@ -483,9 +471,15 @@ const Dashboard: React.FC = () => {
           <Button variant="outlined" onClick={handleClose} color="primary">
             Cancel
           </Button>
-          <Button disabled={loadingSimulate} variant="contained" onClick={simulateData} color="primary" autoFocus>
-            Simulate
-          </Button>
+          {loadingSimulate ? (
+            <Button variant="contained" disabled={true}>
+              <Loader type="ThreeDots" color="#888" height={10} />
+            </Button>
+          ) : (
+            <Button variant="contained" onClick={simulateData} color="primary" autoFocus>
+              Simulate
+            </Button>
+          )}
         </DialogActions>
       </Dialog>
     </div>
