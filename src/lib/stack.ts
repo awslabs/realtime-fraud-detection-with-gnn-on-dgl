@@ -81,6 +81,7 @@ export class FraudDetectionStack extends Stack {
       vpc,
       neptune: neptuneInfo,
       queue: tranQueue,
+      preprocessingJob_id_cols: trainingStack.preprocessingJob_id_cols,
     });
 
     neptuneInfo.neptuneSG.addIngressRule(inferenceStack.inferenceSG,

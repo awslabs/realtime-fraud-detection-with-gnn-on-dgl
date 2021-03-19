@@ -54,6 +54,7 @@ function initializeStackWithContextsAndEnvs(context: {} | undefined, env?: {} | 
     removalPolicy: RemovalPolicy.DESTROY,
     visibilityTimeout: Duration.seconds(60),
   });
+  const preprocessingJob_id_cols = new String();
 
   const stack = new InferenceStack(parentStack, 'inferenceStack', {
     vpc,
@@ -63,6 +64,7 @@ function initializeStackWithContextsAndEnvs(context: {} | undefined, env?: {} | 
       clusterResourceId: 'cluster-12345',
     },
     queue,
+    preprocessingJob_id_cols,
   });
   return { stack };
 }
