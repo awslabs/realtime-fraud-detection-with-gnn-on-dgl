@@ -33,7 +33,7 @@ def handler(event, context):
     mergedDF = pd.merge(tranDF, idDF, on='TransactionID', how='left')
     
     while True:
-        if (time.time() - start) >= int(event['duration']) * 1000:
+        if int(time.time() - start) >= int(event['duration']):
             logger.info(f'The simulation will be interruptted after exceeding the specified duration {event["duration"]} seconds.')
             break
         
