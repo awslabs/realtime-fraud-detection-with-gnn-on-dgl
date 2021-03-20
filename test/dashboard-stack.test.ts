@@ -1088,12 +1088,9 @@ function initializeStackWithContextsAndEnvs(context: {} | undefined, env?: {} | 
   const stack = new TransactionDashboardStack(parentStack, 'DashboardStack', {
     vpc,
     queue,
-<<<<<<< HEAD
     inferenceArn,
-=======
     customDomain,
     r53HostZoneId,
->>>>>>> ef1f3eb1627f1707dc58ffd613c8403ec7e7067c
   });
   return { stack };
 }

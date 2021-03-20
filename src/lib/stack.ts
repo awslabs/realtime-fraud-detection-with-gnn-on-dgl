@@ -77,7 +77,6 @@ export class FraudDetectionStack extends Stack {
       visibilityTimeout: Duration.seconds(60),
     });
 
-<<<<<<< HEAD
     const inferenceStack = new InferenceStack(this, 'inference', {
       vpc,
       neptune: neptuneInfo,
@@ -89,7 +88,6 @@ export class FraudDetectionStack extends Stack {
       Port.tcp(Number(neptuneInfo.port)), 'access from inference job.');
 
     const inferenceStatsFnArn = String(inferenceStack.inferenceStatsFn.functionArn);
-=======
     const interParameterGroups = [
       {
         Label: { default: 'The configuration of graph database Neptune' },
@@ -117,17 +115,13 @@ export class FraudDetectionStack extends Stack {
       customDomain = dashboardDomainNamePara.valueAsString;
       r53HostZoneId = r53HostZoneIdPara.valueAsString;
     }
->>>>>>> ef1f3eb1627f1707dc58ffd613c8403ec7e7067c
 
     new TransactionDashboardStack(this, 'dashboard', {
       vpc,
       queue: tranQueue,
-<<<<<<< HEAD
       inferenceArn: inferenceStatsFnArn,
-=======
       customDomain: customDomain,
       r53HostZoneId: r53HostZoneId,
->>>>>>> ef1f3eb1627f1707dc58ffd613c8403ec7e7067c
     });
 
     this.templateOptions.metadata = {

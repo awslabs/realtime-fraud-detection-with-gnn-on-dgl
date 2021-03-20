@@ -102,12 +102,9 @@ import { artifactsHash } from './utils';
 export interface TransactionDashboardStackStackProps extends NestedStackProps {
   readonly vpc: IVpc;
   readonly queue: IQueue;
-<<<<<<< HEAD
   readonly inferenceArn: String;
-=======
   readonly customDomain?: string;
   readonly r53HostZoneId?: string;
->>>>>>> ef1f3eb1627f1707dc58ffd613c8403ec7e7067c
 }
 
 export class TransactionDashboardStack extends NestedStack {
