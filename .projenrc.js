@@ -116,7 +116,7 @@ const project = new AwsCdkTypeScriptApp({
 
   /* NodeProjectOptions */
   // antitamper: true,                                                         /* Checks that after build there are no modified files on git. */
-  // buildWorkflow: undefined,                                                 /* Define a GitHub workflow for building PRs. */
+  buildWorkflow: false, /* Define a GitHub workflow for building PRs. */
   // codeCov: false,                                                           /* Define a GitHub workflow step for sending code coverage metrics to https://codecov.io/ Uses codecov/codecov-action@v1 A secret is required for private repos. Configured with @codeCovTokenSecret. */
   // codeCovTokenSecret: undefined,                                            /* Define the secret name for a specified https://codecov.io/ token A secret is required to send coverage for private repositories. */
   // copyrightOwner: undefined,                                                /* License copyright owner. */
