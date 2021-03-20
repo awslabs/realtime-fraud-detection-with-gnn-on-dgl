@@ -177,7 +177,7 @@ export class ETLByGlue extends Construct {
       },
     });
     const outputPrefix = `${props.s3Prefix ?? ''}processed-data/`;
-    this.preprocessingJob_id_cols = 'card1,card2,card3,card4,card5,card6,ProductCD,addr1,addr2,P_emaildomain,R_emaildomain'
+    this.preprocessingJob_id_cols = 'card1,card2,card3,card4,card5,card6,ProductCD,addr1,addr2,P_emaildomain,R_emaildomain';
     const etlJob = new CfnJob(this, 'PreprocessingJob', {
       command: {
         name: 'glueetl',

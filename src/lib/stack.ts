@@ -77,6 +77,7 @@ export class FraudDetectionStack extends Stack {
       visibilityTimeout: Duration.seconds(60),
     });
 
+<<<<<<< HEAD
     const inferenceStack = new InferenceStack(this, 'inference', {
       vpc,
       neptune: neptuneInfo,
@@ -88,21 +89,50 @@ export class FraudDetectionStack extends Stack {
       Port.tcp(Number(neptuneInfo.port)), 'access from inference job.');
 
     const inferenceStatsFnArn = String(inferenceStack.inferenceStatsFn.functionArn);
+=======
+    const interParameterGroups = [
+      {
+        Label: { default: 'The configuration of graph database Neptune' },
+        Parameters: [neptuneInstanceType.logicalId],
+      },
+    ];
+
+    let customDomain: string | undefined;
+    let r53HostZoneId: string | undefined;
+    if ('aws-cn' === this.node.tryGetContext('TargetPartition') ||
+      (/true/i).test(this.node.tryGetContext('EnableDashboardCustomDomain'))) {
+      const dashboardDomainNamePara = new CfnParameter(this, 'DashboardDomain', {
+        description: 'Custom domain name for dashboard',
+        type: 'String',
+        allowedPattern: '(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]',
+      });
+      const r53HostZoneIdPara = new CfnParameter(this, 'Route53HostedZoneId', {
+        type: 'AWS::Route53::HostedZone::Id',
+        description: 'Route53 public hosted zone ID of given domain',
+      });
+      interParameterGroups.push({
+        Label: { default: 'The dashboard configuration' },
+        Parameters: [dashboardDomainNamePara.logicalId, r53HostZoneIdPara.logicalId],
+      });
+      customDomain = dashboardDomainNamePara.valueAsString;
+      r53HostZoneId = r53HostZoneIdPara.valueAsString;
+    }
+>>>>>>> ef1f3eb1627f1707dc58ffd613c8403ec7e7067c
 
     new TransactionDashboardStack(this, 'dashboard', {
       vpc,
       queue: tranQueue,
+<<<<<<< HEAD
       inferenceArn: inferenceStatsFnArn,
+=======
+      customDomain: customDomain,
+      r53HostZoneId: r53HostZoneId,
+>>>>>>> ef1f3eb1627f1707dc58ffd613c8403ec7e7067c
     });
 
     this.templateOptions.metadata = {
       'AWS::CloudFormation::Interface': {
-        ParameterGroups: [
-          {
-            Label: { default: 'The configuration of graph database Neptune' },
-            Parameters: [neptuneInstanceType.logicalId],
-          },
-        ],
+        ParameterGroups: interParameterGroups,
       },
     };
     this.templateOptions.description = `(SO8013) - Real-time Fraud Detection with Graph Neural Network on DGL. Template version ${pjson.version}`;

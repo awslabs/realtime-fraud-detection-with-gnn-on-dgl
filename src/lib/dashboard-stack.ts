@@ -17,6 +17,7 @@ import {
   FieldLogLevel,
   AuthorizationType,
 } from '@aws-cdk/aws-appsync';
+import { Certificate, DnsValidatedCertificate } from '@aws-cdk/aws-certificatemanager';
 import {
   Distribution,
   ViewerProtocolPolicy,
@@ -28,6 +29,7 @@ import {
   CloudFrontWebDistribution,
   OriginAccessIdentity,
   CloudFrontAllowedMethods,
+  ViewerCertificate,
 } from '@aws-cdk/aws-cloudfront';
 import { S3Origin, HttpOrigin } from '@aws-cdk/aws-cloudfront-origins';
 import { DatabaseCluster } from '@aws-cdk/aws-docdb';
@@ -53,6 +55,8 @@ import { SqsEventSource } from '@aws-cdk/aws-lambda-event-sources';
 import { NodejsFunction } from '@aws-cdk/aws-lambda-nodejs';
 import { PythonFunction, PythonLayerVersion } from '@aws-cdk/aws-lambda-python';
 import { RetentionDays, LogGroup } from '@aws-cdk/aws-logs';
+import { IHostedZone, ARecord, RecordTarget } from '@aws-cdk/aws-route53';
+import { CloudFrontTarget } from '@aws-cdk/aws-route53-targets';
 import { Bucket, BucketEncryption, BlockPublicAccess } from '@aws-cdk/aws-s3';
 import {
   BucketDeployment,
@@ -83,6 +87,8 @@ import {
   Aws,
   Expiration,
   Fn,
+  Resource,
+  Stack,
 } from '@aws-cdk/core';
 import {
   Provider,
@@ -96,7 +102,12 @@ import { artifactsHash } from './utils';
 export interface TransactionDashboardStackStackProps extends NestedStackProps {
   readonly vpc: IVpc;
   readonly queue: IQueue;
+<<<<<<< HEAD
   readonly inferenceArn: String;
+=======
+  readonly customDomain?: string;
+  readonly r53HostZoneId?: string;
+>>>>>>> ef1f3eb1627f1707dc58ffd613c8403ec7e7067c
 }
 
 export class TransactionDashboardStack extends NestedStack {
@@ -484,6 +495,8 @@ export class TransactionDashboardStack extends NestedStack {
       apiStage.stageName,
       //TODO: use IAM instead of API_KEY for authentication
       dashboardApi.apiKey,
+      props.customDomain,
+      props.r53HostZoneId,
     );
 
     new CfnOutput(this, 'DashboardDBEndpoint', {
@@ -501,6 +514,8 @@ export class TransactionDashboardStack extends NestedStack {
     httpEndpoint: string,
     stageName: string,
     apiKey?: string,
+    customDomain?: string,
+    r53HostZoneId?: string,
   ) {
     const websiteBucket = new Bucket(this, 'DashboardUI', {
       removalPolicy: RemovalPolicy.DESTROY,
@@ -510,7 +525,28 @@ export class TransactionDashboardStack extends NestedStack {
     });
 
     let distribution: IDistribution;
-    const isTargetCN = process.env.CDK_DEFAULT_REGION?.startsWith('cn-') || 'aws-cn' === this.node.tryGetContext('targetPartition');
+    const isTargetCN = process.env.CDK_DEFAULT_REGION?.startsWith('cn-') || 'aws-cn' === this.node.tryGetContext('TargetPartition');
+
+    //TODO: improve this tricky for DnsValidatedCertificate's validate
+    class Import extends Resource implements IHostedZone {
+      public readonly hostedZoneId = r53HostZoneId!;
+
+      public get zoneName(): string {
+        return customDomain!;
+      }
+
+      public get hostedZoneArn(): string {
+        return Stack.of(this).formatArn({
+          account: '',
+          region: '',
+          service: 'route53',
+          resource: 'hostedzone',
+          resourceName: r53HostZoneId,
+        });
+      }
+    }
+    const hostedZone = r53HostZoneId ? new Import(this, 'ImportHostedZone') : undefined;
+
     //TODO: use `Distribution` when https://github.com/aws/aws-cdk/issues/13584 is resolved
     if (isTargetCN) {
       const oai = new OriginAccessIdentity(this, 'DashboardWebsiteOAI', {
@@ -535,6 +571,7 @@ export class TransactionDashboardStack extends NestedStack {
           },
         ],
         viewerProtocolPolicy: ViewerProtocolPolicy.ALLOW_ALL,
+        viewerCertificate: ViewerCertificate.fromCloudFrontDefaultCertificate(customDomain!),
         originConfigs: [
           {
             s3OriginSource: {
@@ -571,7 +608,17 @@ export class TransactionDashboardStack extends NestedStack {
         ],
       });
     } else {
+      let cert: Certificate | undefined;
+      if (customDomain && hostedZone) {
+        cert = new DnsValidatedCertificate(this, 'CustomDomainCertificateForCloudFront', {
+          domainName: customDomain,
+          hostedZone: hostedZone,
+          region: 'us-east-1',
+        });
+      }
       distribution = new Distribution(this, 'Distribution', {
+        certificate: cert,
+        domainNames: customDomain ? [customDomain] : [],
         defaultBehavior: {
           origin: new S3Origin(websiteBucket),
           viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
@@ -613,6 +660,14 @@ export class TransactionDashboardStack extends NestedStack {
             ttl: Duration.seconds(0),
           },
         ],
+      });
+    }
+
+    if (hostedZone) {
+      new ARecord(this, 'AliasRecord', {
+        zone: hostedZone,
+        recordName: `${customDomain}.`,
+        target: RecordTarget.fromAlias(new CloudFrontTarget(distribution)),
       });
     }
 

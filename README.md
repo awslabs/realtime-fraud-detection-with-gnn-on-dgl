@@ -50,6 +50,7 @@ You can input below parameters to overrride the default parameters of model trai
 - Install Docker Engine
 - Install the dependencies of solution via executing command `yarn install && npx projen`
 - Initialize the CDK toolkit stack into AWS environment(only for deploying via [AWS CDK][aws-cdk] first time), run `yarn cdk-init`
+- [Optional] [Public hosted zone in Amazon Route 53][create-public-hosted-zone]
 - Authenticate with below ECR repository in your AWS partition
 ```shell
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 763104351884.dkr.ecr.us-east-1.amazonaws.com
@@ -85,10 +86,21 @@ The solution will deploy Neptune cluster with instance class `db.r5.8xlarge` and
 npx cdk deploy --parameters NeptuneInstaneType=db.r5.12xlarge -c NeptuneReplicaCount=2 
 ```
 
+### Deploy it with custom domain of dashboard
+
+If you want use custom domain to access the dashbaord of solution, you can use below options when deploying the solution. NOTE: you need already create a public hosted zone in Route 53, see [Solution prerequisites](#prerequisites) for detail.
+```shell
+npx cdk deploy -c EnableDashboardCustomDomain=true --parameters DashboardDomain=<the custom domain> --parameters Route53HostedZoneId=<hosted zone id of your domain>
+```
+
 ### Deploy it to China regions
 Add below additional context parameters,
+```shell
+npx cdk deploy -c TargetPartition=aws-cn
 ```
-npx cdk deploy -c targetPartition=aws-cn
+**NOTE**: deploying to China region also require below domain parameters, because the CloudFront distribution must be accessed via custom domain.
+```shell
+--parameters DashboardDomain=<the custom domain> --parameters Route53HostedZoneId=<hosted zone id of your domain>
 ```
 
 ## How to test
@@ -120,3 +132,4 @@ This project is licensed under the Apache-2.0 License.
 [configure-aws-cli]: https://docs.aws.amazon.com/zh_cn/cli/latest/userguide/cli-chap-configure.html
 [aws-cdk]: https://aws.amazon.com/cdk/
 [cfn-stack]: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/stacks.html
+[create-public-hosted-zone]: https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/CreatingHostedZone.html
