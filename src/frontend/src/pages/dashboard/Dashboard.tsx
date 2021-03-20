@@ -14,12 +14,12 @@ import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
 import WbIncandescentIcon from '@material-ui/icons/WbIncandescent';
 
-import { API } from 'aws-amplify';
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { createQueue } from 'best-queue';
 import Loader from 'react-loader-spinner';
+import gql from 'graphql-tag';
 
 import {
   momentFormatData,
@@ -38,6 +38,8 @@ import CountCard from './comps/CountCard';
 import RealtimeChart from './comps/RealtimeChart';
 import TransactionList from './comps/TransactionList';
 
+import ClientContext from '../../common/ClientContext';
+
 interface FraudType {
   id: number;
   amount: number;
@@ -50,6 +52,7 @@ const CHART_INIT_COUNT = 10;
 // const TIME_INTEVAL = 20 * 1000;
 
 const Dashboard: React.FC = () => {
+  const client: any = React.useContext(ClientContext);
   const [transList, setTransList] = useState<FraudType[]>([]);
   const [dataHeight, setDataHeight] = useState(300);
   // const [timeRange, setTimeRange] = useState(5);
@@ -113,8 +116,9 @@ const Dashboard: React.FC = () => {
   };
 
   const getTransStatData = async (start: number, end: number) => {
-    const statData: any = await API.graphql({
-      query: getTransactionStats,
+    const query = gql(getTransactionStats);
+    const statData: any = await client?.query({
+      query: query,
       variables: {
         start: Math.floor(start),
         end: Math.round(end),
@@ -174,8 +178,9 @@ const Dashboard: React.FC = () => {
     const startChartTime = new Date(prevChartTime).getTime();
     const endTime = now.getTime();
     console.info('start:end:', prevChartTime, endTime);
-    const chartData: any = await API.graphql({
-      query: getTransactionStats,
+    const queryChart = gql(getTransactionStats);
+    const chartData: any = await client?.query({
+      query: queryChart,
       variables: {
         start: Math.floor(startChartTime / 1000),
         end: Math.round(endTime / 1000),
@@ -195,7 +200,7 @@ const Dashboard: React.FC = () => {
       }
       return [...prev, momentFormatData(new Date(endTime), formatStr)];
     });
-  }, [pollingChartInterval]);
+  }, [pollingChartInterval, client]);
 
   const getDashboardData = useCallback(async () => {
     const now = new Date();
@@ -207,9 +212,10 @@ const Dashboard: React.FC = () => {
     // const startChartTime = new Date(prevChartTime).getTime();
     const endTime = now.getTime();
     console.info('getTransStats: timeTIME:', startTime, endTime);
+    const query = gql(getTransactionStats);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const statData: any = await API.graphql({
-      query: getTransactionStats,
+    const statData: any = await client?.query({
+      query: query,
       variables: {
         start: Math.floor(startTime / 1000),
         end: Math.round(endTime / 1000),
@@ -223,13 +229,22 @@ const Dashboard: React.FC = () => {
       setTotalAmount(statData.data.getTransactionStats.totalAmount);
     }
 
-    const fraudList: any = await API.graphql({
-      query: getFraudTransactions,
+    const queryList = gql(getFraudTransactions);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const fraudList: any = await client?.query({
+      query: queryList,
       variables: {
-        start: Math.round(startTime / 1000),
+        start: Math.floor(startTime / 1000),
         end: Math.round(endTime / 1000),
       },
     });
+    // const fraudList: any = await API.graphql({
+    //   query: getFraudTransactions,
+    //   variables: {
+    //     start: Math.round(startTime / 1000),
+    //     end: Math.round(endTime / 1000),
+    //   },
+    // });
     if (fraudList && fraudList.data && fraudList.data.getFraudTransactions) {
       const tmpTransList = fraudList.data.getFraudTransactions;
       setTransList((prev: FraudType[]) => {
@@ -249,7 +264,7 @@ const Dashboard: React.FC = () => {
         }
       });
     }
-  }, [dataDurationTime]);
+  }, [dataDurationTime, client]);
 
   // Resize window
   useEffect(() => {
