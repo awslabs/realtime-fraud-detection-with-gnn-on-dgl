@@ -37,7 +37,6 @@ yarn-error.log*
 !/.eslintrc.json
 !/.github/dependabot.yml
 !/.github/pull_request_template.md
-!/.github/workflows/build.yml
 !/.mergify.yml
 !/.npmignore
 !/.projen/deps.json

@@ -119,6 +119,16 @@
       "type": "runtime"
     },
     {
+      "name": "aws-appsync",
+      "version": "^1.0.0",
+      "type": "runtime"
+    },
+    {
+      "name": "aws-sdk",
+      "version": "^2.141.0",
+      "type": "runtime"
+    },
+    {
       "name": "axios",
       "version": "^0.21.1",
       "type": "runtime"
@@ -126,6 +136,11 @@
     {
       "name": "best-queue",
       "version": "^2.0.1",
+      "type": "runtime"
+    },
+    {
+      "name": "graphql-tag",
+      "version": "^2.5.0",
       "type": "runtime"
     },
     {

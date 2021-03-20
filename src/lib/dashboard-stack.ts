@@ -490,8 +490,7 @@ export class TransactionDashboardStack extends NestedStack {
       dashboardApi.graphqlUrl,
       httpApi.apiEndpoint,
       apiStage.stageName,
-      //TODO: use IAM instead of API_KEY for authentication
-      dashboardApi.apiKey,
+      undefined,
       props.customDomain,
       props.r53HostZoneId,
     );
