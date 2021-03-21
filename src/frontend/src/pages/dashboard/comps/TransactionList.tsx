@@ -15,6 +15,7 @@ import React, { useEffect, useState } from 'react';
 // import { momentFormatData } from '../../../assets/js/const';
 import moment from 'moment';
 import useWindowSize from '../../../hooks/useWindowSize';
+import { momentFormatData, TIME_TYPE } from '../../../assets/js/const';
 
 const HtmlTooltip = withStyles((theme: Theme) => ({
   tooltip: {
@@ -113,7 +114,8 @@ const TransactionList: React.FC<Props> = (props: Props) => {
                           <b>{row.id}</b>
                         </Typography>
                         <div>
-                          <b>{'Transtion Time:'}</b> <span>{'2021-02-28 12:12:12'}</span>
+                          <b>{'Transaction Time:'}</b>{' '}
+                          <span>{momentFormatData(new Date(row.timestamp * 1000), TIME_TYPE.WITH_YEAR)}</span>
                         </div>
                         <div>
                           <b>{'Amount:'}</b> <span>${row.amount}</span>
@@ -123,10 +125,12 @@ const TransactionList: React.FC<Props> = (props: Props) => {
                         </div>
                         <div>
                           <b>{'Card Info:'}</b>{' '}
-                          <span>{`${row.card4} ${row.card1} ${row.card2} ${row.card3} ${row.card5}`}</span>
+                          <span>{`${row?.card4 || ''} ${row?.card1 || ''} ${row?.card2 || ''} ${row?.card3 || ''} ${
+                            row?.card5 || ''
+                          }`}</span>
                         </div>
                         <div>
-                          <b>{'Address:'}</b> <span>{`${row.addr1} ${row.addr2}`}</span>
+                          <b>{'Address:'}</b> <span>{`${row?.addr1 || ''} ${row?.addr2 || ''}`}</span>
                         </div>
                       </React.Fragment>
                     }
