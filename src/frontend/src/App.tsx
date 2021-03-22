@@ -38,9 +38,9 @@ const App: React.FC = () => {
 
   const buildAppSyncClient = useCallback((configData: any) => {
     axios.get(configData.api_path + '/token').then((tokenData) => {
-      const tokenDate = new Date();
-      // const expireDate = tokenData.data.Expiration;
-      // const tokenDate = new Date(expireDate);
+      // const tokenDate = new Date();
+      const expireDate = tokenData.data.Expiration;
+      const tokenDate = new Date(expireDate.replace(/-/g, '/'));
       tokenDate.setSeconds(tokenDate.getSeconds() + 10);
       setTokenInvalidTime(new Date(tokenDate).getTime());
       // Build AppSync Client
