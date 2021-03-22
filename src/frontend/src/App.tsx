@@ -3,9 +3,9 @@ import Amplify from 'aws-amplify';
 import AWS from 'aws-sdk';
 import axios from 'axios';
 import { AWSAppSyncClient, AUTH_TYPE } from 'aws-appsync';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { HashRouter, Route, Switch } from 'react-router-dom';
-import Swal from 'sweetalert2';
+// import Swal from 'sweetalert2';
 
 import logo from './assets/images/logo.svg';
 
@@ -34,6 +34,40 @@ const App: React.FC = () => {
 
   const [client, setClient] = useState<any>(null);
   const [tokenInvalidTime, setTokenInvalidTime] = useState(0);
+  const [curConfigData, setcurConfigData] = useState(null);
+
+  const buildAppSyncClient = useCallback((configData: any) => {
+    axios.get(configData.api_path + '/token').then((tokenData) => {
+      const tokenDate = new Date();
+      // const expireDate = tokenData.data.Expiration;
+      // const tokenDate = new Date(expireDate);
+      tokenDate.setSeconds(tokenDate.getSeconds() + 10);
+      setTokenInvalidTime(new Date(tokenDate).getTime());
+      // Build AppSync Client
+      setClient(
+        new AWSAppSyncClient({
+          disableOffline: true,
+          url: configData.aws_appsync_graphqlEndpoint,
+          region: configData.aws_appsync_region,
+          auth: {
+            type: AUTH_TYPE.AWS_IAM,
+            credentials: new AWS.Credentials({
+              accessKeyId: tokenData.data.AccessKeyId,
+              secretAccessKey: tokenData.data.SecretAccessKey,
+              sessionToken: tokenData.data.SessionToken,
+            }),
+          },
+        }),
+      );
+      setAppLoading(false);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (curConfigData !== null) {
+      buildAppSyncClient(curConfigData);
+    }
+  }, [curConfigData, buildAppSyncClient]);
 
   useEffect(() => {
     const timeStamp = new Date().getTime();
@@ -49,28 +83,7 @@ const App: React.FC = () => {
         return ConfigObj;
       })
       .then((configData) => {
-        axios.get(configData.api_path + '/token').then((tokenData) => {
-          const expireDate = tokenData.data.Expiration;
-          const tokenDate = new Date(expireDate);
-          // tokenDate.setSeconds(tokenDate.getSeconds() + 10);
-          setTokenInvalidTime(new Date(tokenDate).getTime());
-          // Build AppSync Client
-          setClient(
-            new AWSAppSyncClient({
-              url: configData.aws_appsync_graphqlEndpoint,
-              region: configData.aws_appsync_region,
-              auth: {
-                type: AUTH_TYPE.AWS_IAM,
-                credentials: new AWS.Credentials({
-                  accessKeyId: tokenData.data.AccessKeyId,
-                  secretAccessKey: tokenData.data.SecretAccessKey,
-                  sessionToken: tokenData.data.SessionToken,
-                }),
-              },
-            }),
-          );
-          setAppLoading(false);
-        });
+        setcurConfigData(configData);
       })
       .catch((err) => {
         setAppLoading(false);
@@ -79,32 +92,22 @@ const App: React.FC = () => {
     return () => {
       console.info('clean');
     };
-  }, []);
+  }, [buildAppSyncClient]);
 
   // Check Token Expire
   useEffect(() => {
     const interval = setInterval(() => {
       if (tokenInvalidTime) {
+        console.info('tokenInvalidTime:', tokenInvalidTime);
+        console.info('new Date().getTime():', new Date().getTime());
         if (tokenInvalidTime < new Date().getTime()) {
           clearInterval(interval);
-          Swal.fire({
-            title: 'Session has expired',
-            text: 'To log in again, please click Login Again.',
-            icon: 'warning',
-            showCancelButton: false,
-            confirmButtonColor: '#3085d6',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Login Again',
-          }).then((result) => {
-            if (result.isConfirmed) {
-              window.location.reload();
-            }
-          });
+          buildAppSyncClient(curConfigData);
         }
       }
     }, 3000);
     return () => clearInterval(interval);
-  }, [tokenInvalidTime]);
+  }, [tokenInvalidTime, buildAppSyncClient, curConfigData]);
 
   if (appLoading) {
     return <Loader />;
