@@ -5,7 +5,7 @@ import { Queue, QueueEncryption } from '@aws-cdk/aws-sqs';
 import { App, Stack, RemovalPolicy, Duration, CfnParameter } from '@aws-cdk/core';
 import { TransactionDashboardStack } from '../src/lib/dashboard-stack';
 
-describe('training stack', () => {
+describe('dashboard stack test suite', () => {
   let stack: Stack;
 
   beforeAll(() => {
@@ -358,7 +358,7 @@ describe('training stack', () => {
         },
       ],
       MemorySize: 256,
-      Runtime: 'nodejs12.x',
+      Runtime: 'nodejs14.x',
       Timeout: 60,
       VpcConfig: {
         SecurityGroupIds: [
@@ -738,30 +738,58 @@ describe('training stack', () => {
 
     expect(stack).toHaveResourceLike('Custom::AWS', {
       Create: {
-        service: 'S3',
-        action: 'putObject',
-        parameters: {
-          Bucket: {
-            Ref: 'DashboardUI1FD1D9B2',
-          },
-          Key: 'aws-exports.json',
-        },
-        physicalResourceId: {
-          responsePath: 'ETag',
-        },
+        'Fn::Join': [
+          '',
+          [
+            '{"service":"S3","action":"putObject","parameters":{"Body":"{\\n            \\"api_path\\": \\"/api\\",\\n            \\"aws_project_region\\": \\"',
+            {
+              Ref: 'AWS::Region',
+            },
+            '\\",\\n            \\"aws_appsync_graphqlEndpoint\\": \\"',
+            {
+              'Fn::GetAtt': [
+                'FraudDetectionDashboardAPID13F00C7',
+                'GraphQLUrl',
+              ],
+            },
+            '\\",\\n            \\"aws_appsync_region\\": \\"',
+            {
+              Ref: 'AWS::Region',
+            },
+            '\\",\\n            \\"aws_appsync_authenticationType\\": \\"AWS_IAM\\",\\n            \\"aws_appsync_apiKey\\": \\"undefined\\"\\n          }","Bucket":"',
+            {
+              Ref: 'DashboardUI1FD1D9B2',
+            },
+            '","Key":"aws-exports.json"},"physicalResourceId":{"responsePath":"ETag"}}',
+          ],
+        ],
       },
       Update: {
-        service: 'S3',
-        action: 'putObject',
-        parameters: {
-          Bucket: {
-            Ref: 'DashboardUI1FD1D9B2',
-          },
-          Key: 'aws-exports.json',
-        },
-        physicalResourceId: {
-          responsePath: 'ETag',
-        },
+        'Fn::Join': [
+          '',
+          [
+            '{"service":"S3","action":"putObject","parameters":{"Body":"{\\n            \\"api_path\\": \\"/api\\",\\n            \\"aws_project_region\\": \\"',
+            {
+              Ref: 'AWS::Region',
+            },
+            '\\",\\n            \\"aws_appsync_graphqlEndpoint\\": \\"',
+            {
+              'Fn::GetAtt': [
+                'FraudDetectionDashboardAPID13F00C7',
+                'GraphQLUrl',
+              ],
+            },
+            '\\",\\n            \\"aws_appsync_region\\": \\"',
+            {
+              Ref: 'AWS::Region',
+            },
+            '\\",\\n            \\"aws_appsync_authenticationType\\": \\"AWS_IAM\\",\\n            \\"aws_appsync_apiKey\\": \\"undefined\\"\\n          }","Bucket":"',
+            {
+              Ref: 'DashboardUI1FD1D9B2',
+            },
+            '","Key":"aws-exports.json"},"physicalResourceId":{"responsePath":"ETag"}}',
+          ],
+        ],
       },
       InstallLatestAwsSdk: false,
     });
