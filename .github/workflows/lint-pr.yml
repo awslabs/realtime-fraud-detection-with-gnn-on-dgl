@@ -34,6 +34,9 @@ jobs:
           # Configure which scopes are allowed.
           scopes: |
             deps-dev
+            deps
+            inference
+            dashboard
             model
             core
             ui
