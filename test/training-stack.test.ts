@@ -8,7 +8,7 @@ import { App, Stack } from '@aws-cdk/core';
 import { TrainingStack } from '../src/lib/training-stack';
 import { artifactHash, dirArtifactHash } from '../src/lib/utils';
 
-describe('training stack', () => {
+describe('training stack test suite', () => {
   let stack: TrainingStack;
 
   let scriptHash : string;
@@ -956,7 +956,6 @@ describe('training stack', () => {
     expect(stack).toHaveResourceLike('AWS::Lambda::Function', {
       Code: {
         S3Bucket: {
-          Ref: 'referencetoTestStackAssetParameters0a9e6571fe780c4057a0a25a4a2e4f32e165cc84bb9273e2d607175fc51f49bfS3Bucket301CA049Ref',
         },
       },
       Handler: 'app.handler',
