@@ -175,7 +175,7 @@ const Dashboard: React.FC = () => {
     const now = new Date();
     // now.setTime(now.getSeconds - )
     const prevChartTime = momentFormatData(new Date(), TIME_TYPE.WITH_YEAR, -pollingChartInterval / 1000);
-    const startChartTime = new Date(prevChartTime).getTime();
+    const startChartTime = new Date(prevChartTime.replace(/-/g, '/')).getTime();
     const endTime = now.getTime();
     console.info('start:end:', prevChartTime, endTime);
     const queryChart = gql(getTransactionStats);
@@ -208,7 +208,7 @@ const Dashboard: React.FC = () => {
     console.info('dataDurationTime:dataDurationTime:dataDurationTime:', dataDurationTime);
     const prevTime = momentFormatData(new Date(), TIME_TYPE.WITH_YEAR, -dataDurationTime);
     // const prevChartTime = momentFormatData(new Date(), true, -pollingInterval / 1000);
-    const startTime = new Date(prevTime).getTime();
+    const startTime = new Date(prevTime.replace(/-/g, '/')).getTime();
     // const startChartTime = new Date(prevChartTime).getTime();
     const endTime = now.getTime();
     console.info('getTransStats: timeTIME:', startTime, endTime);
