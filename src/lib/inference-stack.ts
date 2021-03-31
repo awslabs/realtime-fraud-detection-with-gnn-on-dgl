@@ -44,7 +44,7 @@ export class InferenceStack extends NestedStack {
       timeout: Duration.minutes(2),
       memorySize: 512,
       environment: {
-        MAX_FEATURE_NODE: String(10),
+        MAX_FEATURE_NODE: String(30),
         CLUSTER_ENDPOINT: props.neptune.endpoint,
         CLUSTER_PORT: props.neptune.port,
         CLUSTER_REGION: String(this.region),

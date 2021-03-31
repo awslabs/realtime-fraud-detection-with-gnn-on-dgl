@@ -156,38 +156,92 @@ class GraphModelClient:
         
         neighbor_cols = neighbor_cols.split(',') + dummied_col.split(',')
         
-        if MAX_FEATURE_NODE < 50:
-            neighbor_list = set(neighbor_list)
-            for node in neighbor_list:
-                node_dict = g.V().has(id,'t-'+str(node)).valueMap().toList()[0]
-                node_dict = [node_dict.get(key)[0] for key in neighbor_cols]
-                neighbor_dict[str(node)] = node_dict
+        # if MAX_FEATURE_NODE < 50:
+        #     neighbor_list = set(neighbor_list)
+        #     for node in neighbor_list:
+        #         node_dict = g.V().has(id,'t-'+str(node)).valueMap().toList()[0]
+        #         node_dict = [node_dict.get(key)[-1] for key in neighbor_cols]
+        #         neighbor_dict[str(node)] = node_dict
             
-            e_t = dt.now()
-            logger.info(f'INSIDE query_target_subgraph: neighbor_dict by 2 step for loop a list, used {(e_t - new_s_t).total_seconds()} seconds. Total test cost {(e_t - s_t).total_seconds()} seconds.')
-            new_s_t = e_t
-        else:
-            neighbor_dict = {}
-            target_node_dict = g.V().has(id,'t-'+str(target_name)).valueMap().toList()[0]
-            neighbor_dict[str(target_name)] = [target_node_dict.get(key)[0] for key in neighbor_cols]
+        #     e_t = dt.now()
+        #     logger.info(f'INSIDE query_target_subgraph: neighbor_dict by 2 step for loop a list, used {(e_t - new_s_t).total_seconds()} seconds. Total test cost {(e_t - s_t).total_seconds()} seconds.')
+        #     new_s_t = e_t
+        # else:
+        neighbor_dict = {}
+        target_node_dict = g.V().has(id,'t-'+str(target_name)).valueMap().toList()[0]
+        neighbor_dict[str(target_name)] = [target_node_dict.get(key)[-1] for key in neighbor_cols]
 
-            node_dict = g.V().has(id,target_id).repeat(both().limit(MAX_FEATURE_NODE)).times(2).elementMap().toList()
-            for item in node_dict:
-                node = item.get(list(item)[0])
-                node_value = node[(node.find('-')+1):]
-                neighbor_dict[node_value] = [item.get(key) for key in neighbor_cols]
-            logger.info(len(neighbor_dict))
-            
-            e_t = dt.now()
-            logger.info(f'INSIDE query_target_subgraph: neighbor_dict by query once then ETL, used {(e_t - new_s_t).total_seconds()} seconds. Total test cost {(e_t - s_t).total_seconds()} seconds.')
-            new_s_t = e_t
+        node_dict = g.V().has(id,target_id).\
+                    union(__.both().hasLabel('card1').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('card2').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('card3').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('card4').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('card5').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('card6').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('ProductCD').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('addr1').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('addr2').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('P_emaildomain').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('R_emaildomain').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_01').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_02').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_03').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_04').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_05').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_06').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_07').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_08').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_09').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_10').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_11').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_12').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_13').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_14').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_15').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_16').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_17').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_18').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_19').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_20').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_21').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_22').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_23').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_24').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_25').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_26').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_27').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_28').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_29').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_30').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_31').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_32').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_33').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_34').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_35').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_36').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_37').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('id_38').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('DeviceType').both().limit(MAX_FEATURE_NODE),\
+                    both().hasLabel('DeviceInfo').both().limit(MAX_FEATURE_NODE)).elementMap().toList()
+
+        # node_dict = g.V().has(id,target_id).repeat(both().limit(MAX_FEATURE_NODE)).times(2).elementMap().toList()
+
+        for item in node_dict:
+            node = item.get(list(item)[0])
+            node_value = node[(node.find('-')+1):]
+            neighbor_dict[node_value] = [item.get(key) for key in neighbor_cols]
+        logger.info(len(neighbor_dict))
+        
+        e_t = dt.now()
+        logger.info(f'INSIDE query_target_subgraph: neighbor_dict by query once then ETL, used {(e_t - new_s_t).total_seconds()} seconds. Total test cost {(e_t - s_t).total_seconds()} seconds.')
+        new_s_t = e_t
         
         attr_cols = ['val'+str(x) for x in range(1,391)]
         for attr in feature_list:
             attr_name = attr[:attr.find('-')]
             attr_value = attr[(attr.find('-')+1):]
             attr_dict = g.V().has(id,attr).valueMap().toList()[0]
-            attr_dict = [attr_dict.get(key)[0] for key in attr_cols]
+            attr_dict = [attr_dict.get(key)[-1] for key in attr_cols]
             attr_input_dict = {}
             attr_input_dict[attr_value] =  attr_dict
             transaction_embed_value_dict[attr_name] = attr_input_dict
