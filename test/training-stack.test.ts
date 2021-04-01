@@ -3,6 +3,7 @@ import '@aws-cdk/assert/jest';
 import { ResourcePart } from '@aws-cdk/assert/lib/assertions/have-resource';
 import { Vpc } from '@aws-cdk/aws-ec2';
 import { DockerImageAsset } from '@aws-cdk/aws-ecr-assets';
+import { DatabaseCluster, InstanceType } from '@aws-cdk/aws-neptune';
 import { Bucket } from '@aws-cdk/aws-s3';
 import { App, Stack } from '@aws-cdk/core';
 import { TrainingStack } from '../src/lib/training-stack';
@@ -486,38 +487,6 @@ describe('training stack test suite', () => {
           PolicyDocument: {
             Statement: [
               {
-                Action: 'neptune-db:connect',
-                Effect: 'Allow',
-                Resource: {
-                  'Fn::Join': [
-                    '',
-                    [
-                      'arn:',
-                      {
-                        Ref: 'AWS::Partition',
-                      },
-                      ':neptune-db:',
-                      {
-                        Ref: 'AWS::Region',
-                      },
-                      ':',
-                      {
-                        Ref: 'AWS::AccountId',
-                      },
-                      ':cluster-12345/*',
-                    ],
-                  ],
-                },
-              },
-            ],
-            Version: '2012-10-17',
-          },
-          PolicyName: 'neptune',
-        },
-        {
-          PolicyDocument: {
-            Statement: [
-              {
                 Action: 'logs:AssociateKmsKey',
                 Effect: 'Allow',
                 Resource: {
@@ -549,12 +518,41 @@ describe('training stack test suite', () => {
           },
           PolicyName: 'logs',
         },
+
       ],
     });
 
     expect(stack).toHaveResourceLike('AWS::IAM::Policy', {
       PolicyDocument: {
         Statement: [
+          {
+            Action: 'neptune-db:*',
+            Effect: 'Allow',
+            Resource: {
+              'Fn::Join': [
+                '',
+                [
+                  'arn:',
+                  {
+                    Ref: 'AWS::Partition',
+                  },
+                  ':neptune-db:',
+                  {
+                    Ref: 'AWS::Region',
+                  },
+                  ':',
+                  {
+                    Ref: 'AWS::AccountId',
+                  },
+                  ':',
+                  {
+                    Ref: 'referencetoTestStackDatabase1EBED910ClusterResourceId',
+                  },
+                  '/*',
+                ],
+              ],
+            },
+          },
           {
             Action: [
               'glue:BatchDeletePartition',
@@ -898,8 +896,12 @@ describe('training stack test suite', () => {
             ],
           ],
         },
-        '--neptune_endpoint': 'neptune-xxxx.us-east-1.aws.amazon.com',
-        '--neptune_port': '8182',
+        '--neptune_endpoint': {
+          Ref: 'referencetoTestStackDatabase1EBED910Endpoint',
+        },
+        '--neptune_port': {
+          Ref: 'referencetoTestStackDatabase1EBED910Port',
+        },
       },
       GlueVersion: '2.0',
       NumberOfWorkers: 2,
@@ -1088,7 +1090,15 @@ describe('training stack test suite', () => {
             {
               Ref: 'referencetoTestStackBucket80A092C2Ref',
             },
-            '/s3://bucket/object/folder","--temp_folder","/mnt/efs","--neptune_endpoint","neptune-xxxx.us-east-1.aws.amazon.com","--neptune_port","8182","--region","',
+            '/s3://bucket/object/folder","--temp_folder","/mnt/efs","--neptune_endpoint","',
+            {
+              Ref: 'referencetoTestStackDatabase1EBED910Endpoint',
+            },
+            '","--neptune_port","',
+            {
+              Ref: 'referencetoTestStackDatabase1EBED910Port',
+            },
+            '","--region","',
             {
               Ref: 'AWS::Region',
             },
@@ -1313,6 +1323,11 @@ function initializeStackWithContextsAndEnvs(context: {} | undefined, env?: {} | 
   const parentStack = new Stack(app, 'TestStack', { env: env });
   const vpc = new Vpc(parentStack, 'Vpc');
   const bucket = new Bucket(parentStack, 'Bucket');
+  const cluster = new DatabaseCluster(parentStack, 'Database', {
+    vpc,
+    instanceType: InstanceType.R5_LARGE,
+    port: 8182,
+  });
   const accessLogBucket = new Bucket(parentStack, 'AccessLog');
 
   const stack = new TrainingStack(parentStack, 'TestStack', {
@@ -1320,9 +1335,7 @@ function initializeStackWithContextsAndEnvs(context: {} | undefined, env?: {} | 
     bucket,
     accessLogBucket,
     neptune: {
-      endpoint: 'neptune-xxxx.us-east-1.aws.amazon.com',
-      port: '8182',
-      clusterResourceId: 'cluster-12345',
+      cluster,
       loadRole: 'arn:aws::123456789012:role/neptune-role',
       loadObjectPrefix: 's3://bucket/object/folder',
     },

@@ -1,6 +1,6 @@
-import { GatewayVpcEndpointAwsService, Vpc, SecurityGroup, IVpc, ISecurityGroup, Port, FlowLogDestination } from '@aws-cdk/aws-ec2';
+import { GatewayVpcEndpointAwsService, Vpc, FlowLogDestination, SubnetType, IVpc } from '@aws-cdk/aws-ec2';
 import { Role, ServicePrincipal, PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
-import { CfnDBCluster, CfnDBSubnetGroup, CfnDBClusterParameterGroup, CfnDBParameterGroup, CfnDBInstance } from '@aws-cdk/aws-neptune';
+import { ClusterParameterGroup, ParameterGroup, DatabaseCluster, InstanceType, IDatabaseCluster, CfnDBInstance } from '@aws-cdk/aws-neptune';
 import { Bucket, BucketEncryption, IBucket } from '@aws-cdk/aws-s3';
 import { Queue, QueueEncryption } from '@aws-cdk/aws-sqs';
 import { Construct, RemovalPolicy, Stack, StackProps, Duration, CfnParameter } from '@aws-cdk/core';
@@ -86,10 +86,8 @@ export class FraudDetectionStack extends Stack {
       dataColumnsArg: dataColumnsArg,
     });
 
-    neptuneInfo.neptuneSG.addIngressRule(trainingStack.glueJobSG,
-      Port.tcp(Number(neptuneInfo.port)), 'access from glue job.');
-    neptuneInfo.neptuneSG.addIngressRule(trainingStack.loadPropsSG,
-      Port.tcp(Number(neptuneInfo.port)), 'access from load props fargate task.');
+    neptuneInfo.cluster.connections.allowDefaultPortFrom(trainingStack.glueJobSG, 'access from glue job.');
+    neptuneInfo.cluster.connections.allowDefaultPortFrom(trainingStack.loadPropsSG, 'access from load props fargate task.');
 
     const tranQueue = new Queue(this, 'TransQueue', {
       contentBasedDeduplication: true,
@@ -111,14 +109,13 @@ export class FraudDetectionStack extends Stack {
 
     const inferenceStack = new InferenceStack(this, 'inference', {
       vpc,
-      neptune: neptuneInfo,
+      neptune: neptuneInfo.cluster,
       queue: tranQueue,
       sagemakerEndpointName: trainingStack.endpointName,
       dataColumnsArg: dataColumnsArg,
     });
 
-    neptuneInfo.neptuneSG.addIngressRule(inferenceStack.inferenceSG,
-      Port.tcp(Number(neptuneInfo.port)), 'access from inference job.');
+    neptuneInfo.cluster.connections.allowDefaultPortFrom(inferenceStack.inferenceSG, 'access from inference job.');
 
     const inferenceFnArn = inferenceStack.inferenceFn.functionArn;
     const interParameterGroups = [
@@ -167,30 +164,26 @@ export class FraudDetectionStack extends Stack {
   }
 
   private _createGraphDB_Neptune(vpc: IVpc, bucket: IBucket, dataPrefix: string, instanceType: string, replicaCount: number): {
-    endpoint: string;
-    port: string;
-    clusterResourceId: string;
-    neptuneSG: ISecurityGroup;
-    loadRole: string;
+    cluster: IDatabaseCluster;
     loadObjectPrefix: string;
+    loadRole: string;
   } {
     const clusterPort = 8182;
-    const dbSubnetGroup = new CfnDBSubnetGroup(this, 'DBSubnetGroup', {
-      dbSubnetGroupDescription: 'Neptune Subnet Group',
-      subnetIds: vpc.privateSubnets.map(subnet => subnet.subnetId),
-    });
-    const neptuneSG = new SecurityGroup(this, 'NeptuneSG', {
-      vpc: vpc,
-      allowAllOutbound: true,
-    });
-    const clusterParamGroup = new CfnDBClusterParameterGroup(this, 'ClusterParamGroup', {
-      description: 'Neptune Cluster Param Group',
-      family: 'neptune1',
+    const clusterParams = new ClusterParameterGroup(this, 'ClusterParams', {
+      description: 'Cluster parameter group',
       parameters: {
-        neptune_enable_audit_log: 1,
-        neptune_streams: 1,
+        neptune_enable_audit_log: '1',
+        neptune_streams: '1',
       },
     });
+
+    const dbParams = new ParameterGroup(this, 'DBParamGroup', {
+      description: 'Neptune DB Param Group',
+      parameters: {
+        neptune_query_timeout: '600000',
+      },
+    });
+
     const neptuneRole = new Role(this, 'NeptuneBulkLoadRole', {
       assumedBy: new ServicePrincipal('rds.amazonaws.com'),
       inlinePolicies: {
@@ -208,53 +201,30 @@ export class FraudDetectionStack extends Stack {
     });
     const neptuneLoadObjectPrefix = `${dataPrefix}neptune/bulk-load`;
     bucket.grantRead(neptuneRole, `${neptuneLoadObjectPrefix}/*`);
-    const graphDBCluster = new CfnDBCluster(this, 'TransactionGraphCluster', {
-      associatedRoles: [{
-        roleArn: neptuneRole.roleArn,
-      }],
-      dbSubnetGroupName: dbSubnetGroup.ref,
-      vpcSecurityGroupIds: [neptuneSG.securityGroupId],
-      dbClusterParameterGroupName: clusterParamGroup.ref,
-      port: clusterPort,
-      iamAuthEnabled: true,
-      storageEncrypted: true,
-      backupRetentionPeriod: 7,
-    });
-    graphDBCluster.addDependsOn(clusterParamGroup);
-    graphDBCluster.addDependsOn(dbSubnetGroup);
-    const dbParamGroup = new CfnDBParameterGroup(this, 'DBParamGroup', {
-      family: clusterParamGroup.family,
-      description: 'Neptune DB Param Group',
-      parameters: {
-        neptune_query_timeout: 600000,
-      },
-    });
 
-    const primaryDB = new CfnDBInstance(this, 'primary-instance', {
-      dbClusterIdentifier: graphDBCluster.ref,
-      dbInstanceClass: instanceType,
-      dbParameterGroupName: dbParamGroup.ref,
-      autoMinorVersionUpgrade: true,
+    const graphDBCluster = new DatabaseCluster(this, 'TransactionGraphCluster', {
+      vpc,
+      instanceType: InstanceType.of(instanceType),
+      clusterParameterGroup: clusterParams,
+      parameterGroup: dbParams,
+      associatedRoles: [neptuneRole],
+      iamAuthentication: true,
+      storageEncrypted: true,
+      port: clusterPort,
+      vpcSubnets: {
+        subnetType: SubnetType.PRIVATE,
+      },
+      instances: 1 + replicaCount,
+      removalPolicy: RemovalPolicy.DESTROY,
+      backupRetention: Duration.days(7),
     });
-    primaryDB.addDependsOn(graphDBCluster);
-    primaryDB.addDependsOn(dbParamGroup);
-    [...Array(replicaCount).keys()].forEach(idx => {
-      const replica = new CfnDBInstance(this, `replica-${idx}`, {
-        dbClusterIdentifier: graphDBCluster.ref,
-        dbInstanceClass: instanceType,
-        dbInstanceIdentifier: `replica-${idx}`,
-        autoMinorVersionUpgrade: true,
-      });
-      replica.addDependsOn(primaryDB);
-      replica.addDependsOn(graphDBCluster);
-    });
+    graphDBCluster.node.findAll().filter(c => (c as CfnDBInstance).cfnOptions)
+      .forEach(c => (c as CfnDBInstance).autoMinorVersionUpgrade = true);
+
     return {
-      endpoint: graphDBCluster.attrEndpoint,
-      port: String(clusterPort),
-      clusterResourceId: graphDBCluster.attrClusterResourceId,
-      neptuneSG,
-      loadRole: neptuneRole.roleArn,
+      cluster: graphDBCluster,
       loadObjectPrefix: neptuneLoadObjectPrefix,
+      loadRole: neptuneRole.roleArn,
     };
   }
 }
