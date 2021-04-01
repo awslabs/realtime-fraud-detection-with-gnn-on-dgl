@@ -82,7 +82,7 @@ describe('fraud detection stack test suite', () => {
     expect(stack).toHaveResourceLike('AWS::Neptune::DBClusterParameterGroup', {
       Family: 'neptune1',
       Parameters: {
-        neptune_enable_audit_log: 1,
+        neptune_enable_audit_log: '1',
       },
     });
 
@@ -99,10 +99,10 @@ describe('fraud detection stack test suite', () => {
           },
         ],
         DBClusterParameterGroupName: {
-          Ref: 'ClusterParamGroup',
+          Ref: 'ClusterParams0B94958F',
         },
         DBSubnetGroupName: {
-          Ref: 'DBSubnetGroup',
+          Ref: 'TransactionGraphClusterSubnetsC68CE06F',
         },
         IamAuthEnabled: true,
         Port: 8182,
@@ -111,16 +111,14 @@ describe('fraud detection stack test suite', () => {
         VpcSecurityGroupIds: [
           {
             'Fn::GetAtt': [
-              'NeptuneSG31D2E08E',
+              'TransactionGraphClusterSecurityGroupDB59E630',
               'GroupId',
             ],
           },
         ],
       },
-      DependsOn: [
-        'ClusterParamGroup',
-        'DBSubnetGroup',
-      ],
+      UpdateReplacePolicy: 'Delete',
+      DeletionPolicy: 'Delete',
     }, ResourcePart.CompleteDefinition);
 
     expect(stack).toHaveResourceLike('AWS::Neptune::DBInstance', {
@@ -130,34 +128,17 @@ describe('fraud detection stack test suite', () => {
         },
         AutoMinorVersionUpgrade: true,
         DBClusterIdentifier: {
-          Ref: 'TransactionGraphCluster',
+          Ref: 'TransactionGraphClusterA4FB4FE0',
         },
         DBParameterGroupName: {
-          Ref: 'DBParamGroup',
+          Ref: 'DBParamGroupF0CBD6D8',
         },
       },
-      DependsOn: [
-        'DBParamGroup',
-        'TransactionGraphCluster',
-      ],
+      UpdateReplacePolicy: 'Delete',
+      DeletionPolicy: 'Delete',
     }, ResourcePart.CompleteDefinition);
 
     expect(stack).toCountResources('AWS::Neptune::DBInstance', 2);
-    expect(stack).toHaveResourceLike('AWS::Neptune::DBInstance', {
-      Properties: {
-        DBInstanceClass: {
-          Ref: 'NeptuneInstaneType',
-        },
-        DBClusterIdentifier: {
-          Ref: 'TransactionGraphCluster',
-        },
-        DBInstanceIdentifier: 'replica-0',
-      },
-      DependsOn: [
-        'primaryinstance',
-        'TransactionGraphCluster',
-      ],
-    }, ResourcePart.CompleteDefinition);
   });
 
   test('overriding replica count of Neptune cluster', () => {
@@ -175,10 +156,15 @@ describe('fraud detection stack test suite', () => {
   test('ingress rules of neptune SG', () => {
     expect(stack).toHaveResourceLike('AWS::EC2::SecurityGroupIngress', {
       IpProtocol: 'tcp',
-      FromPort: 8182,
+      FromPort: {
+        'Fn::GetAtt': [
+          'TransactionGraphClusterA4FB4FE0',
+          'Port',
+        ],
+      },
       GroupId: {
         'Fn::GetAtt': [
-          'NeptuneSG31D2E08E',
+          'TransactionGraphClusterSecurityGroupDB59E630',
           'GroupId',
         ],
       },
@@ -188,15 +174,25 @@ describe('fraud detection stack test suite', () => {
           'Outputs.TestStacktrainingLoadPropsSG17993BE1GroupId',
         ],
       },
-      ToPort: 8182,
+      ToPort: {
+        'Fn::GetAtt': [
+          'TransactionGraphClusterA4FB4FE0',
+          'Port',
+        ],
+      },
     });
 
     expect(stack).toHaveResourceLike('AWS::EC2::SecurityGroupIngress', {
       IpProtocol: 'tcp',
-      FromPort: 8182,
+      FromPort: {
+        'Fn::GetAtt': [
+          'TransactionGraphClusterA4FB4FE0',
+          'Port',
+        ],
+      },
       GroupId: {
         'Fn::GetAtt': [
-          'NeptuneSG31D2E08E',
+          'TransactionGraphClusterSecurityGroupDB59E630',
           'GroupId',
         ],
       },
@@ -206,7 +202,12 @@ describe('fraud detection stack test suite', () => {
           'Outputs.TestStacktrainingETLCompGlueJobSG3879196AGroupId',
         ],
       },
-      ToPort: 8182,
+      ToPort: {
+        'Fn::GetAtt': [
+          'TransactionGraphClusterA4FB4FE0',
+          'Port',
+        ],
+      },
     });
   });
 
