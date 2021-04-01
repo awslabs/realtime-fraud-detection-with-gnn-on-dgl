@@ -513,7 +513,7 @@ export class TrainingStack extends NestedStack {
             repositoryArn: Repository.arnForLocalRepository('pytorch-inference', this,
               deepLearningImagesMapping.findInMap(Aws.REGION, 'accountId')),
             repositoryName: 'pytorch-inference',
-          }), '1.4.0-cpu-py36-ubuntu16.04'),
+          }), '1.6.0-cpu-py36-ubuntu16.04'),
         mode: Mode.SINGLE_MODEL,
         modelS3Location: S3Location.fromJsonExpression('$.modelPackagingOutput.RepackagedArtifact'),
         environmentVariables: TaskInput.fromObject({
