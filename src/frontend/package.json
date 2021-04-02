@@ -2,8 +2,6 @@
   "name": "fraud-detection-solution-dashboard",
   "description": "Dashboard frontend power by react.",
   "scripts": {
-    "projen": "npx projen",
-    "start": "npx projen start",
     "clobber": "npx projen clobber",
     "compile": "npx projen compile",
     "test:compile": "npx projen test:compile",
@@ -15,7 +13,9 @@
     "watch": "npx projen watch",
     "dev": "npx projen dev",
     "eject": "npx projen eject",
-    "postinstall": "npx projen postinstall"
+    "postinstall": "npx projen postinstall",
+    "projen": "npx projen",
+    "start": "npx projen start"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.11.9",
@@ -27,7 +27,7 @@
     "@types/react-dom": "^17.0.2",
     "@types/react-loader-spinner": "^3.1.3",
     "@types/react-router-dom": "^5.1.7",
-    "projen": "^0.17.0",
+    "projen": "^0.17.20",
     "standard-version": "^9",
     "typescript": "^4.0.3"
   },

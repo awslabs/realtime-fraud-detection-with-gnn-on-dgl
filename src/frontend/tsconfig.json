@@ -37,6 +37,7 @@
     "jsx": "react-jsx"
   },
   "include": [
+    "src/**/*.ts",
     "src"
   ],
   "exclude": [
