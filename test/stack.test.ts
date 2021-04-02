@@ -5,7 +5,7 @@ import * as cxapi from '@aws-cdk/cx-api';
 import { FraudDetectionStack } from '../src/lib/stack';
 import * as mock from './context-provider-mock';
 
-describe('fraud detection stack', () => {
+describe('fraud detection stack test suite', () => {
   let app: App;
   let stack: Stack;
 

@@ -8,7 +8,7 @@ import { App, Stack } from '@aws-cdk/core';
 import { TrainingStack } from '../src/lib/training-stack';
 import { artifactHash, dirArtifactHash } from '../src/lib/utils';
 
-describe('training stack', () => {
+describe('training stack test suite', () => {
   let stack: TrainingStack;
 
   let scriptHash : string;
@@ -870,7 +870,7 @@ describe('training stack', () => {
             {
               Ref: 'AWS::URLSuffix',
             },
-            '/pytorch-inference:1.4.0-cpu-py36-ubuntu16.04","Mode":"SingleModel","ModelDataUrl.$":"$.modelPackagingOutput.RepackagedArtifact","Environment":{"SAGEMAKER_PROGRAM":"fd_sl_deployment_entry_point.py"}}},"ResultSelector":{"ModelArn.$":"$.ModelArn"}},"Create endpoint config":{"Next":"Check the existence of endpoint","Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","ResultPath":"$.endpointConfigOutput","Resource":"arn:',
+            '/pytorch-inference:1.6.0-cpu-py36-ubuntu16.04","Mode":"SingleModel","ModelDataUrl.$":"$.modelPackagingOutput.RepackagedArtifact","Environment":{"SAGEMAKER_PROGRAM":"fd_sl_deployment_entry_point.py"}}},"ResultSelector":{"ModelArn.$":"$.ModelArn"}},"Create endpoint config":{"Next":"Check the existence of endpoint","Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","ResultPath":"$.endpointConfigOutput","Resource":"arn:',
             {
               Ref: 'AWS::Partition',
             },
@@ -956,7 +956,6 @@ describe('training stack', () => {
     expect(stack).toHaveResourceLike('AWS::Lambda::Function', {
       Code: {
         S3Bucket: {
-          Ref: 'referencetoTestStackAssetParameters0a9e6571fe780c4057a0a25a4a2e4f32e165cc84bb9273e2d607175fc51f49bfS3Bucket301CA049Ref',
         },
       },
       Handler: 'app.handler',

@@ -173,6 +173,7 @@ export class TransactionDashboardStack extends NestedStack {
         CA_FILE: rdsCAMapping.findInMap(Aws.PARTITION, caFileKey),
       },
       memorySize: 256,
+      runtime: Runtime.NODEJS_14_X,
       vpc: props.vpc,
       vpcSubnets: props.vpc.selectSubnets({
         subnetType: SubnetType.PRIVATE,
@@ -191,6 +192,7 @@ export class TransactionDashboardStack extends NestedStack {
         CA_FILE: rdsCAMapping.findInMap(Aws.PARTITION, caFileKey),
       },
       memorySize: 256,
+      runtime: Runtime.NODEJS_14_X,
       vpc: props.vpc,
       vpcSubnets: props.vpc.selectSubnets({
         subnetType: SubnetType.PRIVATE,
@@ -315,6 +317,7 @@ export class TransactionDashboardStack extends NestedStack {
         CA_FILE: rdsCAMapping.findInMap(Aws.PARTITION, caFileKey),
       },
       memorySize: 256,
+      runtime: Runtime.NODEJS_14_X,
       vpc: props.vpc,
       vpcSubnets: props.vpc.selectSubnets({
         subnetType: SubnetType.PRIVATE,
@@ -383,6 +386,7 @@ export class TransactionDashboardStack extends NestedStack {
       handler: 'iter',
       timeout: Duration.seconds(30),
       memorySize: 128,
+      runtime: Runtime.NODEJS_14_X,
     });
     const parameterTask = new (class extends LambdaInvoke {
       public toStateJson(): object {
@@ -469,6 +473,7 @@ export class TransactionDashboardStack extends NestedStack {
       },
       memorySize: 256,
       role: tokenFnRole,
+      runtime: Runtime.NODEJS_14_X,
     });
     const tokenFnIntegration = new LambdaProxyIntegration({
       handler: tokenFn,

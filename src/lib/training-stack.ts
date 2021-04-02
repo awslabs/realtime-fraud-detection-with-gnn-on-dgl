@@ -54,6 +54,7 @@ export class TrainingStack extends NestedStack {
       handler: 'normalize',
       timeout: Duration.seconds(60),
       memorySize: 128,
+      runtime: Runtime.NODEJS_14_X,
     });
     const parametersNormalizeTask = new class extends LambdaInvoke {
       public toStateJson(): object {
@@ -110,6 +111,7 @@ export class TrainingStack extends NestedStack {
       handler: 'crawler',
       timeout: stateTimeout,
       memorySize: 128,
+      runtime: Runtime.NODEJS_14_X,
     });
     dataCatalogCrawlerFn.role?.addToPolicy(new PolicyStatement({
       effect: Effect.ALLOW,
@@ -513,7 +515,7 @@ export class TrainingStack extends NestedStack {
             repositoryArn: Repository.arnForLocalRepository('pytorch-inference', this,
               deepLearningImagesMapping.findInMap(Aws.REGION, 'accountId')),
             repositoryName: 'pytorch-inference',
-          }), '1.4.0-cpu-py36-ubuntu16.04'),
+          }), '1.6.0-cpu-py36-ubuntu16.04'),
         mode: Mode.SINGLE_MODEL,
         modelS3Location: S3Location.fromJsonExpression('$.modelPackagingOutput.RepackagedArtifact'),
         environmentVariables: TaskInput.fromObject({
@@ -621,7 +623,7 @@ export class TrainingStack extends NestedStack {
       .next(checkEndpointTask)
       .next(endpointChoice);
 
-    const pipelineStateMachine = new StateMachine(this, 'ModelTrainingPipeline', {
+    new StateMachine(this, 'ModelTrainingPipeline', {
       definition,
       logs: {
         destination: new LogGroup(this, 'FraudDetectionLogGroup', {
@@ -632,15 +634,6 @@ export class TrainingStack extends NestedStack {
       },
       tracingEnabled: true,
     });
-    // TODO: dirty fix, removed it when https://github.com/aws/aws-cdk/issues/11594 is resolved
-    pipelineStateMachine.addToRolePolicy(new PolicyStatement({
-      actions: ['sagemaker:UpdateEndpoint'],
-      resources: [Arn.format({
-        service: 'sagemaker',
-        resource: 'endpoint-config',
-        resourceName: '*',
-      }, Stack.of(this))],
-    }));
   }
 
   _trainingImageAssets(): DockerImageAssetProps {

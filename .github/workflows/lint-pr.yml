@@ -6,7 +6,6 @@ on:
       - opened
       - edited
       - synchronize
-  pull_request: {}
 
 jobs:
   main:
