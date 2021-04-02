@@ -29,6 +29,8 @@
     "src/**/*.ts"
   ],
   "exclude": [
+    "node_modules",
+    "lib",
     "src/frontend",
     "cdk.out"
   ]

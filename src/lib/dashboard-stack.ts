@@ -120,13 +120,11 @@ export class TransactionDashboardStack extends NestedStack {
         username: dbUser,
       },
       storageEncrypted: true,
-      instanceProps: {
-        instanceType: InstanceType.of(InstanceClass.T3, InstanceSize.MEDIUM),
-        vpcSubnets: {
-          subnetType: SubnetType.PRIVATE,
-        },
-        vpc: props.vpc,
+      instanceType: InstanceType.of(InstanceClass.T3, InstanceSize.MEDIUM),
+      vpcSubnets: {
+        subnetType: SubnetType.PRIVATE,
       },
+      vpc: props.vpc,
       removalPolicy: RemovalPolicy.DESTROY,
     });
 
