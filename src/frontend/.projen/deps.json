@@ -144,6 +144,21 @@
       "type": "runtime"
     },
     {
+      "name": "i18next-browser-languagedetector",
+      "version": "^6.1.0",
+      "type": "runtime"
+    },
+    {
+      "name": "i18next-http-backend",
+      "version": "^1.2.1",
+      "type": "runtime"
+    },
+    {
+      "name": "i18next",
+      "version": "^20.1.0",
+      "type": "runtime"
+    },
+    {
       "name": "moment",
       "version": "^2.29.1",
       "type": "runtime"
@@ -169,6 +184,11 @@
     {
       "name": "react-dom",
       "version": "^17.0.1",
+      "type": "runtime"
+    },
+    {
+      "name": "react-i18next",
+      "version": "^11.8.12",
       "type": "runtime"
     },
     {
