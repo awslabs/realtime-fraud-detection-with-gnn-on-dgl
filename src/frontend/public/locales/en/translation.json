@@ -1,0 +1,57 @@
+{
+  "title": "Real-time Fraud Detection with Graph Neural Network on DGL(Demo)",
+  "tips": {
+    "success": "Success",
+    "wait": "Please wait 1 minute to show data"
+  },
+  "durationLabel": "Transcation in",
+  "duration": {
+    "last3minutes": "last 3 minutes",
+    "last5minutes": "last 5 minutes",
+    "last10minutes": "last 10 minutes",
+    "last30minutes": "last 30 minutes",
+    "last1hour": "last 1 hour"
+  },
+  "intervalLabel": "Polling Interval",
+  "interval": {
+    "10seconds": "10 seconds",
+    "20seconds": "20 seconds",
+    "30seconds": "30 seconds",
+    "1minute": "1 minute",
+    "5minute": "5 minute"
+  },
+  "card": {
+    "fraudCount": "Fraud Count",
+    "transcationCount": "Transcation Count",
+    "fraudAmount": "Fraud Amount",
+    "transcationAmount": "Transcation Amount"
+  },
+  "recentFraudTransactions": "Recent Fraud Transactions",
+  "fraudChart": "Fraud",
+  "chartTitle": "Fraud Trends by Time",
+  "table": {
+    "transactionID": "Transaction ID",
+    "transactionTime": "Transaction Time",
+    "amount": "Amount",
+    "productCD": "Product CD",
+    "cardInfo": "Card Info",
+    "address": "Address",
+    "cardNumber": "Card Number",
+    "cardType": "Card Type"
+  },
+  "simulate": {
+    "title": "Simulate Transcation Data",
+    "durationTitle": "Simulation data duration time",
+    "durationTips": "Unit: Second, Min: 300, Max: 900",
+    "concurrentTitle": "Transcation concurrent count",
+    "concurrentTips": "Min: 1, Max: 40",
+    "intervalTitle": "Simulation Interval",
+    "intervalTips": "Unit: Second, Min: 1, Max: 60"
+  },
+  "btn": {
+    "ok": "OK",
+    "simulateData": "Simulate Data",
+    "cancel": "Cancel",
+    "simulate": "Simulate"
+  }
+}

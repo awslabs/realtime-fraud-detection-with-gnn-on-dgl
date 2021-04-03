@@ -1,5 +1,6 @@
 import React from 'react';
 import Chart from 'react-apexcharts';
+import { useTranslation } from 'react-i18next';
 
 interface DataProps {
   height: number;
@@ -9,13 +10,14 @@ interface DataProps {
 }
 
 const RealtimeChart: React.FC<DataProps> = (props: DataProps) => {
+  const { t } = useTranslation();
   const { height, series, categories } = props;
 
   const chartData = {
     series: [
       {
         // color: '#f00',
-        name: 'Fraud',
+        name: t('fraudChart'),
         data: series,
       },
       // {
@@ -45,7 +47,7 @@ const RealtimeChart: React.FC<DataProps> = (props: DataProps) => {
         curve: 'straight',
       },
       title: {
-        text: 'Fraud Trends by Time',
+        text: t('chartTitle'),
         align: 'left',
       },
       grid: {

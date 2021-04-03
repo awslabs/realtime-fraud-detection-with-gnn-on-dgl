@@ -14,8 +14,13 @@ import React, { useEffect, useState } from 'react';
 
 // import { momentFormatData } from '../../../assets/js/const';
 import moment from 'moment';
+import 'moment/locale/zh-cn';
+import 'moment/locale/en-gb';
 import useWindowSize from '../../../hooks/useWindowSize';
 import { momentFormatData, TIME_TYPE } from '../../../assets/js/const';
+import { useTranslation } from 'react-i18next';
+
+import LanguageContext from '../../../common/LanguageContext';
 
 const HtmlTooltip = withStyles((theme: Theme) => ({
   tooltip: {
@@ -64,9 +69,12 @@ interface Props {
 }
 
 const TransactionList: React.FC<Props> = (props: Props) => {
+  const language: any = React.useContext(LanguageContext);
+  const { t } = useTranslation();
   const { transList } = props;
   const classes = useStyles();
   const [tableHeight, settableHeight] = useState(100);
+  const [curMomentLang, setCurMomentLang] = useState('');
 
   const size = useWindowSize();
 
@@ -75,6 +83,15 @@ const TransactionList: React.FC<Props> = (props: Props) => {
     settableHeight(size.height - size.height * 0.5);
   }, [size]);
 
+  useEffect(() => {
+    if (language === 'zh') {
+      setCurMomentLang('zh-cn');
+    }
+    if (language === 'en') {
+      setCurMomentLang('en-gb');
+    }
+  }, [language]);
+
   return (
     <div>
       <TableContainer style={{ maxHeight: tableHeight }} component={Paper}>
@@ -82,22 +99,22 @@ const TransactionList: React.FC<Props> = (props: Props) => {
           <TableHead>
             <TableRow>
               <StyledTableCell>
-                <b>Transaction ID</b>
+                <b>{t('table.transactionID')}</b>
               </StyledTableCell>
               <StyledTableCell align="right">
-                <b>Product CD</b>
+                <b>{t('table.productCD')}</b>
               </StyledTableCell>
               <StyledTableCell align="right">
-                <b>Card Type</b>
+                <b>{t('table.cardType')}</b>
               </StyledTableCell>
               <StyledTableCell align="right">
-                <b>Card Number</b>
+                <b>{t('table.cardNumber')}</b>
               </StyledTableCell>
               <StyledTableCell align="right">
-                <b>Amount</b>
+                <b>{t('table.amount')}</b>
               </StyledTableCell>
               <StyledTableCell align="right">
-                <b>Transaction Time</b>
+                <b>{t('table.transactionTime')}</b>
               </StyledTableCell>
             </TableRow>
           </TableHead>
@@ -111,26 +128,26 @@ const TransactionList: React.FC<Props> = (props: Props) => {
                     title={
                       <React.Fragment>
                         <Typography color="inherit" style={{ fontSize: 18 }}>
-                          <b>{row.id}</b>
+                          <b>{t('table.transactionID')}</b>
                         </Typography>
                         <div>
-                          <b>{'Transaction Time:'}</b>{' '}
+                          <b>{t('table.transactionTime')}:</b>{' '}
                           <span>{momentFormatData(new Date(row.timestamp * 1000), TIME_TYPE.WITH_YEAR)}</span>
                         </div>
                         <div>
-                          <b>{'Amount:'}</b> <span>${row.amount}</span>
+                          <b>{t('table.amount')}:</b> <span>${row.amount}</span>
                         </div>
                         <div>
-                          <b>{'Product CD:'}</b> <span>{row.productCD}</span>
+                          <b>{t('table.productCD')}:</b> <span>{row.productCD}</span>
                         </div>
                         <div>
-                          <b>{'Card Info:'}</b>{' '}
+                          <b>{t('table.cardInfo')}:</b>{' '}
                           <span>{`${row?.card4 || ''} ${row?.card1 || ''} ${row?.card2 || ''} ${row?.card3 || ''} ${
                             row?.card5 || ''
                           }`}</span>
                         </div>
                         <div>
-                          <b>{'Address:'}</b> <span>{`${row?.addr1 || ''} ${row?.addr2 || ''}`}</span>
+                          <b>{t('table.address')}:</b> <span>{`${row?.addr1 || ''} ${row?.addr2 || ''}`}</span>
                         </div>
                       </React.Fragment>
                     }
@@ -145,7 +162,11 @@ const TransactionList: React.FC<Props> = (props: Props) => {
                 <TableCell align="right">{row.card4}</TableCell>
                 <TableCell align="right">{`${row.card1} ${row.card2} ${row.card3} ${row.card5}`}</TableCell>
                 <TableCell align="right">${row.amount}</TableCell>
-                <TableCell align="right">{moment(new Date(row.timestamp * 1000)).fromNow()}</TableCell>
+                <TableCell align="right">
+                  {moment(new Date(row.timestamp * 1000))
+                    .locale(curMomentLang)
+                    .fromNow()}
+                </TableCell>
               </StyledTableRow>
             ))}
           </TableBody>

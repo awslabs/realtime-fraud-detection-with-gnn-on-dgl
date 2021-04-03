@@ -1,4 +1,3 @@
-import NotificationsIcon from '@material-ui/icons/Notifications';
 import Amplify from 'aws-amplify';
 import AWS from 'aws-sdk';
 import axios from 'axios';
@@ -7,8 +6,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { HashRouter, Route, Switch } from 'react-router-dom';
 // import Swal from 'sweetalert2';
 
-import logo from './assets/images/logo.svg';
-
+import FSHeader from './common/FSHeader';
 import DataLoading from './common/Loading';
 
 import Dashboard from './pages/dashboard/Dashboard';
@@ -17,6 +15,7 @@ import SearchList from './pages/list/SearchList';
 
 import { SYS_GATEWAY_API_URL } from './assets/js/const';
 import ClientContext from './common/ClientContext';
+import LanguageContext from './common/LanguageContext';
 
 // Amplify.configure(awsconfig);
 // loading component for suspense fallback
@@ -35,6 +34,7 @@ const App: React.FC = () => {
   const [client, setClient] = useState<any>(null);
   const [tokenInvalidTime, setTokenInvalidTime] = useState(0);
   const [curConfigData, setcurConfigData] = useState(null);
+  const [curLanguage, setCurLanguage] = useState<any>(null);
 
   const buildAppSyncClient = useCallback((configData: any) => {
     axios.get(configData.api_path + '/token').then((tokenData) => {
@@ -115,34 +115,29 @@ const App: React.FC = () => {
 
   return (
     <ClientContext.Provider value={client}>
-      <div className="App">
-        <div className="container">
-          <div className="fs-header">
-            <div className="logo">
-              <img className="img" width="30" alt="solutions" src={logo} />
-              Real-time Fraud Detection with Graph Neural Network on DGL(Demo)
+      <LanguageContext.Provider value={curLanguage}>
+        <div className="App">
+          <div className="container">
+            <FSHeader
+              changeLang={(lang: any) => {
+                setCurLanguage(lang);
+              }}
+            />
+            <div className="fs-body">
+              <HashRouter>
+                <Switch>
+                  <Route exact path="/" component={Dashboard} />
+                  <Route exact path="/list" component={SearchList} />
+                  <Route component={NotFound} />
+                </Switch>
+              </HashRouter>
             </div>
-            <div className="user text-right">
-              <div style={{ fontSize: '14px', marginTop: 7 }}>
-                <NotificationsIcon />
-              </div>
-              {/* <div>Admin User</div> */}
-            </div>
-          </div>
-          <div className="fs-body">
-            <HashRouter>
-              <Switch>
-                <Route exact path="/" component={Dashboard} />
-                <Route exact path="/list" component={SearchList} />
-                <Route component={NotFound} />
-              </Switch>
-            </HashRouter>
-          </div>
-          {/* <div className="fs-footer">
+            {/* <div className="fs-footer">
           © 2008 - 2021, Amazon Web Services, Inc. or its affiliates. All rights reserved.
         </div> */}
+          </div>
         </div>
-      </div>
+      </LanguageContext.Provider>
     </ClientContext.Provider>
   );
 };

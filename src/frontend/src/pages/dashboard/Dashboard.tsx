@@ -15,6 +15,8 @@ import TextField from '@material-ui/core/TextField';
 import WbIncandescentIcon from '@material-ui/icons/WbIncandescent';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
+
 import axios from 'axios';
 import Swal from 'sweetalert2';
 import { createQueue } from 'best-queue';
@@ -52,6 +54,7 @@ const CHART_INIT_COUNT = 10;
 // const TIME_INTEVAL = 20 * 1000;
 
 const Dashboard: React.FC = () => {
+  const { t } = useTranslation();
   const client: any = React.useContext(ClientContext);
   const [transList, setTransList] = useState<FraudType[]>([]);
   const [dataHeight, setDataHeight] = useState(300);
@@ -107,7 +110,13 @@ const Dashboard: React.FC = () => {
         console.info('res:', res);
         setLoadingSimulate(false);
         setOpenDialog(false);
-        Swal.fire('Success', 'Please wait 1 minute to show data', 'success');
+        Swal.fire({
+          title: t('tips.success'),
+          text: t('tips.wait'),
+          icon: 'success',
+          confirmButtonText: t('btn.ok'),
+        });
+        // Swal.fire(t('tips.success'), t('tips.wait'), 'success');
       })
       .catch((err) => {
         setLoadingSimulate(false);
@@ -336,7 +345,7 @@ const Dashboard: React.FC = () => {
     <div>
       <div className="fds-dashboard-search">
         <div className="select">
-          <b>Transcation in: </b>
+          <b>{t('durationLabel')}: </b>
           <Select
             style={{ marginRight: 15 }}
             id="transcation-in-select"
@@ -348,13 +357,14 @@ const Dashboard: React.FC = () => {
             {DURATION_TIME_LIST.map((element, index) => {
               return (
                 <MenuItem key={index} value={element.value}>
-                  {element.name}
+                  {/* {element.name} */}
+                  <Trans i18nKey={`duration.${element.name}`} />
                 </MenuItem>
               );
             })}
           </Select>
 
-          <b>Polling Interval: </b>
+          <b>{t('intervalLabel')}: </b>
           <Select
             variant="outlined"
             labelId="polling-interval"
@@ -365,7 +375,8 @@ const Dashboard: React.FC = () => {
             {POLLING_INTERVAL_LIST.map((element, index) => {
               return (
                 <MenuItem key={index} value={element.value}>
-                  {element.name}
+                  {/* {element.name} */}
+                  <Trans i18nKey={`interval.${element.name}`} />
                 </MenuItem>
               );
             })}
@@ -393,20 +404,24 @@ const Dashboard: React.FC = () => {
             size="small"
             color="primary"
           >
-            Simulate Data
+            {t('btn.simulateData')}
           </Button>
         </div>
       </div>
       <div className="fds-dashboard-summury">
-        <CountCard title={`Fraud Count`} value={fraudCount} bgColor="#da5b47" />
-        <CountCard title={`Transcation Count`} value={totalCount} bgColor="#5494db" />
-        <CountCard title={`Fraud Amount`} value={`$${numberFormatter(fraudAmount, 2)}`} bgColor="#f5bf4c" />
-        <CountCard title={`Transcation Amount`} value={`$${numberFormatter(totalAmount, 2)}`} bgColor="#67c47d" />
+        <CountCard title={t('card.fraudCount')} value={fraudCount} bgColor="#da5b47" />
+        <CountCard title={t('card.transcationCount')} value={totalCount} bgColor="#5494db" />
+        <CountCard title={t('card.fraudAmount')} value={`$${numberFormatter(fraudAmount, 2)}`} bgColor="#f5bf4c" />
+        <CountCard
+          title={t('card.transcationAmount')}
+          value={`$${numberFormatter(totalAmount, 2)}`}
+          bgColor="#67c47d"
+        />
       </div>
       <div>
         <div className="black-item-title">
           <WbIncandescentIcon className="icon" />
-          Recent Fraud Transactions
+          {t('recentFraudTransactions')}
         </div>
         <div className="fds-data-table" style={{ height: dataHeight }}>
           <div className="fds-linechart">
@@ -428,11 +443,11 @@ const Dashboard: React.FC = () => {
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">{'Simulate Transcation Data'}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">{t('simulate.title')}</DialogTitle>
         <DialogContent style={{ width: 500 }}>
           <FormControl fullWidth variant="outlined">
             <div className="form-title">
-              Simulation data duration time: <span>(Unit: Second, Min: 300, Max: 900)</span>
+              {t('simulate.durationTitle')}: <span>({t('simulate.durationTips')})</span>
             </div>
             <TextField
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -441,7 +456,6 @@ const Dashboard: React.FC = () => {
               type="number"
               InputProps={{ inputProps: { min: 300, max: 900 } }}
               value={duration}
-              placeholder="Max: 900 seconds"
               size="small"
               variant="outlined"
               id="Duration"
@@ -449,7 +463,7 @@ const Dashboard: React.FC = () => {
           </FormControl>
           <FormControl fullWidth variant="outlined" style={{ marginTop: 10 }}>
             <div className="form-title">
-              Transcation concurrent count:<span>(Min: 1, Max: 40)</span>
+              {t('simulate.concurrentTitle')}:<span>({t('simulate.concurrentTips')})</span>
             </div>
             <TextField
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -458,7 +472,6 @@ const Dashboard: React.FC = () => {
               type="number"
               InputProps={{ inputProps: { min: 1, max: 40 } }}
               value={concurrent}
-              placeholder="Max: 40"
               size="small"
               variant="outlined"
               id="Concurrent"
@@ -466,7 +479,7 @@ const Dashboard: React.FC = () => {
           </FormControl>
           <FormControl fullWidth variant="outlined" style={{ marginTop: 10 }}>
             <div className="form-title">
-              Simulation Interval:<span>(Unit: Second, Min: 1, Max: 60)</span>
+              {t('simulate.intervalTitle')}:<span>({t('simulate.intervalTips')})</span>
             </div>
             <TextField
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
@@ -475,7 +488,6 @@ const Dashboard: React.FC = () => {
               type="number"
               InputProps={{ inputProps: { min: 1, max: 60 } }}
               value={dataInterval}
-              placeholder="Min: 1, Max: 60"
               size="small"
               variant="outlined"
               id="Interval"
@@ -484,7 +496,7 @@ const Dashboard: React.FC = () => {
         </DialogContent>
         <DialogActions className="padding20">
           <Button variant="outlined" onClick={handleClose} color="primary">
-            Cancel
+            {t('btn.cancel')}
           </Button>
           {loadingSimulate ? (
             <Button variant="contained" disabled={true}>
@@ -492,7 +504,7 @@ const Dashboard: React.FC = () => {
             </Button>
           ) : (
             <Button variant="contained" onClick={simulateData} color="primary" autoFocus>
-              Simulate
+              {t('btn.simulate')}
             </Button>
           )}
         </DialogActions>
