@@ -809,6 +809,7 @@ describe('dashboard stack test suite', () => {
         },
         DistributionPaths: [
           '/index.html',
+          '/locales/*',
           '/aws-exports.json',
         ],
       },
