@@ -16,6 +16,7 @@ import WbIncandescentIcon from '@material-ui/icons/WbIncandescent';
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 
 import axios from 'axios';
 import Swal from 'sweetalert2';
@@ -50,11 +51,16 @@ interface FraudType {
   isNew?: boolean;
 }
 
+interface ParamType {
+  lang: string;
+}
+
 const CHART_INIT_COUNT = 10;
 // const TIME_INTEVAL = 20 * 1000;
 
 const Dashboard: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const param: ParamType = useParams();
   const client: any = React.useContext(ClientContext);
   const [transList, setTransList] = useState<FraudType[]>([]);
   const [dataHeight, setDataHeight] = useState(300);
@@ -81,6 +87,13 @@ const Dashboard: React.FC = () => {
   const [dataInterval, setDataInterval] = useState<string | number>(3); // Unit Seconds, 传给后端需转换成 毫秒
 
   const size = useWindowSize();
+
+  useEffect(() => {
+    if (param.lang) {
+      i18n.changeLanguage(param.lang);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const simulateData = () => {
     if (duration < 300 || duration > 900) {

@@ -11,7 +11,6 @@ import DataLoading from './common/Loading';
 
 import Dashboard from './pages/dashboard/Dashboard';
 import NotFound from './pages/error/NotFound';
-import SearchList from './pages/list/SearchList';
 
 import { SYS_GATEWAY_API_URL } from './assets/js/const';
 import ClientContext from './common/ClientContext';
@@ -127,7 +126,7 @@ const App: React.FC = () => {
               <HashRouter>
                 <Switch>
                   <Route exact path="/" component={Dashboard} />
-                  <Route exact path="/list" component={SearchList} />
+                  <Route exact path="/dashboard/:lang" component={Dashboard} />
                   <Route component={NotFound} />
                 </Switch>
               </HashRouter>
