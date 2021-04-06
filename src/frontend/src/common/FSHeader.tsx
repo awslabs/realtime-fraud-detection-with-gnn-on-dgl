@@ -55,7 +55,8 @@ const FSHeader: React.FC<HeaderProps> = ({ changeLang }) => {
     } else {
       setCurLanguage(LanguageList[0]);
     }
-  }, [i18n, changeLang]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [i18n.language]);
 
   return (
     <div className="fs-header">
