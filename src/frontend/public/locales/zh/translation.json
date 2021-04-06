@@ -1,5 +1,5 @@
 {
-  "title": "基于图神经网络和深度学习的实时反欺诈系统(演示)",
+  "title": "借助图神经网络的实时欺诈检测系统（演示）",
   "tips": {
     "success": "模拟成功",
     "wait": "请耐心等待1分钟，数据即将显示"
@@ -21,13 +21,13 @@
     "5minute": "5 分钟"
   },
   "card": {
-    "fraudCount": "欺诈交易次数",
-    "transcationCount": "交易次数",
+    "fraudCount": "欺诈交易笔数",
+    "transcationCount": "交易笔数",
     "fraudAmount": "欺诈交易总金额",
     "transcationAmount": "交易总金额"
   },
   "recentFraudTransactions": "最近欺诈交易",
-  "fraudChart": "欺诈交易次数",
+  "fraudChart": "欺诈交易笔数",
   "chartTitle": "欺诈交易趋势图",
   "table": {
     "transactionID": "交易编号",

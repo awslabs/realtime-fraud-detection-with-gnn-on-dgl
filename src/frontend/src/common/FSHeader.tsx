@@ -38,6 +38,8 @@ const FSHeader: React.FC<HeaderProps> = ({ changeLang }) => {
     setCurLanguage(language);
     i18n.changeLanguage(language.value);
     changeLang(language.value);
+    window.history.pushState({}, '', `/#/dashboard/${language.value}`);
+    document.title = t('title');
     setAnchorEl(null);
   };
 
