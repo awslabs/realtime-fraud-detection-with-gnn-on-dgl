@@ -136,6 +136,7 @@ class GraphModelClient:
         
         conn = self.gremlin_utils.remote_connection()
         g = self.gremlin_utils.traversal_source(connection=conn) 
+        t1 = self.gremlin_utils.traversal_source(connection=conn) 
 
         target_name = target_id[(target_id.find('-')+1):]
         feature_list = g.V().has(id,target_id).out().id().toList()
@@ -224,7 +225,30 @@ class GraphModelClient:
                     both().hasLabel('DeviceType').both().limit(MAX_FEATURE_NODE),\
                     both().hasLabel('DeviceInfo').both().limit(MAX_FEATURE_NODE)).elementMap().toList()
 
+        e_t = dt.now()
+        logger.info(f'INSIDE query_target_subgraph: neighbor_dict by query once then ETL, used {(e_t - new_s_t).total_seconds()} seconds. Total test cost {(e_t - s_t).total_seconds()} seconds.')
+        new_s_t = e_t
+
+        union_li_cols = ['card1', 'card2', 'card3', 'card4','card5', 'card6', 'ProductCD', 'addr1', 'addr2', 'P_emaildomain','R_emaildomain'] + identities_cols.split(',') + ['DeviceType', 'DeviceInfo']
+
+        union_li = [t1.V().has(id,target_id).both().hasLabel(label).both().limit(MAX_FEATURE_NODE) for label in union_li_cols]
+        print(len(union_li))
+        node_dict = g.V().has(id,target_id).union(__.both().hasLabel('card1').both().limit(MAX_FEATURE_NODE),\
+                    union_li[1], union_li[2], union_li[3], union_li[4], union_li[5],\
+                    union_li[6], union_li[7], union_li[8], union_li[9], union_li[10],\
+                    union_li[11], union_li[12], union_li[13], union_li[14], union_li[15],\
+                    union_li[16], union_li[17], union_li[18], union_li[19], union_li[20],\
+                    union_li[21], union_li[22], union_li[23], union_li[24], union_li[25],\
+                    union_li[26], union_li[27], union_li[28], union_li[29], union_li[30],\
+                    union_li[31], union_li[32], union_li[33], union_li[34], union_li[35],\
+                    union_li[36], union_li[37], union_li[38], union_li[39], union_li[40],\
+                    union_li[41], union_li[42], union_li[43], union_li[44], union_li[45],\
+                    union_li[46], union_li[47], union_li[48], union_li[49], union_li[50]).elementMap().toList()
+
         # node_dict = g.V().has(id,target_id).repeat(both().limit(MAX_FEATURE_NODE)).times(2).elementMap().toList()
+        e_t = dt.now()
+        logger.info(f'INSIDE query_target_subgraph: neighbor_dict by query, split union element once then ETL, used {(e_t - new_s_t).total_seconds()} seconds. Total test cost {(e_t - s_t).total_seconds()} seconds.')
+        new_s_t = e_t
 
         for item in node_dict:
             node = item.get(list(item)[0])
@@ -232,9 +256,7 @@ class GraphModelClient:
             neighbor_dict[node_value] = [item.get(key) for key in neighbor_cols]
         logger.info(len(neighbor_dict))
         
-        e_t = dt.now()
-        logger.info(f'INSIDE query_target_subgraph: neighbor_dict by query once then ETL, used {(e_t - new_s_t).total_seconds()} seconds. Total test cost {(e_t - s_t).total_seconds()} seconds.')
-        new_s_t = e_t
+        
         
         attr_cols = ['val'+str(x) for x in range(1,391)]
         for attr in feature_list:
@@ -352,4 +374,9 @@ def handler(event, context):
         MessageGroupId=context.aws_request_id,
     )
     
-    return f"Done. with flag:{pred_prob> MODEL_BTW} and pred_prob:  {pred_prob}"
+    function_res = {
+                    'flag': pred_prob > MODEL_BTW,
+                    'pred_prob': pred_prob
+                    }
+
+    return function_res

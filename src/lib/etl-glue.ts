@@ -18,6 +18,10 @@ export interface ETLProps {
     port: string;
     clusterResourceId: string;
   };
+  dataColumnsArg: {
+    id_cols: string;
+    cat_cols: string;
+  };
 }
 
 export class ETLByGlue extends Construct {
@@ -25,7 +29,6 @@ export class ETLByGlue extends Construct {
   readonly jobName: string;
   readonly processedOutputPrefix: string;
   readonly glueJobSG: ISecurityGroup;
-  readonly preprocessingJob_id_cols: String;
 
   constructor(scope: Construct, id: string, props: ETLProps) {
     super(scope, id);
@@ -177,7 +180,6 @@ export class ETLByGlue extends Construct {
       },
     });
     const outputPrefix = `${props.s3Prefix ?? ''}processed-data/`;
-    this.preprocessingJob_id_cols = 'card1,card2,card3,card4,card5,card6,ProductCD,addr1,addr2,P_emaildomain,R_emaildomain';
     const etlJob = new CfnJob(this, 'PreprocessingJob', {
       command: {
         name: 'glueetl',
@@ -189,8 +191,8 @@ export class ETLByGlue extends Construct {
         '--database': transactionDatabase.databaseName,
         '--transaction_table': transactionTable.tableName,
         '--identity_table': identityTable.tableName,
-        '--id_cols': this.preprocessingJob_id_cols,
-        '--cat_cols': 'M1,M2,M3,M4,M5,M6,M7,M8,M9',
+        '--id_cols': props.dataColumnsArg.id_cols,
+        '--cat_cols': props.dataColumnsArg.cat_cols,
         '--output_prefix': props.bucket.s3UrlForObject(outputPrefix),
         '--job-language': 'python',
         '--job-bookmark-option': 'job-bookmark-disable',

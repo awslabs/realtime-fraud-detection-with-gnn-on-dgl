@@ -246,7 +246,7 @@ describe('dashboard stack test suite', () => {
     expect(stack).toHaveResourceLike('AWS::Lambda::Function', {
       Environment: {
         Variables: {
-          INFERENCE_ARN: '',
+          INFERENCE_ARN: 'arn:aws:lambda:ap-southeast-1:123456789012:function:inference-func',
           DATASET_URL: {
             'Fn::FindInMap': [
               'DataSet',
@@ -1111,7 +1111,7 @@ function initializeStackWithContextsAndEnvs(context: {} | undefined, env?: {} | 
     removalPolicy: RemovalPolicy.DESTROY,
     visibilityTimeout: Duration.seconds(60),
   });
-  const inferenceArn = new String();
+  const inferenceArn = 'arn:aws:lambda:ap-southeast-1:123456789012:function:inference-func';
 
   const stack = new TransactionDashboardStack(parentStack, 'DashboardStack', {
     vpc,

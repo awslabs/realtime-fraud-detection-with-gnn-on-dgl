@@ -1036,6 +1036,10 @@ function initializeStackWithContextsAndEnvs(context: {} | undefined, env?: {} | 
       loadObjectPrefix: 's3://bucket/object/folder',
     },
     dataPrefix: 'fraud-detection/',
+    dataColumnsArg: {
+      id_cols: 'card1,card2,card3,card4,card5,card6,ProductCD,addr1,addr2,P_emaildomain,R_emaildomain',
+      cat_cols: 'M1,M2,M3,M4,M5,M6,M7,M8,M9',
+    },
   });
   return { stack };
 }

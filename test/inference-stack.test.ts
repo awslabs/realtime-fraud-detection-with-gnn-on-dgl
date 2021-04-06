@@ -54,7 +54,6 @@ function initializeStackWithContextsAndEnvs(context: {} | undefined, env?: {} | 
     removalPolicy: RemovalPolicy.DESTROY,
     visibilityTimeout: Duration.seconds(60),
   });
-  const preprocessingJob_id_cols = new String();
 
   const stack = new InferenceStack(parentStack, 'inferenceStack', {
     vpc,
@@ -64,7 +63,12 @@ function initializeStackWithContextsAndEnvs(context: {} | undefined, env?: {} | 
       clusterResourceId: 'cluster-12345',
     },
     queue,
-    preprocessingJob_id_cols,
+    dataColumnsArg: {
+      id_cols: 'card1,card2,card3,card4',
+      identity_cols: 'id_01,id_02,id_03,id_04,id_05,id_06',
+      vertex_values_cols: 'TransactionAmt,dist1,dist2,C1',
+      dummies_cols: 'M1_F,M1_T,M2_F,M2_T',
+    },
   });
   return { stack };
 }

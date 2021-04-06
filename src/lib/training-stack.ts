@@ -30,12 +30,15 @@ export interface TrainingStackProps extends NestedStackProps {
     loadObjectPrefix: string;
   };
   readonly dataPrefix: string;
+  readonly dataColumnsArg: {
+    id_cols: string;
+    cat_cols: string;
+  };
 }
 
 export class TrainingStack extends NestedStack {
   readonly glueJobSG: ISecurityGroup;
   readonly loadPropsSG: ISecurityGroup;
-  readonly preprocessingJob_id_cols: String;
 
   constructor(scope: Construct, id: string, props: TrainingStackProps) {
     super(scope, id, props);
@@ -102,9 +105,9 @@ export class TrainingStack extends NestedStack {
       bucket: props.bucket,
       vpc: props.vpc,
       neptune: props.neptune,
+      dataColumnsArg: props.dataColumnsArg,
     });
     this.glueJobSG = etlConstruct.glueJobSG;
-    this.preprocessingJob_id_cols = etlConstruct.preprocessingJob_id_cols;
 
     const dataCatalogCrawlerFn = new NodejsFunction(this, 'DataCatalogCrawler', {
       entry: path.join(__dirname, '../lambda.d/crawl-data-catalog/index.ts'),
