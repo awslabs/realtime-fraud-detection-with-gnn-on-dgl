@@ -116,7 +116,7 @@ const project = new AwsCdkTypeScriptApp({
 
   /* NodeProjectOptions */
   // antitamper: true,                                                         /* Checks that after build there are no modified files on git. */
-  buildWorkflow: false, /* Define a GitHub workflow for building PRs. */
+  buildWorkflow: false /* Define a GitHub workflow for building PRs. */,
   // codeCov: false,                                                           /* Define a GitHub workflow step for sending code coverage metrics to https://codecov.io/ Uses codecov/codecov-action@v1 A secret is required for private repos. Configured with @codeCovTokenSecret. */
   // codeCovTokenSecret: undefined,                                            /* Define the secret name for a specified https://codecov.io/ token A secret is required to send coverage for private repositories. */
   // copyrightOwner: undefined,                                                /* License copyright owner. */
@@ -216,6 +216,9 @@ const reactPrj = new web.ReactTypeScriptProject({
     'aws-sdk@^2.141.0',
     'aws-appsync@^1.0.0',
     'graphql-tag@^2.5.0',
+    'i18next@^20.1.0',
+    'i18next-browser-languagedetector@^6.1.0',
+    'i18next-http-backend@^1.2.1',
     'axios@^0.21.1',
     'aws-amplify@^3.3.22',
     'best-queue@^2.0.1',
@@ -224,6 +227,7 @@ const reactPrj = new web.ReactTypeScriptProject({
     'react@^17.0.1',
     'react-apexcharts@^1.3.7',
     'react-dom@^17.0.1',
+    'react-i18next@^11.8.12',
     'react-loader-spinner@^4.0.0',
     'react-minimal-pie-chart@^8.1.0',
     'react-router-dom@^5.2.0',

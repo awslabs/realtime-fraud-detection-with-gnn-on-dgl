@@ -5,21 +5,21 @@ export const SYS_GATEWAY_API_URL = '__FRAUD_DETECTION_SYS_APIGATEWAY_URL__';
 export const DEFAULT_PULLING_INTERVAL = 20 * 1000;
 
 export const POLLING_INTERVAL_LIST = [
-  { value: 10 * 1000, name: '10 seconds' },
-  { value: 20 * 1000, name: '20 seconds' },
-  { value: 30 * 1000, name: '30 seconds' },
-  { value: 60 * 1000, name: '1 minute' },
-  { value: 5 * 60 * 1000, name: '5 minute' },
+  { value: 10 * 1000, name: '10seconds' },
+  { value: 20 * 1000, name: '20seconds' },
+  { value: 30 * 1000, name: '30seconds' },
+  { value: 60 * 1000, name: '1minute' },
+  { value: 5 * 60 * 1000, name: '5minute' },
 ];
 
 export const DEFAULT_DURATION_TIME = 5 * 60;
 
 export const DURATION_TIME_LIST = [
-  { value: 3 * 60, name: 'last 3 minutes' },
-  { value: 5 * 60, name: 'last 5 minutes' },
-  { value: 10 * 60, name: 'last 10 minutes' },
-  { value: 30 * 60, name: 'last 30 minutes' },
-  { value: 60 * 60, name: 'last 1 hour' },
+  { value: 3 * 60, name: 'last3minutes' },
+  { value: 5 * 60, name: 'last5minutes' },
+  { value: 10 * 60, name: 'last10minutes' },
+  { value: 30 * 60, name: 'last30minutes' },
+  { value: 60 * 60, name: 'last1hour' },
 ];
 
 export enum TIME_TYPE {
