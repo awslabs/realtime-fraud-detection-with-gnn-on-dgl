@@ -21,7 +21,7 @@ describe('parameters normalize tests', () => {
             'labels': 'tags.csv',
             'embedding-size': '64',
             'n-layers': '2',
-            'n-epochs': '10',
+            'n-epochs': '50',
             'optimizer': 'adam',
             'lr': '1e-2',
           },
@@ -44,6 +44,7 @@ describe('parameters normalize tests', () => {
       trainingJob: {
         hyperparameters: {
           'n-epochs': '1',
+          'n-layers': '3',
         },
       },
     }, context, callback);

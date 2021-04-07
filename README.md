@@ -32,7 +32,7 @@ You can input below parameters to overrride the default parameters of model trai
   "trainingJob": {
     "hyperparameters": {
     "n-hidden": "64",
-    "n-epochs": "1",
+    "n-epochs": "100",
     "lr":"1e-3"
     },
     "instanceType": "ml.c5.9xlarge"
