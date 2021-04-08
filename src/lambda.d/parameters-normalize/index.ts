@@ -10,6 +10,7 @@ export interface Parameters {
     };
     instanceType?: string;
     instanceCount?: number;
+    timeoutInSeconds?: number;
   };
 }
 
@@ -21,10 +22,12 @@ export interface ParametersOutput {
       };
       instanceType: string;
       instanceCount: number;
+      timeoutInSeconds: number;
     };
   };
 }
 
+export const DEFAULT_TRAINING_TIMEOUT = 90 * 60;
 export const normalize: ParameterNormalizeHandler = async (para, _context) => {
   console.info(`Receiving parameter normalize event ${JSON.stringify(para, null, 2)}.`);
 
@@ -35,6 +38,7 @@ export const normalize: ParameterNormalizeHandler = async (para, _context) => {
         hyperparameters,
         instanceType: para?.trainingJob?.instanceType ?? 'ml.c5.4xlarge',
         instanceCount: para?.trainingJob?.instanceCount ?? 1,
+        timeoutInSeconds: para?.trainingJob?.timeoutInSeconds ?? DEFAULT_TRAINING_TIMEOUT,
       },
     },
   };

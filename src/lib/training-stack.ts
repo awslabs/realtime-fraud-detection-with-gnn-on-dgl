@@ -178,8 +178,10 @@ export class TrainingStack extends NestedStack {
         json.Parameters['HyperParameters.$'] = '$.parameters.trainingJob.hyperparameters';
         json.Parameters.ResourceConfig['InstanceCount.$'] = '$.parameters.trainingJob.instanceCount';
         json.Parameters.ResourceConfig['InstanceType.$'] = '$.parameters.trainingJob.instanceType';
+        json.Parameters.StoppingCondition['MaxRuntimeInSeconds.$'] = '$.parameters.trainingJob.timeoutInSeconds';
         delete json.Parameters.ResourceConfig.InstanceCount;
         delete json.Parameters.ResourceConfig.InstanceType;
+        delete json.Parameters.StoppingCondition.MaxRuntimeInSeconds;
         return json;
       }
     }(this, 'Train model', {
