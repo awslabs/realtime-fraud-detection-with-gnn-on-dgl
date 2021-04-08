@@ -52,8 +52,8 @@ function _normalizeTrainingJobHyperparameters(para: Parameters) : {
   hyperparameters.edges = para?.trainingJob?.hyperparameters?.edges ?? 'relation*';
   hyperparameters.labels = para?.trainingJob?.hyperparameters?.labels ?? 'tags.csv';
   hyperparameters['embedding-size'] = para?.trainingJob?.hyperparameters?.['embedding-size'] ?? '64';
-  hyperparameters['n-layers'] = para?.trainingJob?.hyperparameters?.['n-layers'] ?? '2';
-  hyperparameters['n-epochs'] = para?.trainingJob?.hyperparameters?.['n-epochs'] ?? '10';
+  hyperparameters['n-layers'] = '2';
+  hyperparameters['n-epochs'] = para?.trainingJob?.hyperparameters?.['n-epochs'] ?? '50';
   hyperparameters.optimizer = para?.trainingJob?.hyperparameters?.optimizer ?? 'adam';
   hyperparameters.lr = para?.trainingJob?.hyperparameters?.lr ?? '1e-2';
   return hyperparameters;

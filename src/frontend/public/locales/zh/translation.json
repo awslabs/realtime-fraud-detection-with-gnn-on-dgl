@@ -1,0 +1,57 @@
+{
+  "title": "借助图神经网络的实时欺诈检测系统（演示）",
+  "tips": {
+    "success": "模拟成功",
+    "wait": "请耐心等待1分钟，数据即将显示"
+  },
+  "durationLabel": "交易时间在",
+  "duration": {
+    "last3minutes": "最近 3 分钟",
+    "last5minutes": "最近 5 分钟",
+    "last10minutes": "最近 10 分钟",
+    "last30minutes": "最近 30 分钟",
+    "last1hour": "最近 1 小时"
+  },
+  "intervalLabel": "轮询数据间隔时间",
+  "interval": {
+    "10seconds": "10 秒钟",
+    "20seconds": "20 秒钟",
+    "30seconds": "30 秒钟",
+    "1minute": "1 分钟",
+    "5minute": "5 分钟"
+  },
+  "card": {
+    "fraudCount": "欺诈交易笔数",
+    "transcationCount": "交易笔数",
+    "fraudAmount": "欺诈交易总金额",
+    "transcationAmount": "交易总金额"
+  },
+  "recentFraudTransactions": "最近欺诈交易",
+  "fraudChart": "欺诈交易笔数",
+  "chartTitle": "欺诈交易趋势图",
+  "table": {
+    "transactionID": "交易编号",
+    "transactionTime": "交易时间",
+    "amount": "交易金额",
+    "productCD": "存款凭证",
+    "cardInfo": "卡片信息",
+    "address": "地址",
+    "cardNumber": "卡号",
+    "cardType": "卡类型"
+  },
+  "simulate": {
+    "title": "模拟交易数据",
+    "durationTitle": "模拟数据持续时间",
+    "durationTips": "单位: 秒, 最小: 300, 最大: 900",
+    "concurrentTitle": "交易并发个数",
+    "concurrentTips": "最小: 1, 最大: 40",
+    "intervalTitle": "模拟数据间隔时间",
+    "intervalTips": "单位: 秒, 最小: 1, 最大: 60"
+  },
+  "btn": {
+    "ok": "好的",
+    "simulateData": "模拟数据",
+    "cancel": "取消",
+    "simulate": "模拟"
+  }
+}

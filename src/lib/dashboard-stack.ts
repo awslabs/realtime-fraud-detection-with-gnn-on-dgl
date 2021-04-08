@@ -712,7 +712,7 @@ export class TransactionDashboardStack extends NestedStack {
       cacheControl: [CacheControl.maxAge(Duration.days(7))],
       storageClass: StorageClass.INTELLIGENT_TIERING,
       distribution,
-      distributionPaths: ['/index.html', `/${amplifyConfFile}`],
+      distributionPaths: ['/index.html', '/locales/*', `/${amplifyConfFile}`],
     });
 
     websiteDeployment.node.addDependency(createAwsExportsJson);
