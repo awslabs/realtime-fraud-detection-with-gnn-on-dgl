@@ -796,7 +796,7 @@ describe('training stack test suite', () => {
             {
               Ref: 'referencetoTestStackBucket80A092C2Ref',
             },
-            '/fraud-detection/model_output"},"ResourceConfig":{"VolumeSizeInGB":50,"InstanceCount.$":"$.parameters.trainingJob.instanceCount","InstanceType.$":"$.parameters.trainingJob.instanceType"},"StoppingCondition":{"MaxRuntimeInSeconds":3600},"HyperParameters.$":"$.parameters.trainingJob.hyperparameters"},"ResultSelector":{"TrainingJobName.$":"$.TrainingJobName","ModelArtifacts.$":"$.ModelArtifacts"}},"Load the props to graph":{"Next":"Package model with code","Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","TimeoutSeconds":7200,"ResultPath":null,"Resource":"arn:',
+            '/fraud-detection/model_output"},"ResourceConfig":{"VolumeSizeInGB":50,"InstanceCount.$":"$.parameters.trainingJob.instanceCount","InstanceType.$":"$.parameters.trainingJob.instanceType"},"StoppingCondition":{"MaxRuntimeInSeconds.$":"$.parameters.trainingJob.timeoutInSeconds"},"HyperParameters.$":"$.parameters.trainingJob.hyperparameters"},"ResultSelector":{"TrainingJobName.$":"$.TrainingJobName","ModelArtifacts.$":"$.ModelArtifacts"}},"Load the props to graph":{"Next":"Package model with code","Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","TimeoutSeconds":7200,"ResultPath":null,"Resource":"arn:',
             {
               Ref: 'AWS::Partition',
             },
