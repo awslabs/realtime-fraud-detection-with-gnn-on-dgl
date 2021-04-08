@@ -51,13 +51,21 @@ def handler(event, context):
             logger.info(f'The simulation will be interruptted after exceeding the specified duration {event["duration"]} seconds.')
             break
         
-        sampleDF = mergedDF.sample()
+        sample_tran_DF = tranDF.sample()
+
+        sample_id_DF = idDF.loc[idDF['TransactionID'] == sample_tran_DF['TransactionID'].values[0]]
         
-        sampleDF.columns = [x.replace('-','_') if '-' in x else x for x in sampleDF.columns]
+        sample_id_DF.columns = [x.replace('-','_') if '-' in x else x for x in sample_id_DF.columns]
 
-        sampleData = sampleDF.iloc[0].fillna(0)
+        sample_tran_DF = sample_tran_DF.fillna(0)
+        sample_id_DF = sample_id_DF.fillna(0)
 
-        inference_input_event = sampleData.to_dict()
+        sample_tran_DF = sample_tran_DF.to_dict('records')
+        sample_id_DF = sample_id_DF.to_dict('records')
+        inference_input_event = {
+            'transaction_data':sample_tran_DF,
+            'identity_data':sample_id_DF
+        }
 
         logger.info(f'Send event {inference_input_event} to inference.')
 

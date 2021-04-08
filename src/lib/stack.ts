@@ -96,7 +96,7 @@ export class FraudDetectionStack extends Stack {
     neptuneInfo.neptuneSG.addIngressRule(inferenceStack.inferenceSG,
       Port.tcp(Number(neptuneInfo.port)), 'access from inference job.');
 
-    const inferenceStatsFnArn = String(inferenceStack.inferenceStatsFn.functionArn);
+    const inferenceStatsFnArn = inferenceStack.inferenceStatsFn.functionArn;
     const interParameterGroups = [
       {
         Label: { default: 'The configuration of graph database Neptune' },

@@ -25,8 +25,8 @@ MODEL_BTW = float(os.environ['MODEL_BTW'])
 QUEUE_URL = os.environ['QUEUE_URL']
 
 transactions_id_cols = os.environ['TRANSACTION_ID_COLS']
-identities_cols = os.environ['IDENTITIES_COLS']
-neighbor_cols = os.environ['NEIGHBOR_COLS']
+transactions_cat_cols = os.environ['TRANSACTION_CAT_COLS']
+# neighbor_cols = os.environ['NEIGHBOR_COLS']
 dummied_col = os.environ['DUMMIED_COL']
 
 sqs = boto3.client('sqs')
@@ -34,23 +34,37 @@ runtime = boto3.client('runtime.sagemaker')
 
 endpoints = Endpoints(neptune_endpoint = CLUSTER_ENDPOINT, neptune_port = CLUSTER_PORT, region_name = CLUSTER_REGION)
 
-def load_data_from_event(input_event, transactions_id_cols, identities_cols, neighbor_cols, dummied_col):
+def load_data_from_event(input_event, transactions_id_cols, transactions_cat_cols, dummied_col):
     """Load and transform event data into correct format for next step subgraph loading and model inference input. 
         input event keys should come from related dataset.]
     
     Example:
-    >>> load_data_from_event(event = {"TransactionID":"3163166", "V1":1, ...}, 'card1,card2,,...', 'id_01,id_02,,...', 'C1,C2,C3,C4,C5,C6,...', 'M2_T,M3_F,M3_T,...')
+    >>> load_data_from_event(event = {"transaction_data":[{"TransactionID":"3163166", "V1":1, ...]}, 'card1,card2,,...', 'M2_T,M3_F,M3_T,...')
     """
     TRANSACTION_ID = 'TransactionID'
+
+    transactions_id_cols = transactions_id_cols.split(',') 
+    transactions_cat_cols = transactions_cat_cols.split(',') 
+    transactions_no_value_cols = [TRANSACTION_ID, 'TransactionDT'] + transactions_id_cols + transactions_cat_cols
+    dummied_col = dummied_col.split(',')
+
+    if input_event['identity_data'] != []:
+        identities_cols = list(input_event['identity_data'][0].keys())
+        identities_cols.remove(TRANSACTION_ID)
+    else:
+        identities_cols = []
+
+    neighbor_cols = [x for x in list(input_event['transaction_data'][0].keys()) if x not in transactions_no_value_cols]
+
+    input_event = {**input_event['transaction_data'][0], **input_event['identity_data'][0]} # TODO
     input_event[TRANSACTION_ID] = f't-{input_event[TRANSACTION_ID]}'
+    input_event['TransactionAmt'] = np.log10(input_event['TransactionAmt'])
     input_event = pd.DataFrame.from_dict(input_event, orient='index').transpose()
 
-    new_id_cols = transactions_id_cols.split(',') + identities_cols.split(',') 
-    dummied_col = dummied_col.split(',')
-    neighbor_cols = neighbor_cols.split(',')
+    union_id_cols = transactions_id_cols + identities_cols 
 
     target_id = input_event[TRANSACTION_ID].iloc[0]
-    
+
     for dummy in dummied_col:
         col_name = dummy[:2]
         if input_event[col_name].iloc[0] == dummy[3:]:
@@ -59,8 +73,8 @@ def load_data_from_event(input_event, transactions_id_cols, identities_cols, nei
             input_event[dummy] = 0.0
             
     trans_dict = [input_event[neighbor_cols+dummied_col].iloc[0].fillna(0.0).to_dict()]
-    identity_dict = [input_event[new_id_cols].iloc[0].fillna(0.0).to_dict()]
-    return trans_dict, identity_dict, target_id
+    identity_dict = [input_event[union_id_cols].iloc[0].fillna(0.0).to_dict()]
+    return trans_dict, identity_dict, target_id, union_id_cols
 
 class GraphModelClient:
     def __init__(self, endpoint):
@@ -117,7 +131,7 @@ class GraphModelClient:
 
         conn.close()                    
                     
-    def query_target_subgraph(self, target_id, neighbor_cols, dummied_col):
+    def query_target_subgraph(self, target_id, union_li_cols, dummied_col):
         """Extract 2nd degree subgraph of target transaction.Dump data into subgraph dict and n_feats dict.
         subgraph_dict:  related transactions' id list and values through edges
         n_feats dict: related 1 degree vertex and transactions' embeded elements vectors. 
@@ -229,8 +243,6 @@ class GraphModelClient:
         logger.info(f'INSIDE query_target_subgraph: neighbor_dict by query once then ETL, used {(e_t - new_s_t).total_seconds()} seconds. Total test cost {(e_t - s_t).total_seconds()} seconds.')
         new_s_t = e_t
 
-        union_li_cols = ['card1', 'card2', 'card3', 'card4','card5', 'card6', 'ProductCD', 'addr1', 'addr2', 'P_emaildomain','R_emaildomain'] + identities_cols.split(',') + ['DeviceType', 'DeviceInfo']
-
         union_li = [t1.V().has(id,target_id).both().hasLabel(label).both().limit(MAX_FEATURE_NODE) for label in union_li_cols]
         print(len(union_li))
         node_dict = g.V().has(id,target_id).union(__.both().hasLabel('card1').both().limit(MAX_FEATURE_NODE),\
@@ -319,7 +331,7 @@ def handler(event, context):
     
     G_s_t = dt.now()
 
-    trans_dict, identity_dict, target_id = load_data_from_event(event, transactions_id_cols, identities_cols, neighbor_cols, dummied_col)
+    trans_dict, identity_dict, target_id, union_li_cols = load_data_from_event(event, transactions_id_cols, identities_cols, dummied_col)
     
     G_e_t = dt.now()
     logger.info(f'load_data_from_event used {(G_e_t - G_s_t).total_seconds()} seconds. ')
@@ -332,7 +344,7 @@ def handler(event, context):
     logger.info(f'insert_new_transaction_vertex_and_edge used {(G_e_t - G_new_s_t).total_seconds()} seconds. Total test cost {(G_e_t - G_s_t).total_seconds()} seconds.')
     G_new_s_t = G_e_t
     
-    subgraph_dict, transaction_embed_value_dict = graph_input.query_target_subgraph(target_id, neighbor_cols, dummied_col)
+    subgraph_dict, transaction_embed_value_dict = graph_input.query_target_subgraph(target_id, union_li_cols, dummied_col)
     
     G_e_t = dt.now()
     logger.info(f'query_target_subgraph used {(G_e_t - G_new_s_t).total_seconds()} seconds. Total test cost {(G_e_t - G_s_t).total_seconds()} seconds.')

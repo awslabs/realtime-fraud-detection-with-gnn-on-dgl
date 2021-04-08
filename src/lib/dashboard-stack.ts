@@ -102,7 +102,7 @@ import { artifactsHash } from './utils';
 export interface TransactionDashboardStackStackProps extends NestedStackProps {
   readonly vpc: IVpc;
   readonly queue: IQueue;
-  readonly inferenceArn: String;
+  readonly inferenceArn: string;
   readonly customDomain?: string;
   readonly r53HostZoneId?: string;
 }
@@ -333,8 +333,6 @@ export class TransactionDashboardStack extends NestedStack {
 
     const simEnd = new Pass(this, 'Stop generation');
 
-    const inferenceStatsFnArn = String(props.inferenceArn);
-
     const tranSimFn = new PythonFunction(this, 'TransactionSimulatorFunc', {
       entry: path.join(__dirname, '../lambda.d/simulator'),
       layers: [
@@ -346,7 +344,7 @@ export class TransactionDashboardStack extends NestedStack {
       index: 'gen.py',
       runtime: Runtime.PYTHON_3_8,
       environment: {
-        INFERENCE_ARN: inferenceStatsFnArn,
+        INFERENCE_ARN: props.inferenceArn,
         DATASET_URL: getDatasetMapping(this).findInMap(Aws.PARTITION, IEEE),
       },
       timeout: Duration.minutes(15),
@@ -354,7 +352,7 @@ export class TransactionDashboardStack extends NestedStack {
     });
     tranSimFn.addToRolePolicy(new PolicyStatement({
       actions: ['lambda:InvokeFunction'],
-      resources: [inferenceStatsFnArn],
+      resources: [props.inferenceArn],
     }),
     );
     const tranSimTask = new (class extends LambdaInvoke {
