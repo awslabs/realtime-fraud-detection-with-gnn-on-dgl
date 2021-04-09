@@ -178,7 +178,7 @@ const Dashboard: React.FC = () => {
       const tmpFraudCountArr: any = [];
       const tmpTotalCountArr: any = [];
       const tmpDataTimeArr: any = [];
-      result.forEach((element) => {
+      result.forEach((element: any) => {
         tmpFraudCountArr.push(element.fraudCount);
         tmpTotalCountArr.push(element.totalCount);
         tmpDataTimeArr.push(momentFormatData(new Date(element.end * 1000), formatStr));
