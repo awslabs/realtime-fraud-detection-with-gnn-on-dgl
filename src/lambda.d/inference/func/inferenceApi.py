@@ -26,7 +26,6 @@ QUEUE_URL = os.environ['QUEUE_URL']
 
 transactions_id_cols = os.environ['TRANSACTION_ID_COLS']
 transactions_cat_cols = os.environ['TRANSACTION_CAT_COLS']
-# neighbor_cols = os.environ['NEIGHBOR_COLS']
 dummied_col = os.environ['DUMMIED_COL']
 
 sqs = boto3.client('sqs')
@@ -162,85 +161,10 @@ class GraphModelClient:
             target_and_conn_node_list = [int(target_name)]+[int(target_conn_node[(target_conn_node.find('-')+1):]) for target_conn_node in node_list]
             neighbor_list += target_and_conn_node_list
             nodes_and_feature_value_array = (target_and_conn_node_list,[feat_value]*len(target_and_conn_node_list))
-            # nodes_and_feature_value_array = (np.array(target_and_conn_node_list),np.array([feat_value]*len(target_and_conn_node_list)))
             subgraph_dict['target<>'+feat_name] = nodes_and_feature_value_array
         
         e_t = dt.now()
         logger.info(f'INSIDE query_target_subgraph: subgraph_dict used {(e_t - s_t).total_seconds()} seconds')
-        new_s_t = e_t
-        
-        neighbor_cols = neighbor_cols.split(',') + dummied_col.split(',')
-        
-        # if MAX_FEATURE_NODE < 50:
-        #     neighbor_list = set(neighbor_list)
-        #     for node in neighbor_list:
-        #         node_dict = g.V().has(id,'t-'+str(node)).valueMap().toList()[0]
-        #         node_dict = [node_dict.get(key)[-1] for key in neighbor_cols]
-        #         neighbor_dict[str(node)] = node_dict
-            
-        #     e_t = dt.now()
-        #     logger.info(f'INSIDE query_target_subgraph: neighbor_dict by 2 step for loop a list, used {(e_t - new_s_t).total_seconds()} seconds. Total test cost {(e_t - s_t).total_seconds()} seconds.')
-        #     new_s_t = e_t
-        # else:
-        neighbor_dict = {}
-        target_node_dict = g.V().has(id,'t-'+str(target_name)).valueMap().toList()[0]
-        neighbor_dict[str(target_name)] = [target_node_dict.get(key)[-1] for key in neighbor_cols]
-
-        node_dict = g.V().has(id,target_id).\
-                    union(__.both().hasLabel('card1').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('card2').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('card3').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('card4').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('card5').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('card6').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('ProductCD').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('addr1').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('addr2').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('P_emaildomain').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('R_emaildomain').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_01').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_02').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_03').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_04').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_05').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_06').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_07').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_08').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_09').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_10').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_11').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_12').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_13').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_14').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_15').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_16').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_17').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_18').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_19').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_20').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_21').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_22').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_23').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_24').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_25').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_26').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_27').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_28').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_29').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_30').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_31').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_32').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_33').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_34').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_35').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_36').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_37').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('id_38').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('DeviceType').both().limit(MAX_FEATURE_NODE),\
-                    both().hasLabel('DeviceInfo').both().limit(MAX_FEATURE_NODE)).elementMap().toList()
-
-        e_t = dt.now()
-        logger.info(f'INSIDE query_target_subgraph: neighbor_dict by query once then ETL, used {(e_t - new_s_t).total_seconds()} seconds. Total test cost {(e_t - s_t).total_seconds()} seconds.')
         new_s_t = e_t
 
         union_li = [t1.V().has(id,target_id).both().hasLabel(label).both().limit(MAX_FEATURE_NODE) for label in union_li_cols]
@@ -257,7 +181,6 @@ class GraphModelClient:
                     union_li[41], union_li[42], union_li[43], union_li[44], union_li[45],\
                     union_li[46], union_li[47], union_li[48], union_li[49], union_li[50]).elementMap().toList()
 
-        # node_dict = g.V().has(id,target_id).repeat(both().limit(MAX_FEATURE_NODE)).times(2).elementMap().toList()
         e_t = dt.now()
         logger.info(f'INSIDE query_target_subgraph: neighbor_dict by query, split union element once then ETL, used {(e_t - new_s_t).total_seconds()} seconds. Total test cost {(e_t - s_t).total_seconds()} seconds.')
         new_s_t = e_t
@@ -331,7 +254,7 @@ def handler(event, context):
     
     G_s_t = dt.now()
 
-    trans_dict, identity_dict, target_id, union_li_cols = load_data_from_event(event, transactions_id_cols, identities_cols, dummied_col)
+    trans_dict, identity_dict, target_id, union_li_cols = load_data_from_event(event, transactions_id_cols, transactions_cat_cols, dummied_col)
     
     G_e_t = dt.now()
     logger.info(f'load_data_from_event used {(G_e_t - G_s_t).total_seconds()} seconds. ')
