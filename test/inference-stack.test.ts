@@ -64,10 +64,9 @@ function initializeStackWithContextsAndEnvs(context: {} | undefined, env?: {} | 
     },
     queue,
     dataColumnsArg: {
-      id_cols: 'card1,card2,card3,card4',
-      identity_cols: 'id_01,id_02,id_03,id_04,id_05,id_06',
-      vertex_values_cols: 'TransactionAmt,dist1,dist2,C1',
-      dummies_cols: 'M1_F,M1_T,M2_F,M2_T',
+      id_cols: 'card1,card2,card3,card4,card5,card6,ProductCD,addr1,addr2,P_emaildomain,R_emaildomain',
+      cat_cols: 'M1,M2,M3,M4,M5,M6,M7,M8,M9',
+      dummies_cols: 'M1_F,M1_T,M2_F,M2_T,M3_F,M3_T,M4_M0,M4_M1,M4_M2,M5_F,M5_T,M6_F,M6_T,M7_F,M7_T,M8_F,M8_T,M9_F,M9_T',
     },
   });
   return { stack };

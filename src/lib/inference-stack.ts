@@ -17,8 +17,6 @@ export interface InferenceProps extends NestedStackProps {
   readonly dataColumnsArg: {
     id_cols: string;
     cat_cols: string;
-    identity_cols: string;
-    vertex_values_cols: string;
     dummies_cols: string;
   };
 }
@@ -59,7 +57,6 @@ export class InferenceStack extends NestedStack {
         QUEUE_URL: props.queue.queueUrl,
         TRANSACTION_ID_COLS: props.dataColumnsArg.id_cols,
         TRANSACTION_CAT_COLS: props.dataColumnsArg.cat_cols,
-        // NEIGHBOR_COLS: props.dataColumnsArg.vertex_values_cols,
         DUMMIED_COL: props.dataColumnsArg.dummies_cols,
       },
       vpc: props.vpc,
