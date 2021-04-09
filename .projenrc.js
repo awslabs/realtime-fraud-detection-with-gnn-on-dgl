@@ -4,26 +4,6 @@ const tsExcludeConfig = {
   exclude: ['src/frontend'],
 };
 
-const tsReactConfig = {
-  compilerOptions: {
-    lib: ['dom', 'dom.iterable', 'esnext'],
-    target: 'es5',
-    module: 'esnext',
-    allowJs: true,
-    skipLibCheck: true,
-    esModuleInterop: true,
-    allowSyntheticDefaultImports: true,
-    forceConsistentCasingInFileNames: true,
-    moduleResolution: 'node',
-    isolatedModules: true,
-    noEmit: true,
-  },
-};
-const jestTsConfig = {
-  // ...tsReactConfig,
-  ...tsExcludeConfig,
-};
-
 const project = new AwsCdkTypeScriptApp({
   cdkVersion: '1.96.0',
   name: 'realtime-fraud-detection-with-gnn-on-dgl',
@@ -81,13 +61,15 @@ const project = new AwsCdkTypeScriptApp({
     '@aws-sdk/client-secrets-manager@^3.8.0',
     '@aws-sdk/client-sts@^3.8.0',
     'sync-fetch@^0.3.0',
-    'mongodb',
+    'mongodb@^3.6.6',
+    'mongodb-client-encryption@^1.2.3',
   ] /* Runtime dependencies of this module. */,
   description:
     'Real-time Fraud Detection with Graph Neural Network on DGL' /* The description is just a string that helps people understand the purpose of the package. */,
   devDeps: [
     '@types/aws-lambda@^8.10.72',
     '@types/mongodb@^3.6.8',
+    'typescript@^4.2.0',
   ] /* Build dependencies for this module. */,
   // entrypoint: 'lib/index.js',                                               /* Module entrypoint (`main` in `package.json`). */
   // homepage: undefined,                                                      /* Package's Homepage / Website. */
@@ -131,9 +113,9 @@ const project = new AwsCdkTypeScriptApp({
     '.DS_Store',
   ] /* Additional entries to .gitignore. */,
   // jest: true,                                                               /* Setup jest unit tests. */
-  jestOptions: {
-    typescriptConfig: jestTsConfig,
-  } /* Jest options. */,
+  // jestOptions: {
+  //   typescriptConfig: jestTsConfig,
+  // } /* Jest options. */,
   // libdir: 'lib',                                                            /* Compiler artifacts output directory. */
   // mergify: true,                                                            /* Adds mergify configuration. */
   // mergifyAutoMergeLabel: 'auto-merge',                                      /* Automatically merge PRs that build successfully and have this label. */
@@ -199,6 +181,22 @@ project.addTask('postinstall', {
   exec:
     'git submodule init && git submodule sync && git submodule update && docker run --rm -v `pwd`/src/script-libs/amazon-neptune-tools/neptune-python-utils:/src --workdir /src python:3.8-buster bash -c "apt update && apt install -y sudo zip && rm -rf /src/target && /src/build.sh"',
 });
+
+const tsReactConfig = {
+  compilerOptions: {
+    lib: ['dom', 'dom.iterable', 'esnext'],
+    target: 'es5',
+    module: 'esnext',
+    allowJs: true,
+    skipLibCheck: true,
+    esModuleInterop: true,
+    allowSyntheticDefaultImports: true,
+    forceConsistentCasingInFileNames: true,
+    moduleResolution: 'node',
+    isolatedModules: true,
+    noEmit: true,
+  },
+};
 
 const reactPrj = new web.ReactTypeScriptProject({
   deps: [
