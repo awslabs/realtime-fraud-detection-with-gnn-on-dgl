@@ -1,6 +1,6 @@
 /* eslint import/no-unresolved: "off" */
 import { Callback, Context } from 'aws-lambda';
-import { ParametersOutput, normalize } from '../../../src/lambda.d/parameters-normalize/index';
+import { ParametersOutput, normalize, DEFAULT_TRAINING_TIMEOUT } from '../../../src/lambda.d/parameters-normalize/index';
 
 describe('parameters normalize tests', () => {
 
@@ -27,6 +27,7 @@ describe('parameters normalize tests', () => {
           },
           instanceType: 'ml.c5.4xlarge',
           instanceCount: 1,
+          timeoutInSeconds: DEFAULT_TRAINING_TIMEOUT,
         },
       },
     };

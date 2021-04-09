@@ -35,7 +35,8 @@ You can input below parameters to overrride the default parameters of model trai
     "n-epochs": "100",
     "lr":"1e-3"
     },
-    "instanceType": "ml.c5.9xlarge"
+    "instanceType": "ml.c5.9xlarge",
+    "timeoutInSeconds": 10800    
   }
 }
 ```
