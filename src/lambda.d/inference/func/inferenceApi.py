@@ -137,7 +137,7 @@ class GraphModelClient:
         Usually after insert new test sample's vertex and edges into graphDB. 
         
         Example:
-        >>> query_target_subgraph('3661635', 'C1,C2,C3,C4,C5,C6,...', 'M2_T,M3_F,M3_T,...')
+        >>> query_target_subgraph('3661635', load_data_from_event(), 'M2_T,M3_F,M3_T,...')
         """
         subgraph_dict = {}
         neighbor_list = []
@@ -182,13 +182,13 @@ class GraphModelClient:
                     union_li[46], union_li[47], union_li[48], union_li[49], union_li[50]).elementMap().toList()
 
         e_t = dt.now()
-        logger.info(f'INSIDE query_target_subgraph: neighbor_dict by query, split union element once then ETL, used {(e_t - new_s_t).total_seconds()} seconds. Total test cost {(e_t - s_t).total_seconds()} seconds.')
+        logger.info(f'INSIDE query_target_subgraph: neighbor_dict used {(e_t - new_s_t).total_seconds()} seconds.')
         new_s_t = e_t
 
         for item in node_dict:
             node = item.get(list(item)[0])
             node_value = node[(node.find('-')+1):]
-            neighbor_dict[node_value] = [item.get(key) for key in neighbor_cols]
+            neighbor_dict[node_value] = [item.get(key) for key in union_li_cols]
         logger.info(len(neighbor_dict))
         
         
