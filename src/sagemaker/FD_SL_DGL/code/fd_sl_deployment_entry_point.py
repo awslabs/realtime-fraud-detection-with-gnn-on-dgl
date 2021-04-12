@@ -26,7 +26,7 @@ import dgl.function as fn
 import numpy as np
 
 INPUT_SIZE = 390
-HIDDEN_SIZE = 16
+HIDDEN_SIZE = int(os.getenv('HIDDEN_SIZE', '16'))
 N_LAYERS = 2
 OUT_SIZE = 2
 EMBEDDING_SIZE = 390
