@@ -14,6 +14,7 @@ export interface InferenceProps extends NestedStackProps {
     clusterResourceId: string;
   };
   readonly queue:IQueue;
+  readonly sagemakerEndpointName: string;
   readonly dataColumnsArg: {
     id_cols: string;
     cat_cols: string;
@@ -27,8 +28,6 @@ export class InferenceStack extends NestedStack {
 
   constructor(scope: Construct, id: string, props: InferenceProps) {
     super(scope, id, props);
-
-    const endpointName = 'FraudDetection'.toLowerCase();
 
     this.inferenceStatsFn = new PythonFunction(this, 'InferenceStatsFn', {
       entry: path.join(__dirname, '../lambda.d/inference/func'),
@@ -52,7 +51,7 @@ export class InferenceStack extends NestedStack {
         CLUSTER_ENDPOINT: props.neptune.endpoint,
         CLUSTER_PORT: props.neptune.port,
         CLUSTER_REGION: Aws.REGION,
-        ENDPOINT_NAME: endpointName,
+        ENDPOINT_NAME: props.sagemakerEndpointName,
         MODEL_BTW: String(0.9),
         QUEUE_URL: props.queue.queueUrl,
         TRANSACTION_ID_COLS: props.dataColumnsArg.id_cols,
@@ -85,7 +84,7 @@ export class InferenceStack extends NestedStack {
         Stack.of(this).formatArn({
           service: 'sagemaker',
           resource: 'endpoint',
-          resourceName: endpointName,
+          resourceName: props.sagemakerEndpointName,
         }),
       ],
     }),

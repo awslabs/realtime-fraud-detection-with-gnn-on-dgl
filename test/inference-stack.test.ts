@@ -63,6 +63,7 @@ function initializeStackWithContextsAndEnvs(context: {} | undefined, env?: {} | 
       clusterResourceId: 'cluster-12345',
     },
     queue,
+    sagemakerEndpointName: 'frauddetection',
     dataColumnsArg: {
       id_cols: 'card1,card2,card3,card4,card5,card6,ProductCD,addr1,addr2,P_emaildomain,R_emaildomain',
       cat_cols: 'M1,M2,M3,M4,M5,M6,M7,M8,M9',

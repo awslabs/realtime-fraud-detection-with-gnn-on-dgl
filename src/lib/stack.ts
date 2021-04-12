@@ -88,6 +88,7 @@ export class FraudDetectionStack extends Stack {
       vpc,
       neptune: neptuneInfo,
       queue: tranQueue,
+      sagemakerEndpointName: trainingStack.endpointName,
       dataColumnsArg: dataColumnsArg,
     });
 
