@@ -63,7 +63,7 @@
     },
     {
       "name": "projen",
-      "version": "^0.17.20",
+      "version": "^0.17.30",
       "type": "build"
     },
     {
@@ -81,6 +81,11 @@
     },
     {
       "name": "typescript",
+      "type": "build"
+    },
+    {
+      "name": "typescript",
+      "version": "^4.2.0",
       "type": "build"
     },
     {
@@ -264,7 +269,13 @@
       "type": "runtime"
     },
     {
+      "name": "mongodb-client-encryption",
+      "version": "^1.2.3",
+      "type": "runtime"
+    },
+    {
       "name": "mongodb",
+      "version": "^3.6.6",
       "type": "runtime"
     },
     {
