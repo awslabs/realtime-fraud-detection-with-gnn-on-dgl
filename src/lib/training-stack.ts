@@ -526,6 +526,7 @@ export class TrainingStack extends NestedStack {
         modelS3Location: S3Location.fromJsonExpression('$.modelPackagingOutput.RepackagedArtifact'),
         environmentVariables: TaskInput.fromObject({
           SAGEMAKER_PROGRAM: 'fd_sl_deployment_entry_point.py',
+          HIDDEN_SIZE: TaskInput.fromJsonPathAt('$.parameters.trainingJob.hyperparameters[\'n-hidden\']').value,
         }),
       }),
       resultPath: '$.modelOutput',

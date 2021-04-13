@@ -24,6 +24,7 @@ describe('parameters normalize tests', () => {
             'n-epochs': '50',
             'optimizer': 'adam',
             'lr': '1e-2',
+            'n-hidden': '16',
           },
           instanceType: 'ml.c5.4xlarge',
           instanceCount: 1,
