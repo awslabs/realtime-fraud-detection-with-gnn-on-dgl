@@ -55,7 +55,11 @@ def load_data_from_event(input_event, transactions_id_cols, transactions_cat_col
 
     neighbor_cols = [x for x in list(input_event['transaction_data'][0].keys()) if x not in transactions_no_value_cols]
 
-    input_event = {**input_event['transaction_data'][0], **input_event['identity_data'][0]} # TODO
+    if input_event['identity_data'] != []:
+        input_event = {**input_event['transaction_data'][0], **input_event['identity_data'][0]} 
+    else:
+        input_event = input_event['transaction_data'][0] 
+    
     input_event[TRANSACTION_ID] = f't-{input_event[TRANSACTION_ID]}'
     input_event['TransactionAmt'] = np.log10(input_event['TransactionAmt'])
     input_event = pd.DataFrame.from_dict(input_event, orient='index').transpose()
@@ -71,9 +75,16 @@ def load_data_from_event(input_event, transactions_id_cols, transactions_cat_col
         else:
             input_event[dummy] = 0.0
             
-    trans_dict = [input_event[neighbor_cols+dummied_col].iloc[0].fillna(0.0).to_dict()]
+    transaction_value_cols = neighbor_cols+dummied_col        
+    trans_dict = [input_event[transaction_value_cols].iloc[0].fillna(0.0).to_dict()]
     identity_dict = [input_event[union_id_cols].iloc[0].fillna(0.0).to_dict()]
-    return trans_dict, identity_dict, target_id, union_id_cols
+    logger.info(f'trans_dict len: {len(trans_dict[0].keys())}  key: {trans_dict[0].keys()}')
+    logger.info(f'trans_dict: {trans_dict[0]}')
+    logger.info(f'identity_dict len: {len(identity_dict[0].keys())}  key: {identity_dict[0].keys()}')
+    logger.info(f'identity_dict: {identity_dict[0]}')
+    logger.info(f'union_id_cols len: {len(union_id_cols)}')
+    logger.info(f'union_id_cols: {union_id_cols}')
+    return trans_dict, identity_dict, target_id, transaction_value_cols, union_id_cols
 
 class GraphModelClient:
     def __init__(self, endpoint):
@@ -130,7 +141,7 @@ class GraphModelClient:
 
         conn.close()                    
                     
-    def query_target_subgraph(self, target_id, union_li_cols, dummied_col):
+    def query_target_subgraph(self, target_id, transaction_value_cols, union_id_cols, dummied_col):
         """Extract 2nd degree subgraph of target transaction.Dump data into subgraph dict and n_feats dict.
         subgraph_dict:  related transactions' id list and values through edges
         n_feats dict: related 1 degree vertex and transactions' embeded elements vectors. 
@@ -159,38 +170,53 @@ class GraphModelClient:
             feat_value = feat[(feat.find('-')+1):]
             node_list = g.V().has(id,feat).both().limit(MAX_FEATURE_NODE).id().toList()
             target_and_conn_node_list = [int(target_name)]+[int(target_conn_node[(target_conn_node.find('-')+1):]) for target_conn_node in node_list]
+            target_and_conn_node_list = list(set(target_and_conn_node_list))
             neighbor_list += target_and_conn_node_list
             nodes_and_feature_value_array = (target_and_conn_node_list,[feat_value]*len(target_and_conn_node_list))
             subgraph_dict['target<>'+feat_name] = nodes_and_feature_value_array
         
         e_t = dt.now()
         logger.info(f'INSIDE query_target_subgraph: subgraph_dict used {(e_t - s_t).total_seconds()} seconds')
+        logger.info(f'subgraph_dict len: {len(subgraph_dict.keys())}  key: {subgraph_dict.keys()}')
+        logger.info(f'subgraph_dict: {subgraph_dict}')
         new_s_t = e_t
 
-        union_li = [t1.V().has(id,target_id).both().hasLabel(label).both().limit(MAX_FEATURE_NODE) for label in union_li_cols]
-        print(len(union_li))
-        node_dict = g.V().has(id,target_id).union(__.both().hasLabel('card1').both().limit(MAX_FEATURE_NODE),\
+        union_li = [t1.V().has(id,target_id).both().hasLabel(label).both().limit(MAX_FEATURE_NODE) for label in union_id_cols]
+        logger.info(f'union_id_cols len: {len(union_id_cols)}  key: {union_id_cols}')
+        logger.info(f'union_li len: {len(union_li)}  key: {union_li}')
+
+        if len(union_id_cols) == 51:
+            node_dict = g.V().has(id,target_id).union(__.both().hasLabel('card1').both().limit(MAX_FEATURE_NODE),\
                     union_li[1], union_li[2], union_li[3], union_li[4], union_li[5],\
                     union_li[6], union_li[7], union_li[8], union_li[9], union_li[10],\
                     union_li[11], union_li[12], union_li[13], union_li[14], union_li[15],\
                     union_li[16], union_li[17], union_li[18], union_li[19], union_li[20],\
                     union_li[21], union_li[22], union_li[23], union_li[24], union_li[25],\
-                    union_li[26], union_li[27], union_li[28], union_li[29], union_li[30],\
+                    union_li[26], union_li[27], union_li[28], unio_li[29], union_li[30],\
                     union_li[31], union_li[32], union_li[33], union_li[34], union_li[35],\
                     union_li[36], union_li[37], union_li[38], union_li[39], union_li[40],\
                     union_li[41], union_li[42], union_li[43], union_li[44], union_li[45],\
                     union_li[46], union_li[47], union_li[48], union_li[49], union_li[50]).elementMap().toList()
+        else:
+            node_dict = g.V().has(id,target_id).union(__.both().hasLabel('card1').both().limit(MAX_FEATURE_NODE),\
+                    union_li[1], union_li[2], union_li[3], union_li[4], union_li[5],\
+                    union_li[6], union_li[7], union_li[8], union_li[9], union_li[10]).elementMap().toList()
 
         e_t = dt.now()
-        logger.info(f'INSIDE query_target_subgraph: neighbor_dict used {(e_t - new_s_t).total_seconds()} seconds.')
+        logger.info(f'INSIDE query_target_subgraph: node_dict used {(e_t - new_s_t).total_seconds()} seconds.')
         new_s_t = e_t
+
+        logger.info(f'node_dict len: {len(node_dict)}  key: {node_dict}')
 
         for item in node_dict:
             node = item.get(list(item)[0])
             node_value = node[(node.find('-')+1):]
-            neighbor_dict[node_value] = [item.get(key) for key in union_li_cols]
+            neighbor_dict[node_value] = [item.get(key) for key in transaction_value_cols]
         logger.info(len(neighbor_dict))
         
+        logger.info(f'INSIDE query_target_subgraph: node_dict used {(e_t - new_s_t).total_seconds()} seconds.')
+        logger.info(f'neighbor_dict len: {len(neighbor_dict.keys())}  key: {neighbor_dict.keys()}')
+        logger.info(f'neighbor_dict: {neighbor_dict}')
         
         
         attr_cols = ['val'+str(x) for x in range(1,391)]
@@ -210,6 +236,9 @@ class GraphModelClient:
         transaction_embed_value_dict['target'] = neighbor_dict
 
         conn.close()   
+
+        logger.info(f'transaction_embed_value_dict len: {len(transaction_embed_value_dict.keys())} key: {transaction_embed_value_dict.keys()}')
+        logger.info(f'transaction_embed_value_dict: {transaction_embed_value_dict}')
 
         return subgraph_dict, transaction_embed_value_dict    
 
@@ -254,7 +283,7 @@ def handler(event, context):
     
     G_s_t = dt.now()
 
-    trans_dict, identity_dict, target_id, union_li_cols = load_data_from_event(event, transactions_id_cols, transactions_cat_cols, dummied_col)
+    trans_dict, identity_dict, target_id, transaction_value_cols, union_li_cols = load_data_from_event(event, transactions_id_cols, transactions_cat_cols, dummied_col)
     
     G_e_t = dt.now()
     logger.info(f'load_data_from_event used {(G_e_t - G_s_t).total_seconds()} seconds. ')
@@ -267,7 +296,7 @@ def handler(event, context):
     logger.info(f'insert_new_transaction_vertex_and_edge used {(G_e_t - G_new_s_t).total_seconds()} seconds. Total test cost {(G_e_t - G_s_t).total_seconds()} seconds.')
     G_new_s_t = G_e_t
     
-    subgraph_dict, transaction_embed_value_dict = graph_input.query_target_subgraph(target_id, union_li_cols, dummied_col)
+    subgraph_dict, transaction_embed_value_dict = graph_input.query_target_subgraph(target_id, transaction_value_cols, union_li_cols, dummied_col)
     
     G_e_t = dt.now()
     logger.info(f'query_target_subgraph used {(G_e_t - G_new_s_t).total_seconds()} seconds. Total test cost {(G_e_t - G_s_t).total_seconds()} seconds.')
@@ -284,21 +313,21 @@ def handler(event, context):
     data_output = {
                     'timestamp': int(time.time()),
                     'isFraud': pred_prob > MODEL_BTW,
-                    'id': event['TransactionID'],
-                    'amount': event['TransactionAmt'],
-                    'productCD': event['ProductCD'],
-                    'card1': event['card1'],
-                    'card2': event['card2'],
-                    'card3': event['card3'],
-                    'card4': event['card4'],
-                    'card5': event['card5'],
-                    'card6': event['card6'],
-                    'addr1': event['addr1'],
-                    'addr2': event['addr2'],
-                    'dist1': event['dist1'],
-                    'dist2': event['dist2'],
-                    'pEmaildomain': event['P_emaildomain'],
-                    'rEmaildomain': event['R_emaildomain'],
+                    'id': event['transaction_data'][0]['TransactionID'],
+                    'amount': event['transaction_data'][0]['TransactionAmt'],
+                    'productCD': event['transaction_data'][0]['ProductCD'],
+                    'card1': event['transaction_data'][0]['card1'],
+                    'card2': event['transaction_data'][0]['card2'],
+                    'card3': event['transaction_data'][0]['card3'],
+                    'card4': event['transaction_data'][0]['card4'],
+                    'card5': event['transaction_data'][0]['card5'],
+                    'card6': event['transaction_data'][0]['card6'],
+                    'addr1': event['transaction_data'][0]['addr1'],
+                    'addr2': event['transaction_data'][0]['addr2'],
+                    'dist1': event['transaction_data'][0]['dist1'],
+                    'dist2': event['transaction_data'][0]['dist2'],
+                    'pEmaildomain': event['transaction_data'][0]['P_emaildomain'],
+                    'rEmaildomain': event['transaction_data'][0]['R_emaildomain'],
                 }
 
     logger.info(f'Send transaction {data_output} to queue.')
