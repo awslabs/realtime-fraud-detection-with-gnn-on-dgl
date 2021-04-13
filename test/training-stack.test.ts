@@ -870,7 +870,7 @@ describe('training stack test suite', () => {
             {
               Ref: 'AWS::URLSuffix',
             },
-            '/pytorch-inference:1.6.0-cpu-py36-ubuntu16.04","Mode":"SingleModel","ModelDataUrl.$":"$.modelPackagingOutput.RepackagedArtifact","Environment":{"SAGEMAKER_PROGRAM":"fd_sl_deployment_entry_point.py"}}},"ResultSelector":{"ModelArn.$":"$.ModelArn"}},"Create endpoint config":{"Next":"Check the existence of endpoint","Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","ResultPath":"$.endpointConfigOutput","Resource":"arn:',
+            '/pytorch-inference:1.6.0-cpu-py36-ubuntu16.04","Mode":"SingleModel","ModelDataUrl.$":"$.modelPackagingOutput.RepackagedArtifact","Environment":{"SAGEMAKER_PROGRAM":"fd_sl_deployment_entry_point.py","HIDDEN_SIZE.$":"$.parameters.trainingJob.hyperparameters[\'n-hidden\']"}}},"ResultSelector":{"ModelArn.$":"$.ModelArn"}},"Create endpoint config":{"Next":"Check the existence of endpoint","Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","ResultPath":"$.endpointConfigOutput","Resource":"arn:',
             {
               Ref: 'AWS::Partition',
             },
