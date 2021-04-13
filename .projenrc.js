@@ -225,7 +225,7 @@ const reactPrj = new web.ReactTypeScriptProject({
     'react@^17.0.1',
     'react-apexcharts@^1.3.7',
     'react-dom@^17.0.1',
-    'react-i18next@^11.8.12',
+    'react-i18next@^11.8.13',
     'react-loader-spinner@^4.0.0',
     'react-minimal-pie-chart@^8.1.0',
     'react-router-dom@^5.2.0',
