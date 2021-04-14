@@ -192,7 +192,7 @@ class GraphModelClient:
                     union_li[11], union_li[12], union_li[13], union_li[14], union_li[15],\
                     union_li[16], union_li[17], union_li[18], union_li[19], union_li[20],\
                     union_li[21], union_li[22], union_li[23], union_li[24], union_li[25],\
-                    union_li[26], union_li[27], union_li[28], unio_li[29], union_li[30],\
+                    union_li[26], union_li[27], union_li[28], union_li[29], union_li[30],\
                     union_li[31], union_li[32], union_li[33], union_li[34], union_li[35],\
                     union_li[36], union_li[37], union_li[38], union_li[39], union_li[40],\
                     union_li[41], union_li[42], union_li[43], union_li[44], union_li[45],\
