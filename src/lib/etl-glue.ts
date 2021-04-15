@@ -4,7 +4,7 @@ import { Database, DataFormat, Table, Schema, CfnJob, CfnConnection, CfnCrawler 
 import { CompositePrincipal, ManagedPolicy, PolicyDocument, PolicyStatement, ServicePrincipal, Role } from '@aws-cdk/aws-iam';
 import { IBucket, Bucket, BucketEncryption } from '@aws-cdk/aws-s3';
 import { BucketDeployment, Source } from '@aws-cdk/aws-s3-deployment';
-import { Aws, Construct, RemovalPolicy, Stack, CfnMapping } from '@aws-cdk/core';
+import { Aws, Construct, RemovalPolicy, Stack } from '@aws-cdk/core';
 import { artifactHash } from './utils';
 
 export interface ETLProps {
@@ -165,16 +165,6 @@ export class ETLByGlue extends Construct {
       'src/script-libs/amazon-neptune-tools/neptune-python-utils/target/');
     glueJobBucket.grantRead(glueJobRole, `${libPrefix}/*`);
 
-    const glueVersionMapping = new CfnMapping(this, 'GlueVersionMapping', {
-      mapping: {
-        'aws': {
-          glueVersion: '2.0',
-        },
-        'aws-cn': {
-          glueVersion: '1.0',
-        },
-      },
-    });
     const outputPrefix = `${props.s3Prefix ?? ''}processed-data/`;
     const etlJob = new CfnJob(this, 'PreprocessingJob', {
       command: {
@@ -203,7 +193,7 @@ export class ETLByGlue extends Construct {
       role: glueJobRole.roleArn,
       workerType: 'G.2X',
       numberOfWorkers: 2,
-      glueVersion: glueVersionMapping.findInMap(Aws.PARTITION, 'glueVersion'),
+      glueVersion: '2.0',
       connections: {
         connections: [
           connName,
