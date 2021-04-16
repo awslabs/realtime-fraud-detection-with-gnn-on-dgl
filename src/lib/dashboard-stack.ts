@@ -402,6 +402,7 @@ export class TransactionDashboardStack extends NestedStack {
         logs: {
           destination: new LogGroup(this, 'FraudDetectionSimulatorLogGroup', {
             retention: RetentionDays.SIX_MONTHS,
+            logGroupName: `/aws/vendedlogs/states/fraud-detetion/dashboard-simulator/${this.stackName}`,
           }),
           includeExecutionData: true,
           level: LogLevel.ERROR,

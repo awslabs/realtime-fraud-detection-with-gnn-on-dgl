@@ -629,6 +629,7 @@ export class TrainingStack extends NestedStack {
       logs: {
         destination: new LogGroup(this, 'FraudDetectionLogGroup', {
           retention: RetentionDays.SIX_MONTHS,
+          logGroupName: `/aws/vendedlogs/states/fraud-detetion/training-pipeline/${this.stackName}`,
         }),
         includeExecutionData: true,
         level: LogLevel.ERROR,
