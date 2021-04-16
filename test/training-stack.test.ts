@@ -642,15 +642,7 @@ describe('training stack test suite', () => {
         '--neptune_endpoint': 'neptune-xxxx.us-east-1.aws.amazon.com',
         '--neptune_port': '8182',
       },
-      GlueVersion: {
-        'Fn::FindInMap': [
-          'ETLCompGlueVersionMapping71D78D7A',
-          {
-            Ref: 'AWS::Partition',
-          },
-          'glueVersion',
-        ],
-      },
+      GlueVersion: '2.0',
       NumberOfWorkers: 2,
       WorkerType: 'G.2X',
     });
