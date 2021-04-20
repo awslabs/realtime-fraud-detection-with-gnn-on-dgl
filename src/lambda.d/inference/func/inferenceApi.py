@@ -141,7 +141,7 @@ class GraphModelClient:
 
         conn.close()                    
                     
-    def query_target_subgraph(self, target_id, transaction_value_cols, union_id_cols, dummied_col):
+    def query_target_subgraph(self, target_id, tr_dict, transaction_value_cols, union_id_cols, dummied_col):
         """Extract 2nd degree subgraph of target transaction.Dump data into subgraph dict and n_feats dict.
         subgraph_dict:  related transactions' id list and values through edges
         n_feats dict: related 1 degree vertex and transactions' embeded elements vectors. 
@@ -212,7 +212,9 @@ class GraphModelClient:
             node = item.get(list(item)[0])
             node_value = node[(node.find('-')+1):]
             neighbor_dict[node_value] = [item.get(key) for key in transaction_value_cols]
-        logger.info(len(neighbor_dict))
+
+        target_value = target_id[(target_id.find('-')+1):]
+        neighbor_dict[target_value] = [tr_dict[0].get(key) for key in transaction_value_cols]
         
         logger.info(f'INSIDE query_target_subgraph: node_dict used {(e_t - new_s_t).total_seconds()} seconds.')
         logger.info(f'neighbor_dict len: {len(neighbor_dict.keys())}  key: {neighbor_dict.keys()}')
@@ -281,6 +283,8 @@ def handler(event, context):
 
     logger.info('Endpoint name: {}'.format(ENDPOINT_NAME))
     
+    logger.info(f'Receive event: {event}')
+
     G_s_t = dt.now()
 
     trans_dict, identity_dict, target_id, transaction_value_cols, union_li_cols = load_data_from_event(event, transactions_id_cols, transactions_cat_cols, dummied_col)
@@ -296,7 +300,7 @@ def handler(event, context):
     logger.info(f'insert_new_transaction_vertex_and_edge used {(G_e_t - G_new_s_t).total_seconds()} seconds. Total test cost {(G_e_t - G_s_t).total_seconds()} seconds.')
     G_new_s_t = G_e_t
     
-    subgraph_dict, transaction_embed_value_dict = graph_input.query_target_subgraph(target_id, transaction_value_cols, union_li_cols, dummied_col)
+    subgraph_dict, transaction_embed_value_dict = graph_input.query_target_subgraph(target_id, trans_dict, transaction_value_cols, union_li_cols, dummied_col)
     
     G_e_t = dt.now()
     logger.info(f'query_target_subgraph used {(G_e_t - G_new_s_t).total_seconds()} seconds. Total test cost {(G_e_t - G_s_t).total_seconds()} seconds.')
@@ -339,8 +343,10 @@ def handler(event, context):
     )
     
     function_res = {
+                    'id': event['transaction_data'][0]['TransactionID'],
                     'flag': pred_prob > MODEL_BTW,
-                    'pred_prob': pred_prob
+                    'pred_prob': pred_prob,
+                    'time': (G_e_t - G_s_t).total_seconds()
                     }
 
     return function_res
