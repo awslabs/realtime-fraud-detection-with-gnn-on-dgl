@@ -889,6 +889,33 @@ describe('training stack test suite', () => {
           ],
         ],
       },
+      TracingConfiguration: {
+        Enabled: true,
+      },
+    });
+  });
+
+  // see https://docs.aws.amazon.com/step-functions/latest/dg/bp-cwl.html for detail
+  test('log group of states is applied the best practise.', () => {
+    expect(stack).toHaveResourceLike('AWS::Logs::LogGroup', {
+      Properties: {
+        LogGroupName: {
+          'Fn::Join': [
+            '',
+            [
+              '/aws/vendedlogs/states/fraud-detetion/training-pipeline/',
+              {
+                Ref: 'AWS::StackName',
+              },
+            ],
+          ],
+        },
+        RetentionInDays: 180,
+      },
+      UpdateReplacePolicy: 'Retain',
+      DeletionPolicy: 'Retain',
+    }, ResourcePart.CompleteDefinition);
+    expect(stack).toHaveResourceLike('AWS::StepFunctions::StateMachine', {
       LoggingConfiguration: {
         Destinations: [
           {
@@ -904,9 +931,6 @@ describe('training stack test suite', () => {
         ],
         IncludeExecutionData: true,
         Level: 'ERROR',
-      },
-      TracingConfiguration: {
-        Enabled: true,
       },
     });
   });
