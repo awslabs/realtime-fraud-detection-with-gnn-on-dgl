@@ -9,6 +9,7 @@ import { artifactHash } from './utils';
 
 export interface ETLProps {
   bucket: IBucket;
+  accessLogBucket: IBucket;
   s3Prefix?: string;
   vpc: IVpc;
   transactionPrefix: string;
@@ -33,6 +34,8 @@ export class ETLByGlue extends Construct {
       encryption: BucketEncryption.S3_MANAGED,
       autoDeleteObjects: true,
       removalPolicy: RemovalPolicy.DESTROY,
+      serverAccessLogsBucket: props.accessLogBucket,
+      serverAccessLogsPrefix: 'glueJobBucketAccessLog',
     });
 
     const transactionDatabase = new Database(this, 'FraudDetectionDatabase', {

@@ -31,9 +31,17 @@ export class FraudDetectionStack extends Stack {
       throw new Error('The VPC must have PRIVATE subnet.');
     }
 
+    const accessLogBucket = new Bucket(this, 'BucketAccessLog', {
+      encryption: BucketEncryption.S3_MANAGED,
+      removalPolicy: RemovalPolicy.RETAIN,
+      serverAccessLogsPrefix: 'accessLogBucketAccessLog',
+    });
+
     const bucket = new Bucket(this, 'FraudDetectionDataBucket', {
       encryption: BucketEncryption.S3_MANAGED,
       removalPolicy: RemovalPolicy.RETAIN,
+      serverAccessLogsBucket: accessLogBucket,
+      serverAccessLogsPrefix: 'dataBucketAccessLog',
     });
 
     const neptuneInstanceType = new CfnParameter(this, 'NeptuneInstaneType', {
@@ -59,6 +67,7 @@ export class FraudDetectionStack extends Stack {
     const trainingStack = new TrainingStack(this, 'training', {
       vpc,
       bucket,
+      accessLogBucket,
       neptune: neptuneInfo,
       dataPrefix,
     });
@@ -107,6 +116,7 @@ export class FraudDetectionStack extends Stack {
     new TransactionDashboardStack(this, 'dashboard', {
       vpc,
       queue: tranQueue,
+      accessLogBucket,
       customDomain: customDomain,
       r53HostZoneId: r53HostZoneId,
     });
