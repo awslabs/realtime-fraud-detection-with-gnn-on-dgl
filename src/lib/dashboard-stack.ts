@@ -57,7 +57,7 @@ import { PythonFunction, PythonLayerVersion } from '@aws-cdk/aws-lambda-python';
 import { RetentionDays, LogGroup } from '@aws-cdk/aws-logs';
 import { IHostedZone, ARecord, RecordTarget } from '@aws-cdk/aws-route53';
 import { CloudFrontTarget } from '@aws-cdk/aws-route53-targets';
-import { Bucket, BucketEncryption, BlockPublicAccess } from '@aws-cdk/aws-s3';
+import { Bucket, BucketEncryption, BlockPublicAccess, IBucket } from '@aws-cdk/aws-s3';
 import {
   BucketDeployment,
   Source,
@@ -102,6 +102,7 @@ import { artifactsHash } from './utils';
 export interface TransactionDashboardStackStackProps extends NestedStackProps {
   readonly vpc: IVpc;
   readonly queue: IQueue;
+  readonly accessLogBucket: IBucket;
   readonly customDomain?: string;
   readonly r53HostZoneId?: string;
 }
@@ -484,6 +485,7 @@ export class TransactionDashboardStack extends NestedStack {
     });
 
     this._deployFrontend(
+      props.accessLogBucket,
       dashboardApi.graphqlUrl,
       httpApi.apiEndpoint,
       apiStage.stageName,
@@ -503,6 +505,7 @@ export class TransactionDashboardStack extends NestedStack {
   }
 
   _deployFrontend(
+    accessLogBucket: IBucket,
     graphqlEndpoint: string,
     httpEndpoint: string,
     stageName: string,
@@ -515,6 +518,8 @@ export class TransactionDashboardStack extends NestedStack {
       autoDeleteObjects: true,
       encryption: BucketEncryption.S3_MANAGED,
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+      serverAccessLogsBucket: accessLogBucket,
+      serverAccessLogsPrefix: 'dashboardUIBucketAccessLog',
     });
 
     let distribution: IDistribution;
