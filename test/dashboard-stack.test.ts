@@ -17,6 +17,13 @@ describe('dashboard stack test suite', () => {
   });
 
   test('docdb is created.', () => {
+    expect(stack).toHaveResourceLike('AWS::DocDB::DBClusterParameterGroup', {
+      Family: 'docdb4.0',
+      Parameters: {
+        audit_logs: 'enabled',
+      },
+    });
+
     expect(stack).toHaveResourceLike('AWS::DocDB::DBCluster', {
       Properties: {
         MasterUsername: {
@@ -43,6 +50,12 @@ describe('dashboard stack test suite', () => {
             ],
           ],
         },
+        BackupRetentionPeriod: 7,
+        DBClusterParameterGroupName: {
+          Ref: 'DashboardDBParameterGroupB9B62F6B',
+        },
+        EngineVersion: '4.0.0',
+        Port: 27117,
         StorageEncrypted: true,
       },
       UpdateReplacePolicy: 'Delete',

@@ -32,7 +32,7 @@ import {
   ViewerCertificate,
 } from '@aws-cdk/aws-cloudfront';
 import { S3Origin, HttpOrigin } from '@aws-cdk/aws-cloudfront-origins';
-import { DatabaseCluster } from '@aws-cdk/aws-docdb';
+import { ClusterParameterGroup, DatabaseCluster } from '@aws-cdk/aws-docdb';
 import {
   IVpc,
   SubnetType,
@@ -116,17 +116,31 @@ export class TransactionDashboardStack extends NestedStack {
   ) {
     super(scope, id, props);
 
+    const engine = '4.0.0';
+    const docDBParameterGroup = new ClusterParameterGroup(this, 'DashboardDBParameterGroup', {
+      family: 'docdb4.0', // peer to engine
+      description: 'Parameter group of Dashboard DB.',
+      parameters: {
+        audit_logs: 'enabled',
+      },
+    });
     const dbUser = 'dashboard';
     const docDBCluster = new DatabaseCluster(this, 'DashboardDatabase', {
       masterUser: {
         username: dbUser,
       },
+      engineVersion: engine,
+      port: 27117,
       storageEncrypted: true,
       instanceType: InstanceType.of(InstanceClass.T3, InstanceSize.MEDIUM),
       vpcSubnets: {
         subnetType: SubnetType.PRIVATE,
       },
       vpc: props.vpc,
+      backup: {
+        retention: Duration.days(7),
+      },
+      parameterGroup: docDBParameterGroup,
       removalPolicy: RemovalPolicy.DESTROY,
     });
 
