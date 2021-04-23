@@ -95,7 +95,7 @@ export class FraudDetectionStack extends Stack {
     neptuneInfo.neptuneSG.addIngressRule(inferenceStack.inferenceSG,
       Port.tcp(Number(neptuneInfo.port)), 'access from inference job.');
 
-    const inferenceStatsFnArn = inferenceStack.inferenceStatsFn.functionArn;
+    const inferenceFnArn = inferenceStack.inferenceFn.functionArn;
     const interParameterGroups = [
       {
         Label: { default: 'The configuration of graph database Neptune' },
@@ -127,7 +127,7 @@ export class FraudDetectionStack extends Stack {
     new TransactionDashboardStack(this, 'dashboard', {
       vpc,
       queue: tranQueue,
-      inferenceArn: inferenceStatsFnArn,
+      inferenceArn: inferenceFnArn,
       customDomain: customDomain,
       r53HostZoneId: r53HostZoneId,
     });

@@ -1,7 +1,7 @@
 import * as path from 'path';
 import { IVpc, ISecurityGroup, SecurityGroup } from '@aws-cdk/aws-ec2';
 import { PolicyStatement } from '@aws-cdk/aws-iam';
-import { IFunction, Runtime } from '@aws-cdk/aws-lambda';
+import { IFunction, Runtime, Tracing } from '@aws-cdk/aws-lambda';
 import { PythonFunction, PythonLayerVersion } from '@aws-cdk/aws-lambda-python';
 import { IQueue } from '@aws-cdk/aws-sqs';
 import { Construct, Duration, Stack, NestedStack, NestedStackProps, Aws } from '@aws-cdk/core';
@@ -24,12 +24,12 @@ export interface InferenceProps extends NestedStackProps {
 
 export class InferenceStack extends NestedStack {
   readonly inferenceSG: ISecurityGroup;
-  readonly inferenceStatsFn: IFunction;
+  readonly inferenceFn: IFunction;
 
   constructor(scope: Construct, id: string, props: InferenceProps) {
     super(scope, id, props);
 
-    this.inferenceStatsFn = new PythonFunction(this, 'InferenceStatsFn', {
+    this.inferenceFn = new PythonFunction(this, 'InferenceFn', {
       entry: path.join(__dirname, '../lambda.d/inference/func'),
       layers: [
         new PythonLayerVersion(this, 'InferenceDataLayer', {
@@ -46,6 +46,7 @@ export class InferenceStack extends NestedStack {
       handler: 'handler',
       timeout: Duration.minutes(2),
       memorySize: 512,
+      tracing: Tracing.ACTIVE,
       environment: {
         MAX_FEATURE_NODE: String(50),
         CLUSTER_ENDPOINT: props.neptune.endpoint,
@@ -64,9 +65,9 @@ export class InferenceStack extends NestedStack {
         allowAllOutbound: true,
       }),
     });
-    props.queue.grantSendMessages(this.inferenceStatsFn);
+    props.queue.grantSendMessages(this.inferenceFn);
 
-    this.inferenceStatsFn.addToRolePolicy(new PolicyStatement({
+    this.inferenceFn.addToRolePolicy(new PolicyStatement({
       actions: ['neptune-db:connect'],
       resources: [
         Stack.of(this).formatArn({
@@ -78,7 +79,7 @@ export class InferenceStack extends NestedStack {
     }),
     );
 
-    this.inferenceStatsFn.addToRolePolicy(new PolicyStatement({
+    this.inferenceFn.addToRolePolicy(new PolicyStatement({
       actions: ['sagemaker:InvokeEndpoint'],
       resources: [
         Stack.of(this).formatArn({
