@@ -1,6 +1,7 @@
 import '@aws-cdk/assert/jest';
 import { ResourcePart } from '@aws-cdk/assert/lib/assertions/have-resource';
 import { Vpc } from '@aws-cdk/aws-ec2';
+import { Bucket } from '@aws-cdk/aws-s3';
 import { Queue, QueueEncryption } from '@aws-cdk/aws-sqs';
 import { App, Stack, RemovalPolicy, Duration, CfnParameter } from '@aws-cdk/core';
 import { TransactionDashboardStack } from '../src/lib/dashboard-stack';
@@ -531,6 +532,12 @@ describe('dashboard stack test suite', () => {
               },
             },
           ],
+        },
+        LoggingConfiguration: {
+          DestinationBucketName: {
+            Ref: 'referencetoTestStackAccessLogF5229892Ref',
+          },
+          LogFilePrefix: 'dashboardUIBucketAccessLog',
         },
         PublicAccessBlockConfiguration: {
           BlockPublicAcls: true,
@@ -1137,11 +1144,13 @@ function initializeStackWithContextsAndEnvs(context: {} | undefined, env?: {} | 
     visibilityTimeout: Duration.seconds(60),
   });
   const inferenceArn = 'arn:aws:lambda:ap-southeast-1:123456789012:function:inference-func';
+  const accessLogBucket = new Bucket(parentStack, 'AccessLog');
 
   const stack = new TransactionDashboardStack(parentStack, 'DashboardStack', {
     vpc,
     queue,
     inferenceArn,
+    accessLogBucket,
     customDomain,
     r53HostZoneId,
   });

@@ -32,6 +32,12 @@ describe('fraud detection stack test suite', () => {
             },
           ],
         },
+        LoggingConfiguration: {
+          DestinationBucketName: {
+            Ref: 'BucketAccessLog9C13C446',
+          },
+          LogFilePrefix: 'dataBucketAccessLog',
+        },
       },
       UpdateReplacePolicy: 'Retain',
       DeletionPolicy: 'Retain',

@@ -21,6 +21,7 @@ import { dirArtifactHash } from './utils';
 
 export interface TrainingStackProps extends NestedStackProps {
   readonly bucket: IBucket;
+  readonly accessLogBucket: IBucket;
   readonly vpc: IVpc;
   readonly neptune: {
     endpoint: string;
@@ -101,6 +102,7 @@ export class TrainingStack extends NestedStack {
 
     const etlConstruct = new ETLByGlue(this, 'ETLComp', {
       s3Prefix: dataPrefix,
+      accessLogBucket: props.accessLogBucket,
       transactionPrefix,
       identityPrefix,
       bucket: props.bucket,

@@ -178,6 +178,26 @@ describe('training stack test suite', () => {
     });
   });
 
+  test('s3 bucket for glue job', () => {
+    expect(stack).toHaveResourceLike('AWS::S3::Bucket', {
+      BucketEncryption: {
+        ServerSideEncryptionConfiguration: [
+          {
+            ServerSideEncryptionByDefault: {
+              SSEAlgorithm: 'AES256',
+            },
+          },
+        ],
+      },
+      LoggingConfiguration: {
+        DestinationBucketName: {
+          Ref: 'referencetoTestStackAccessLogF5229892Ref',
+        },
+        LogFilePrefix: 'glueJobBucketAccessLog',
+      },
+    });
+  });
+
   test('glue job is created', () => {
     expect(stack).toHaveResourceLike('AWS::IAM::Role', {
       AssumeRolePolicyDocument: {
@@ -1040,10 +1060,12 @@ function initializeStackWithContextsAndEnvs(context: {} | undefined, env?: {} | 
   const parentStack = new Stack(app, 'TestStack', { env: env });
   const vpc = new Vpc(parentStack, 'Vpc');
   const bucket = new Bucket(parentStack, 'Bucket');
+  const accessLogBucket = new Bucket(parentStack, 'AccessLog');
 
   const stack = new TrainingStack(parentStack, 'TestStack', {
     vpc,
     bucket,
+    accessLogBucket,
     neptune: {
       endpoint: 'neptune-xxxx.us-east-1.aws.amazon.com',
       port: '8182',
