@@ -281,6 +281,9 @@ describe('dashboard stack test suite', () => {
       MemorySize: 3008,
       Runtime: 'python3.8',
       Timeout: 900,
+      TracingConfig: {
+        Mode: 'Active',
+      },
     });
 
     expect(stack).toHaveResourceLike('AWS::StepFunctions::StateMachine', {
@@ -355,7 +358,7 @@ describe('dashboard stack test suite', () => {
           },
         ],
         IncludeExecutionData: true,
-        Level: 'ERROR',
+        Level: 'ALL',
       },
     });
   });
@@ -413,6 +416,9 @@ describe('dashboard stack test suite', () => {
             Ref: 'referencetoTestStackVpcPrivateSubnet2Subnet5DE74951Ref',
           },
         ],
+      },
+      TracingConfig: {
+        Mode: 'Active',
       },
     });
 
