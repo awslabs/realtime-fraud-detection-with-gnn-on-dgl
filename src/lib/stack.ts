@@ -208,6 +208,7 @@ export class FraudDetectionStack extends Stack {
       port: clusterPort,
       iamAuthEnabled: true,
       storageEncrypted: true,
+      backupRetentionPeriod: 7,
     });
     graphDBCluster.addDependsOn(clusterParamGroup);
     graphDBCluster.addDependsOn(dbSubnetGroup);
@@ -223,6 +224,7 @@ export class FraudDetectionStack extends Stack {
       dbClusterIdentifier: graphDBCluster.ref,
       dbInstanceClass: instanceType,
       dbParameterGroupName: dbParamGroup.ref,
+      autoMinorVersionUpgrade: true,
     });
     primaryDB.addDependsOn(graphDBCluster);
     primaryDB.addDependsOn(dbParamGroup);
@@ -231,6 +233,7 @@ export class FraudDetectionStack extends Stack {
         dbClusterIdentifier: graphDBCluster.ref,
         dbInstanceClass: instanceType,
         dbInstanceIdentifier: `replica-${idx}`,
+        autoMinorVersionUpgrade: true,
       });
       replica.addDependsOn(primaryDB);
       replica.addDependsOn(graphDBCluster);
