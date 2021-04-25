@@ -63,6 +63,18 @@ describe('fraud detection stack test suite', () => {
       },
       VpcEndpointType: 'Gateway',
     });
+
+    expect(stack).toHaveResourceLike('AWS::EC2::FlowLog', {
+      ResourceType: 'VPC',
+      TrafficType: 'ALL',
+      LogDestination: {
+        'Fn::GetAtt': [
+          'FraudDetectionVpcVpcFlowlogsBucket43753A7B',
+          'Arn',
+        ],
+      },
+      LogDestinationType: 's3',
+    });
   });
 
   test('Neptune cluster and dbs created', () => {
