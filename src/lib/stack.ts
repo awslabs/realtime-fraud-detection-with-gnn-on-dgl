@@ -97,6 +97,16 @@ export class FraudDetectionStack extends Stack {
       fifo: true,
       removalPolicy: RemovalPolicy.DESTROY,
       visibilityTimeout: Duration.seconds(60),
+      deadLetterQueue: {
+        queue: new Queue(this, 'TransDLQ', {
+          contentBasedDeduplication: true,
+          encryption: QueueEncryption.KMS_MANAGED,
+          fifo: true,
+          visibilityTimeout: Duration.seconds(60),
+          removalPolicy: RemovalPolicy.DESTROY,
+        }),
+        maxReceiveCount: 5,
+      },
     });
 
     const inferenceStack = new InferenceStack(this, 'inference', {

@@ -231,7 +231,18 @@ describe('fraud detection stack test suite', () => {
       FifoQueue: true,
       KmsMasterKeyId: 'alias/aws/sqs',
       VisibilityTimeout: 60,
+      RedrivePolicy: {
+        deadLetterTargetArn: {
+          'Fn::GetAtt': [
+            'TransDLQ2CB8C42A',
+            'Arn',
+          ],
+        },
+        maxReceiveCount: 5,
+      },
     });
+
+    expect(stack).toCountResources('AWS::SQS::Queue', 2);
   });
 
   function _mockVpcWithoutPrivateSubnet(): (scope: Construct, options: GetContextValueOptions) => GetContextValueResult {
