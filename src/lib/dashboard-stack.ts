@@ -8,6 +8,7 @@ import {
   HttpMethod,
   CfnRoute,
   HttpStage,
+  CfnStage,
 } from '@aws-cdk/aws-apigatewayv2';
 import { LambdaProxyIntegration } from '@aws-cdk/aws-apigatewayv2-integrations';
 import {
@@ -431,7 +432,9 @@ export class TransactionDashboardStack extends NestedStack {
       },
     );
 
-    const httpApi = new HttpApi(this, 'FraudDetectionDashboardApi');
+    const httpApi = new HttpApi(this, 'FraudDetectionDashboardApi', {
+      createDefaultStage: false,
+    });
     const apiRole = new Role(this, 'FraudDetectionDashboardApiRole', {
       assumedBy: new ServicePrincipal('apigateway.amazonaws.com'),
     });
@@ -502,6 +505,24 @@ export class TransactionDashboardStack extends NestedStack {
       stageName: apiStageName,
       autoDeploy: true,
     });
+    // TODO: update it when https://github.com/aws/aws-cdk/issues/11100 is resolved
+    const apiCfnStage = apiStage.node.defaultChild as CfnStage;
+    const apiAccessLog = new LogGroup(this, `Stage${apiStageName}Log`);
+    apiCfnStage.accessLogSettings = {
+      destinationArn: apiAccessLog.logGroupArn,
+      format: JSON.stringify({
+        requestId: '$context.requestId',
+        ip: '$context.identity.sourceIp',
+        caller: '$context.identity.caller',
+        user: '$context.identity.user',
+        requestTime: '$context.requestTime',
+        httpMethod: '$context.httpMethod',
+        resourcePath: '$context.resourcePath',
+        status: '$context.status',
+        protocol: '$context.protocol',
+        responseLength: '$context.responseLength',
+      }),
+    };
 
     this._deployFrontend(
       props.accessLogBucket,
