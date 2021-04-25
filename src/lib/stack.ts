@@ -1,4 +1,4 @@
-import { GatewayVpcEndpointAwsService, Vpc, SecurityGroup, IVpc, ISecurityGroup, Port } from '@aws-cdk/aws-ec2';
+import { GatewayVpcEndpointAwsService, Vpc, SecurityGroup, IVpc, ISecurityGroup, Port, FlowLogDestination } from '@aws-cdk/aws-ec2';
 import { Role, ServicePrincipal, PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
 import { CfnDBCluster, CfnDBSubnetGroup, CfnDBClusterParameterGroup, CfnDBParameterGroup, CfnDBInstance } from '@aws-cdk/aws-neptune';
 import { Bucket, BucketEncryption, IBucket } from '@aws-cdk/aws-s3';
@@ -17,17 +17,23 @@ export class FraudDetectionStack extends Stack {
     const vpc = vpcId ? Vpc.fromLookup(this, 'FraudDetectionVpc', {
       vpcId: vpcId === 'default' ? undefined : vpcId,
       isDefault: vpcId === 'default' ? true : undefined,
-    }) : new Vpc(this, 'FraudDetectionVpc', {
-      maxAzs: 2,
-      gatewayEndpoints: {
-        s3: {
-          service: GatewayVpcEndpointAwsService.S3,
+    }) : (() => {
+      const newVpc = new Vpc(this, 'FraudDetectionVpc', {
+        maxAzs: 2,
+        gatewayEndpoints: {
+          s3: {
+            service: GatewayVpcEndpointAwsService.S3,
+          },
+          dynamodb: {
+            service: GatewayVpcEndpointAwsService.DYNAMODB,
+          },
         },
-        dynamodb: {
-          service: GatewayVpcEndpointAwsService.DYNAMODB,
-        },
-      },
-    });
+      });
+      newVpc.addFlowLog('VpcFlowlogs', {
+        destination: FlowLogDestination.toS3(),
+      });
+      return newVpc;
+    })();
     if (vpc.privateSubnets.length < 1) {
       throw new Error('The VPC must have PRIVATE subnet.');
     }
