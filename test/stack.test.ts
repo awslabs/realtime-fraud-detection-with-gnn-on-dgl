@@ -106,6 +106,7 @@ describe('fraud detection stack test suite', () => {
         },
         IamAuthEnabled: true,
         Port: 8182,
+        BackupRetentionPeriod: 7,
         StorageEncrypted: true,
         VpcSecurityGroupIds: [
           {
@@ -127,6 +128,7 @@ describe('fraud detection stack test suite', () => {
         DBInstanceClass: {
           Ref: 'NeptuneInstaneType',
         },
+        AutoMinorVersionUpgrade: true,
         DBClusterIdentifier: {
           Ref: 'TransactionGraphCluster',
         },
