@@ -1,6 +1,6 @@
 import * as path from 'path';
 import { IVpc, Port, SecurityGroup, ISecurityGroup } from '@aws-cdk/aws-ec2';
-import { Database, DataFormat, Table, Schema, CfnJob, CfnConnection, CfnCrawler } from '@aws-cdk/aws-glue';
+import { Database, DataFormat, Table, Schema, CfnJob, CfnConnection, CfnCrawler, SecurityConfiguration, S3EncryptionMode, CloudWatchEncryptionMode, JobBookmarksEncryptionMode } from '@aws-cdk/aws-glue';
 import { CompositePrincipal, ManagedPolicy, PolicyDocument, PolicyStatement, ServicePrincipal, Role } from '@aws-cdk/aws-iam';
 import { IBucket, Bucket, BucketEncryption } from '@aws-cdk/aws-s3';
 import { BucketDeployment, Source } from '@aws-cdk/aws-s3-deployment';
@@ -121,6 +121,19 @@ export class ETLByGlue extends Construct {
     });
     const connName = networkConn.ref;
 
+    const securityConf = new SecurityConfiguration(this, 'FraudDetectionSecConf', {
+      securityConfigurationName: `SecConf-${Stack.of(this).stackName}`,
+      s3Encryption: {
+        mode: S3EncryptionMode.S3_MANAGED,
+      },
+      cloudWatchEncryption: {
+        mode: CloudWatchEncryptionMode.KMS,
+      },
+      jobBookmarksEncryption: {
+        mode: JobBookmarksEncryptionMode.CLIENT_SIDE_KMS,
+      },
+    });
+
     const glueJobRole = new Role(this, 'GlueJobRole', {
       assumedBy: new CompositePrincipal(
         new ServicePrincipal('glue.amazonaws.com')),
@@ -206,6 +219,7 @@ export class ETLByGlue extends Construct {
           connName,
         ],
       },
+      securityConfiguration: securityConf.securityConfigurationName,
     });
     props.bucket.grantWrite(glueJobRole, `${outputPrefix}*`);
     this.jobName = etlJob.ref;
