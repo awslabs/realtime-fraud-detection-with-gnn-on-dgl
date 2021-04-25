@@ -51,7 +51,7 @@ import {
   ArnPrincipal,
   ManagedPolicy,
 } from '@aws-cdk/aws-iam';
-import { LayerVersion, Code, Runtime } from '@aws-cdk/aws-lambda';
+import { LayerVersion, Code, Runtime, Tracing } from '@aws-cdk/aws-lambda';
 import { SqsEventSource } from '@aws-cdk/aws-lambda-event-sources';
 import { NodejsFunction } from '@aws-cdk/aws-lambda-nodejs';
 import { PythonFunction, PythonLayerVersion } from '@aws-cdk/aws-lambda-python';
@@ -194,6 +194,7 @@ export class TransactionDashboardStack extends NestedStack {
       }),
       securityGroup: dashboardSG,
       layers: [docDBCertLayer],
+      tracing: Tracing.ACTIVE,
     });
     docDBCluster.secret!.grantRead(transacationFn);
 
@@ -213,6 +214,7 @@ export class TransactionDashboardStack extends NestedStack {
       }),
       securityGroup: dashboardSG,
       layers: [docDBCertLayer],
+      tracing: Tracing.ACTIVE,
     });
     docDBCluster.secret!.grantRead(createIndexesFn);
 
@@ -338,6 +340,7 @@ export class TransactionDashboardStack extends NestedStack {
       }),
       securityGroup: dashboardSG,
       layers: [docDBCertLayer],
+      tracing: Tracing.ACTIVE,
     });
     docDBCluster.secret!.grantRead(tranEventFn);
     tranEventFn.addEventSource(
@@ -365,6 +368,7 @@ export class TransactionDashboardStack extends NestedStack {
       },
       timeout: Duration.minutes(15),
       memorySize: 3008,
+      tracing: Tracing.ACTIVE,
     });
     tranSimFn.addToRolePolicy(new PolicyStatement({
       actions: ['lambda:InvokeFunction'],
@@ -399,6 +403,7 @@ export class TransactionDashboardStack extends NestedStack {
       timeout: Duration.seconds(30),
       memorySize: 128,
       runtime: Runtime.NODEJS_14_X,
+      tracing: Tracing.ACTIVE,
     });
     const parameterTask = new (class extends LambdaInvoke {
       public toStateJson(): object {
@@ -426,7 +431,7 @@ export class TransactionDashboardStack extends NestedStack {
             logGroupName: `/aws/vendedlogs/states/fraud-detetion/dashboard-simulator/${this.stackName}`,
           }),
           includeExecutionData: true,
-          level: LogLevel.ERROR,
+          level: LogLevel.ALL,
         },
         tracingEnabled: true,
       },
@@ -489,6 +494,7 @@ export class TransactionDashboardStack extends NestedStack {
       memorySize: 256,
       role: tokenFnRole,
       runtime: Runtime.NODEJS_14_X,
+      tracing: Tracing.ACTIVE,
     });
     const tokenFnIntegration = new LambdaProxyIntegration({
       handler: tokenFn,

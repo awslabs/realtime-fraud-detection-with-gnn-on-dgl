@@ -34,6 +34,14 @@ describe('training stack test suite', () => {
         Statement: [
           {
             Action: [
+              'xray:PutTraceSegments',
+              'xray:PutTelemetryRecords',
+            ],
+            Effect: 'Allow',
+            Resource: '*',
+          },
+          {
+            Action: [
               's3:DeleteObject*',
               's3:PutObject*',
               's3:Abort*',
@@ -100,6 +108,9 @@ describe('training stack test suite', () => {
       MemorySize: 3008,
       Runtime: 'python3.8',
       Timeout: 900,
+      TracingConfig: {
+        Mode: 'Active',
+      },
     });
   });
 
@@ -673,6 +684,14 @@ describe('training stack test suite', () => {
       PolicyDocument: {
         Statement: [
           {
+            Action: [
+              'xray:PutTraceSegments',
+              'xray:PutTelemetryRecords',
+            ],
+            Effect: 'Allow',
+            Resource: '*',
+          },
+          {
             Action: 'glue:StartCrawler',
             Effect: 'Allow',
             Resource: {
@@ -950,7 +969,7 @@ describe('training stack test suite', () => {
           },
         ],
         IncludeExecutionData: true,
-        Level: 'ERROR',
+        Level: 'ALL',
       },
     });
   });
@@ -1049,6 +1068,9 @@ describe('training stack test suite', () => {
           LocalMountPath: '/mnt/efs',
         },
       ],
+      TracingConfig: {
+        Mode: 'Active',
+      },
     });
   });
 });

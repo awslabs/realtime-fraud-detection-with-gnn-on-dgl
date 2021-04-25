@@ -60,6 +60,7 @@ export class TrainingStack extends NestedStack {
       timeout: Duration.seconds(60),
       memorySize: 128,
       runtime: Runtime.NODEJS_14_X,
+      tracing: Tracing.ACTIVE,
     });
     const parametersNormalizeTask = new class extends LambdaInvoke {
       public toStateJson(): object {
@@ -97,6 +98,7 @@ export class TrainingStack extends NestedStack {
       },
       timeout: stateTimeout,
       memorySize: 3008,
+      tracing: Tracing.ACTIVE,
     });
     props.bucket.grantWrite(dataIngestFn);
 
@@ -118,6 +120,7 @@ export class TrainingStack extends NestedStack {
       timeout: stateTimeout,
       memorySize: 128,
       runtime: Runtime.NODEJS_14_X,
+      tracing: Tracing.ACTIVE,
     });
     dataCatalogCrawlerFn.role?.addToPolicy(new PolicyStatement({
       effect: Effect.ALLOW,
@@ -639,7 +642,7 @@ export class TrainingStack extends NestedStack {
           logGroupName: `/aws/vendedlogs/states/fraud-detetion/training-pipeline/${this.stackName}`,
         }),
         includeExecutionData: true,
-        level: LogLevel.ERROR,
+        level: LogLevel.ALL,
       },
       tracingEnabled: true,
     });
