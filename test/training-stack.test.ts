@@ -123,6 +123,47 @@ describe('training stack test suite', () => {
     });
   });
 
+  test('glue security configuration is created.', () => {
+    expect(stack).toHaveResourceLike('AWS::Glue::SecurityConfiguration', {
+      EncryptionConfiguration: {
+        CloudWatchEncryption: {
+          CloudWatchEncryptionMode: 'SSE-KMS',
+          KmsKeyArn: {
+            'Fn::GetAtt': [
+              'ETLCompFraudDetectionSecConfKey781FDC27',
+              'Arn',
+            ],
+          },
+        },
+        JobBookmarksEncryption: {
+          JobBookmarksEncryptionMode: 'CSE-KMS',
+          KmsKeyArn: {
+            'Fn::GetAtt': [
+              'ETLCompFraudDetectionSecConfKey781FDC27',
+              'Arn',
+            ],
+          },
+        },
+        S3Encryptions: [
+          {
+            S3EncryptionMode: 'SSE-S3',
+          },
+        ],
+      },
+      Name: {
+        'Fn::Join': [
+          '',
+          [
+            'SecConf-',
+            {
+              Ref: 'AWS::StackName',
+            },
+          ],
+        ],
+      },
+    });
+  });
+
   test('glue crawler is created.', () => {
     expect(stack).toHaveResourceLike('AWS::IAM::Policy', {
       PolicyDocument: {
@@ -676,6 +717,9 @@ describe('training stack test suite', () => {
       GlueVersion: '2.0',
       NumberOfWorkers: 2,
       WorkerType: 'G.2X',
+      SecurityConfiguration: {
+        Ref: 'ETLCompFraudDetectionSecConf653F0C00',
+      },
     });
   });
 
