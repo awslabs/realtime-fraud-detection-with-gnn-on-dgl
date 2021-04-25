@@ -40,7 +40,7 @@ export interface TrainingStackProps extends NestedStackProps {
 export class TrainingStack extends NestedStack {
   readonly glueJobSG: ISecurityGroup;
   readonly loadPropsSG: ISecurityGroup;
-  readonly endpointName: string;
+  readonly endpointName = 'FraudDetection'.toLowerCase();
 
   constructor(scope: Construct, id: string, props: TrainingStackProps) {
     super(scope, id, props);
@@ -558,7 +558,6 @@ export class TrainingStack extends NestedStack {
       resultPath: '$.error',
     });
 
-    this.endpointName = 'FraudDetection'.toLowerCase();
     const checkEndpointFn = new PythonFunction(this, 'CheckEndpointFunc', {
       entry: path.join(__dirname, '../lambda.d/check-sagemaker-endpoint/'),
       index: 'app.py',
