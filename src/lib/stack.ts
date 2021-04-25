@@ -6,6 +6,7 @@ import { Queue, QueueEncryption } from '@aws-cdk/aws-sqs';
 import { Construct, RemovalPolicy, Stack, StackProps, Duration, CfnParameter } from '@aws-cdk/core';
 import * as pjson from '../../package.json';
 import { TransactionDashboardStack } from './dashboard-stack';
+import { InferenceStack } from './inference-stack';
 import { TrainingStack } from './training-stack';
 
 export class FraudDetectionStack extends Stack {
@@ -64,12 +65,19 @@ export class FraudDetectionStack extends Stack {
       (replicaCount === undefined) ? 1 : parseInt(replicaCount),
     );
 
+    const dataColumnsArg = {
+      id_cols: 'card1,card2,card3,card4,card5,card6,ProductCD,addr1,addr2,P_emaildomain,R_emaildomain',
+      cat_cols: 'M1,M2,M3,M4,M5,M6,M7,M8,M9',
+      dummies_cols: 'M1_F,M1_T,M2_F,M2_T,M3_F,M3_T,M4_M0,M4_M1,M4_M2,M5_F,M5_T,M6_F,M6_T,M7_F,M7_T,M8_F,M8_T,M9_F,M9_T',
+    };
+
     const trainingStack = new TrainingStack(this, 'training', {
       vpc,
       bucket,
       accessLogBucket,
       neptune: neptuneInfo,
       dataPrefix,
+      dataColumnsArg: dataColumnsArg,
     });
 
     neptuneInfo.neptuneSG.addIngressRule(trainingStack.glueJobSG,
@@ -85,6 +93,18 @@ export class FraudDetectionStack extends Stack {
       visibilityTimeout: Duration.seconds(60),
     });
 
+    const inferenceStack = new InferenceStack(this, 'inference', {
+      vpc,
+      neptune: neptuneInfo,
+      queue: tranQueue,
+      sagemakerEndpointName: trainingStack.endpointName,
+      dataColumnsArg: dataColumnsArg,
+    });
+
+    neptuneInfo.neptuneSG.addIngressRule(inferenceStack.inferenceSG,
+      Port.tcp(Number(neptuneInfo.port)), 'access from inference job.');
+
+    const inferenceFnArn = inferenceStack.inferenceFn.functionArn;
     const interParameterGroups = [
       {
         Label: { default: 'The configuration of graph database Neptune' },
@@ -116,6 +136,7 @@ export class FraudDetectionStack extends Stack {
     new TransactionDashboardStack(this, 'dashboard', {
       vpc,
       queue: tranQueue,
+      inferenceArn: inferenceFnArn,
       accessLogBucket,
       customDomain: customDomain,
       r53HostZoneId: r53HostZoneId,

@@ -260,9 +260,7 @@ describe('dashboard stack test suite', () => {
     expect(stack).toHaveResourceLike('AWS::Lambda::Function', {
       Environment: {
         Variables: {
-          QUEUE_URL: {
-            Ref: 'referencetoTestStackTransQueue6E481EC7Ref',
-          },
+          INFERENCE_ARN: 'arn:aws:lambda:ap-southeast-1:123456789012:function:inference-func',
           DATASET_URL: {
             'Fn::FindInMap': [
               'DataSet',
@@ -1158,11 +1156,13 @@ function initializeStackWithContextsAndEnvs(context: {} | undefined, env?: {} | 
     removalPolicy: RemovalPolicy.DESTROY,
     visibilityTimeout: Duration.seconds(60),
   });
+  const inferenceArn = 'arn:aws:lambda:ap-southeast-1:123456789012:function:inference-func';
   const accessLogBucket = new Bucket(parentStack, 'AccessLog');
 
   const stack = new TransactionDashboardStack(parentStack, 'DashboardStack', {
     vpc,
     queue,
+    inferenceArn,
     accessLogBucket,
     customDomain,
     r53HostZoneId,

@@ -1,6 +1,7 @@
 from os import environ
 import logging
 import awswrangler as wr
+import numpy as np
 import pandas as pd
 import time
 import boto3
@@ -10,13 +11,26 @@ import random
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-sqs = boto3.client('sqs')
+inference = boto3.client('lambda')
 
-QUEUE_URL = environ['QUEUE_URL']
 RAW_DATA_URL = environ['DATASET_URL']
+INFERENCE_ARN = environ['INFERENCE_ARN']
 
 TRANSACTION_FILE_URL = f'{RAW_DATA_URL}test_transaction.csv'
 IDENTITY_FILE_URL = f'{RAW_DATA_URL}test_identity.csv'
+
+class NpEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, (np.int_, np.intc, np.intp, np.int8,
+                            np.int16, np.int32, np.int64, np.uint8,
+                            np.uint16, np.uint32, np.uint64)):
+            return int(obj)
+        elif isinstance(obj, np.floating):
+            return float(obj)
+        elif isinstance(obj, np.ndarray):
+            return obj.tolist()
+        else:
+            return super(NpEncoder, self).default(obj)
 
 def getValue(value):
     return None if pd.isna(value) else (value if isinstance(value, str) else value.item())
@@ -37,39 +51,32 @@ def handler(event, context):
             logger.info(f'The simulation will be interruptted after exceeding the specified duration {event["duration"]} seconds.')
             break
         
-        sampleDF = mergedDF.sample()
-        
-        sampleData = sampleDF.iloc[0]
+        sample_tran_DF = tranDF.sample()
 
-        # TODO: replace by send request to real-time inference endpoint        
-        data = {
-                    'timestamp': int(time.time()),
-                    'isFraud': random.randint(0, 1000) < 33,
-                    'id': sampleData['TransactionID'].item(),
-                    'amount': sampleData['TransactionAmt'].item(),
-                    'productCD': getValue(sampleData['ProductCD']),
-                    'card1': getValue(sampleData['card1']),
-                    'card2': getValue(sampleData['card2']),
-                    'card3': getValue(sampleData['card3']),
-                    'card4': getValue(sampleData['card4']),
-                    'card5': getValue(sampleData['card5']),
-                    'card6': getValue(sampleData['card6']),
-                    'addr1': getValue(sampleData['addr1']),
-                    'addr2': getValue(sampleData['addr2']),
-                    'dist1': getValue(sampleData['dist1']),
-                    'dist2': getValue(sampleData['dist2']),
-                    'pEmaildomain': getValue(sampleData['P_emaildomain']),
-                    'rEmaildomain': getValue(sampleData['R_emaildomain']),
-                }
-        logger.info(f'Send transaction {data} to queue.')
-        response = sqs.send_message(
-            QueueUrl=QUEUE_URL,
-            DelaySeconds=0,
-            MessageBody=json.dumps(data),
-            MessageGroupId=context.aws_request_id,
-        )
+        sample_id_DF = idDF.loc[idDF['TransactionID'] == sample_tran_DF['TransactionID'].values[0]]
         
-        logger.info(f'Trascation is sent with response message {response}.')
+        sample_id_DF.columns = [x.replace('-','_') if '-' in x else x for x in sample_id_DF.columns]
+
+        sample_tran_DF = sample_tran_DF.fillna(0)
+        sample_id_DF = sample_id_DF.fillna(0)
+
+        sample_tran_DF = sample_tran_DF.to_dict('records')
+        sample_id_DF = sample_id_DF.to_dict('records')
+        inference_input_event = {
+            'transaction_data':sample_tran_DF,
+            'identity_data':sample_id_DF
+        }
+
+        logger.info(f'Send event {inference_input_event} to inference.')
+
+        inference_response = inference.invoke(FunctionName=INFERENCE_ARN,
+                                                InvocationType='RequestResponse',
+                                                Payload=json.dumps(inference_input_event, cls=NpEncoder))
+
+        inference_result = inference_response["Payload"].read().decode()
+        
+        logger.info(f'Get result {inference_result} from inference.')
+        
         time.sleep(event['interval'] / 1000)
     
     logger.info(f'Completed the simulating event {event}.')

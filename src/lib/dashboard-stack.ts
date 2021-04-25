@@ -102,6 +102,7 @@ import { artifactsHash } from './utils';
 export interface TransactionDashboardStackStackProps extends NestedStackProps {
   readonly vpc: IVpc;
   readonly queue: IQueue;
+  readonly inferenceArn: string;
   readonly accessLogBucket: IBucket;
   readonly customDomain?: string;
   readonly r53HostZoneId?: string;
@@ -358,13 +359,17 @@ export class TransactionDashboardStack extends NestedStack {
       index: 'gen.py',
       runtime: Runtime.PYTHON_3_8,
       environment: {
-        QUEUE_URL: props.queue.queueUrl,
+        INFERENCE_ARN: props.inferenceArn,
         DATASET_URL: getDatasetMapping(this).findInMap(Aws.PARTITION, IEEE),
       },
       timeout: Duration.minutes(15),
       memorySize: 3008,
     });
-    props.queue.grantSendMessages(tranSimFn);
+    tranSimFn.addToRolePolicy(new PolicyStatement({
+      actions: ['lambda:InvokeFunction'],
+      resources: [props.inferenceArn],
+    }),
+    );
     const tranSimTask = new (class extends LambdaInvoke {
       public toStateJson(): object {
         return {

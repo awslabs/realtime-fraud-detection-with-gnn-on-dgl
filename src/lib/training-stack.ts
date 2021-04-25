@@ -31,11 +31,16 @@ export interface TrainingStackProps extends NestedStackProps {
     loadObjectPrefix: string;
   };
   readonly dataPrefix: string;
+  readonly dataColumnsArg: {
+    id_cols: string;
+    cat_cols: string;
+  };
 }
 
 export class TrainingStack extends NestedStack {
   readonly glueJobSG: ISecurityGroup;
   readonly loadPropsSG: ISecurityGroup;
+  readonly endpointName = 'FraudDetection'.toLowerCase();
 
   constructor(scope: Construct, id: string, props: TrainingStackProps) {
     super(scope, id, props);
@@ -103,6 +108,7 @@ export class TrainingStack extends NestedStack {
       bucket: props.bucket,
       vpc: props.vpc,
       neptune: props.neptune,
+      dataColumnsArg: props.dataColumnsArg,
     });
     this.glueJobSG = etlConstruct.glueJobSG;
 
@@ -552,7 +558,6 @@ export class TrainingStack extends NestedStack {
       resultPath: '$.error',
     });
 
-    const endpointName = 'FraudDetection'.toLowerCase();
     const checkEndpointFn = new PythonFunction(this, 'CheckEndpointFunc', {
       entry: path.join(__dirname, '../lambda.d/check-sagemaker-endpoint/'),
       index: 'app.py',
@@ -566,7 +571,7 @@ export class TrainingStack extends NestedStack {
         Arn.format({
           service: 'sagemaker',
           resource: 'endpoint',
-          resourceName: endpointName,
+          resourceName: this.endpointName,
         }, Stack.of(this)),
       ],
     }));
@@ -584,7 +589,7 @@ export class TrainingStack extends NestedStack {
       integrationPattern: IntegrationPattern.REQUEST_RESPONSE,
       timeout: Duration.seconds(30),
       payload: TaskInput.fromObject({
-        EndpointName: endpointName,
+        EndpointName: this.endpointName,
       }),
       resultPath: '$.checkEndpointOutput',
     }).addCatch(failure, {
@@ -594,7 +599,7 @@ export class TrainingStack extends NestedStack {
 
     const createEndpointTask = new SageMakerCreateEndpoint(this, 'Create endpoint', {
       integrationPattern: IntegrationPattern.REQUEST_RESPONSE,
-      endpointName: endpointName,
+      endpointName: this.endpointName,
       endpointConfigName: JsonPath.stringAt('$.trainingJobOutput.TrainingJobName'),
     }).addCatch(failure, {
       errors: [Errors.ALL],
@@ -603,7 +608,7 @@ export class TrainingStack extends NestedStack {
 
     const updateEndpointTask = new SageMakerUpdateEndpoint(this, 'Update endpoint', {
       integrationPattern: IntegrationPattern.REQUEST_RESPONSE,
-      endpointName: endpointName,
+      endpointName: this.endpointName,
       endpointConfigName: JsonPath.stringAt('$.trainingJobOutput.TrainingJobName'),
     }).addCatch(failure, {
       errors: [Errors.ALL],
@@ -611,7 +616,7 @@ export class TrainingStack extends NestedStack {
     });
 
     const endpointChoice = new Choice(this, 'Create or update endpoint');
-    endpointChoice.when(Condition.booleanEquals(`\$.checkEndpointOutput.Endpoint.${endpointName}`, false), createEndpointTask);
+    endpointChoice.when(Condition.booleanEquals(`\$.checkEndpointOutput.Endpoint.${this.endpointName}`, false), createEndpointTask);
     endpointChoice.otherwise(updateEndpointTask);
 
     const definition = parametersNormalizeTask
