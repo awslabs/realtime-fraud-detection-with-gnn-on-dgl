@@ -119,8 +119,31 @@ describe('training stack test suite', () => {
       ConnectionInput: {
         ConnectionProperties: {},
         ConnectionType: 'NETWORK',
+        PhysicalConnectionRequirements: {
+          AvailabilityZone: {
+            'Fn::Select': [
+              0,
+              {
+                'Fn::GetAZs': '',
+              },
+            ],
+          },
+          SecurityGroupIdList: [
+            {
+              'Fn::GetAtt': [
+                'ETLCompGlueJobSG4513B7C4',
+                'GroupId',
+              ],
+            },
+          ],
+          SubnetId: {
+            Ref: 'referencetoTestStackVpcPrivateSubnet1Subnet707BB947Ref',
+          },
+        },
       },
     });
+
+    expect(stack).toCountResources('AWS::Glue::Connection', 2);
   });
 
   test('glue security configuration is created.', () => {
@@ -323,7 +346,30 @@ describe('training stack test suite', () => {
                         },
                         ':connection/',
                         {
-                          Ref: 'ETLCompNetworkConnectionBE430FD7',
+                          Ref: 'ETLCompNetworkConnection1C8EC8091',
+                        },
+                      ],
+                    ],
+                  },
+                  {
+                    'Fn::Join': [
+                      '',
+                      [
+                        'arn:',
+                        {
+                          Ref: 'AWS::Partition',
+                        },
+                        ':glue:',
+                        {
+                          Ref: 'AWS::Region',
+                        },
+                        ':',
+                        {
+                          Ref: 'AWS::AccountId',
+                        },
+                        ':connection/',
+                        {
+                          Ref: 'ETLCompNetworkConnection25132F300',
                         },
                       ],
                     ],
@@ -651,7 +697,10 @@ describe('training stack test suite', () => {
       Connections: {
         Connections: [
           {
-            Ref: 'ETLCompNetworkConnectionBE430FD7',
+            Ref: 'ETLCompNetworkConnection1C8EC8091',
+          },
+          {
+            Ref: 'ETLCompNetworkConnection25132F300',
           },
         ],
       },

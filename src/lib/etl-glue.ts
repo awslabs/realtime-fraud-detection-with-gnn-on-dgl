@@ -104,22 +104,22 @@ export class ETLByGlue extends Construct {
       allowAllOutbound: true,
     });
     this.glueJobSG.addIngressRule(this.glueJobSG, Port.allTraffic());
-    // TODO: get resource name from CfnConnection
-    const networkConn = new CfnConnection(this, 'NetworkConnection', {
+
+    var connCount = 1;
+    const networkConntions = props.vpc.privateSubnets.map(sub => new CfnConnection(this, `NetworkConnection-${connCount++}`, {
       catalogId: transactionDatabase.catalogId,
       connectionInput: {
         connectionType: 'NETWORK',
         connectionProperties: {},
         physicalConnectionRequirements: {
-          availabilityZone: props.vpc.privateSubnets[0].availabilityZone,
-          subnetId: props.vpc.privateSubnets[0].subnetId,
+          availabilityZone: sub.availabilityZone,
+          subnetId: sub.subnetId,
           securityGroupIdList: [
             this.glueJobSG.securityGroupId,
           ],
         },
       },
-    });
-    const connName = networkConn.ref;
+    }));
 
     const securityConf = new SecurityConfiguration(this, 'FraudDetectionSecConf', {
       securityConfigurationName: `SecConf-${Stack.of(this).stackName}`,
@@ -145,11 +145,11 @@ export class ETLByGlue extends Construct {
               actions: ['glue:GetConnection'],
               resources: [
                 transactionDatabase.catalogArn,
-                Stack.of(this).formatArn({
+                ...networkConntions.map(conn => Stack.of(this).formatArn({
                   service: 'glue',
                   resource: 'connection',
-                  resourceName: connName,
-                }),
+                  resourceName: conn.ref,
+                })),
               ],
             }),
           ],
@@ -215,9 +215,7 @@ export class ETLByGlue extends Construct {
       numberOfWorkers: 2,
       glueVersion: '2.0',
       connections: {
-        connections: [
-          connName,
-        ],
+        connections: networkConntions.map(conn => conn.ref),
       },
       securityConfiguration: securityConf.securityConfigurationName,
     });
