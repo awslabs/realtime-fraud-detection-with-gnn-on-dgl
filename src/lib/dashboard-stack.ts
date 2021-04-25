@@ -144,6 +144,9 @@ export class TransactionDashboardStack extends NestedStack {
       parameterGroup: docDBParameterGroup,
       removalPolicy: RemovalPolicy.DESTROY,
     });
+    if (!this._targetCNRegion()) {
+      docDBCluster.addRotationSingleUser();
+    }
 
     const docDBCertLayer = new DocumentDBCertLayer(this, 'CertLayer');
     const caFileKey = 'CAFile';
@@ -550,6 +553,10 @@ export class TransactionDashboardStack extends NestedStack {
     });
   }
 
+  _targetCNRegion(): boolean {
+    return process.env.CDK_DEFAULT_REGION?.startsWith('cn-') || 'aws-cn' === this.node.tryGetContext('TargetPartition');
+  }
+
   _deployFrontend(
     accessLogBucket: IBucket,
     graphqlEndpoint: string,
@@ -569,7 +576,7 @@ export class TransactionDashboardStack extends NestedStack {
     });
 
     let distribution: IDistribution;
-    const isTargetCN = process.env.CDK_DEFAULT_REGION?.startsWith('cn-') || 'aws-cn' === this.node.tryGetContext('TargetPartition');
+    const isTargetCN = this._targetCNRegion();
 
     //TODO: improve this tricky for DnsValidatedCertificate's validate
     class Import extends Resource implements IHostedZone {
