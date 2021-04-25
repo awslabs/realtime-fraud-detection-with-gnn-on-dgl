@@ -434,9 +434,20 @@ describe('dashboard stack test suite', () => {
     });
 
     expect(stack).toHaveResourceLike('AWS::ApiGatewayV2::Stage', {
-      StageName: '$default',
+      StageName: 'api',
+      AccessLogSettings: {
+        DestinationArn: {
+          'Fn::GetAtt': [
+            'StageapiLog3FA18EF0',
+            'Arn',
+          ],
+        },
+        Format: '{"requestId":"$context.requestId","ip":"$context.identity.sourceIp","caller":"$context.identity.caller","user":"$context.identity.user","requestTime":"$context.requestTime","httpMethod":"$context.httpMethod","resourcePath":"$context.resourcePath","status":"$context.status","protocol":"$context.protocol","responseLength":"$context.responseLength"}',
+      },
       AutoDeploy: true,
     });
+
+    expect(stack).toCountResources('AWS::ApiGatewayV2::Stage', 1);
 
     expect(stack).toHaveResourceLike('AWS::ApiGatewayV2::Integration', {
       IntegrationType: 'AWS_PROXY',
