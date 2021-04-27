@@ -2,8 +2,8 @@ import * as path from 'path';
 import '@aws-cdk/assert/jest';
 import { ResourcePart } from '@aws-cdk/assert/lib/assertions/have-resource';
 import { Vpc } from '@aws-cdk/aws-ec2';
-import { DockerImageAsset } from '@aws-cdk/aws-ecr-assets';
 import { DatabaseCluster, InstanceType } from '@aws-cdk/aws-neptune';
+
 import { Bucket } from '@aws-cdk/aws-s3';
 import { App, Stack } from '@aws-cdk/core';
 import { TrainingStack } from '../src/lib/training-stack';
@@ -15,15 +15,12 @@ describe('training stack test suite', () => {
   let scriptHash : string;
   let neptuneLibHash : string;
   let codeDirHash: string;
-  let trainingImageHash: string;
 
   beforeAll(() => {
     scriptHash = artifactHash(path.join(__dirname, '../src/scripts/glue-etl.py'));
     neptuneLibHash = artifactHash(path.join(__dirname, '../src/script-libs/amazon-neptune-tools/neptune-python-utils/target/neptune_python_utils.zip'));
     codeDirHash = dirArtifactHash(path.join(__dirname, '../src/sagemaker/FD_SL_DGL/code'));
     ({ stack } = initializeStackWithContextsAndEnvs({}));
-    const asset = new DockerImageAsset(stack, 'Asset', stack._trainingImageAssets());
-    trainingImageHash = asset.sourceHash;
   });
 
   beforeEach(() => {
@@ -1101,7 +1098,13 @@ describe('training stack test suite', () => {
             },
             '","AlgorithmSpecification":{"TrainingInputMode":"File","TrainingImage":"',
             {
-              Ref: 'AWS::AccountId',
+              'Fn::FindInMap': [
+                'ImageAccountsMapping',
+                {
+                  Ref: 'AWS::Partition',
+                },
+                'accountId',
+              ],
             },
             '.dkr.ecr.',
             {
@@ -1111,7 +1114,7 @@ describe('training stack test suite', () => {
             {
               Ref: 'AWS::URLSuffix',
             },
-            `/aws-cdk/assets:${trainingImageHash}\"},\"InputDataConfig\":[{\"ChannelName\":\"train\",\"DataSource\":{\"S3DataSource\":{\"S3DataType\":\"S3Prefix\",\"S3Uri.$\":\"$.trainingParametersOutput.inputDataUri\"}}}],\"OutputDataConfig\":{\"S3OutputPath\":\"https://s3.`,
+            '/fraud-detection-with-gnn-on-dgl/training:1.0.0.202108111000"},"InputDataConfig":[{"ChannelName":"train","DataSource":{"S3DataSource":{"S3DataType":"S3Prefix","S3Uri.$":"$.trainingParametersOutput.inputDataUri"}}}],"OutputDataConfig":{"S3OutputPath":"https://s3.',
             {
               Ref: 'AWS::Region',
             },

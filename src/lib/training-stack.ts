@@ -1,7 +1,7 @@
 import * as path from 'path';
 import { IVpc, InstanceType, InstanceClass, InstanceSize, SecurityGroup, SubnetType } from '@aws-cdk/aws-ec2';
 import { Repository } from '@aws-cdk/aws-ecr';
-import { DockerImageAsset, DockerImageAssetProps } from '@aws-cdk/aws-ecr-assets';
+import { DockerImageAssetProps } from '@aws-cdk/aws-ecr-assets';
 import { Cluster, FargateTaskDefinition, ContainerImage, LogDrivers, FargatePlatformVersion } from '@aws-cdk/aws-ecs';
 import { FileSystem, LifecyclePolicy } from '@aws-cdk/aws-efs';
 import { PolicyStatement, Effect, Role, ServicePrincipal } from '@aws-cdk/aws-iam';
@@ -176,6 +176,18 @@ export class TrainingStack extends NestedStack {
       resultPath: '$.error',
     });
 
+    const imageAccountMapping = new CfnMapping(this, 'ImageAccountsMapping', {
+      mapping: {
+        'aws': {
+          accountId: '366590864501',
+        },
+        'aws-cn': {
+          accountId: '753680513547',
+        },
+      },
+    });
+    const trainingImageName = 'fraud-detection-with-gnn-on-dgl/training';
+    const trainingImageTag = '1.0.0.202108111000';
     const hyperParaFn = new NodejsFunction(this, 'HyperParametersFunc', {
       entry: path.join(__dirname, '../lambda.d/training-hyperparam/index.ts'),
       handler: 'build',
@@ -235,7 +247,12 @@ export class TrainingStack extends NestedStack {
       trainingJobName: TaskInput.fromJsonPathAt('$.dataProcessOutput.CompletedOn').value,
       algorithmSpecification: {
         trainingInputMode: InputMode.FILE,
-        trainingImage: DockerImage.fromAsset(this, 'TrainingImage', this._trainingImageAssets()),
+        trainingImage: DockerImage.fromEcrRepository(
+          Repository.fromRepositoryAttributes(this, 'CustomTrainingImage', {
+            repositoryArn: Repository.arnForLocalRepository(trainingImageName, this,
+              imageAccountMapping.findInMap(Aws.PARTITION, 'accountId')),
+            repositoryName: trainingImageName,
+          }), trainingImageTag),
       },
       inputDataConfig: [
         {
@@ -414,24 +431,17 @@ export class TrainingStack extends NestedStack {
       ],
     });
 
-    const loadGraphDataImage = new DockerImageAsset(this, 'BulkLoadGraphDataImage', {
-      directory: path.join(__dirname, '../'),
-      file: 'container.d/load-graph-data/Dockerfile',
-      exclude: [
-        'container.d/(!load-graph-data)',
-        'lambda.d/**',
-        'lib/**',
-        'sagemaker/**',
-        'schema/**',
-        'script-libs/**/(!neptune_python_utils.zip)',
-        'scripts/**',
-      ],
-      ignoreMode: IgnoreMode.GLOB,
-    });
+    const bulkLoadImageName = 'fraud-detection-with-gnn-on-dgl/bulk-load-graph-data';
+    const bulkLoadImageTag = '1.0.0.202108111000';
     const bulkLoadGraphLogGroupName = `/realtime-fraud-detection-with-gnn-on-dgl/training/BulkLoadGraphData-${this.stackName}`;
     grantKmsKeyPerm(kmsKey, bulkLoadGraphLogGroupName);
     const loadGraphDataTaskContainer = loadGraphDataTaskDefinition.addContainer('container', {
-      image: ContainerImage.fromDockerImageAsset(loadGraphDataImage),
+      image: ContainerImage.fromEcrRepository(
+        Repository.fromRepositoryAttributes(this, 'LoadPropertiesImage', {
+          repositoryArn: Repository.arnForLocalRepository(bulkLoadImageName, this,
+            imageAccountMapping.findInMap(Aws.PARTITION, 'accountId')),
+          repositoryName: bulkLoadImageName,
+        }), bulkLoadImageTag),
       memoryLimitMiB: 512,
       logging: LogDrivers.awsLogs({
         streamPrefix: 'fraud-detection-training-pipeline-load-graph-data-to-graph-dbs',
