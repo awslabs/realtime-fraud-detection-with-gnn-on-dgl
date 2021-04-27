@@ -121,8 +121,9 @@ export class ETLByGlue extends Construct {
       },
     }));
 
+    const securityConfName = `SecConf-${Stack.of(this).stackName}`;
     const securityConf = new SecurityConfiguration(this, 'FraudDetectionSecConf', {
-      securityConfigurationName: `SecConf-${Stack.of(this).stackName}`,
+      securityConfigurationName: securityConfName,
       s3Encryption: {
         mode: S3EncryptionMode.S3_MANAGED,
       },
@@ -133,6 +134,27 @@ export class ETLByGlue extends Construct {
         mode: JobBookmarksEncryptionMode.CLIENT_SIDE_KMS,
       },
     });
+    securityConf.cloudWatchEncryptionKey?.addToResourcePolicy(new PolicyStatement({
+      principals: [new ServicePrincipal('logs.amazonaws.com')],
+      actions: [
+        'kms:Encrypt*',
+        'kms:Decrypt*',
+        'kms:ReEncrypt*',
+        'kms:GenerateDataKey*',
+        'kms:Describe*',
+      ],
+      resources: ['*'],
+      conditions: {
+        ArnLike: {
+          'kms:EncryptionContext:aws:logs:arn': Stack.of(this).formatArn({
+            service: 'logs',
+            resource: 'log-group',
+            resourceName: `/aws-glue/jobs/${securityConfName}*`,
+            sep: ':',
+          }),
+        },
+      },
+    }));
 
     const glueJobRole = new Role(this, 'GlueJobRole', {
       assumedBy: new CompositePrincipal(
@@ -163,6 +185,21 @@ export class ETLByGlue extends Construct {
                   service: 'neptune-db',
                   resource: props.neptune.clusterResourceId,
                   resourceName: '*',
+                }),
+              ],
+            }),
+          ],
+        }),
+        logs: new PolicyDocument({
+          statements: [
+            new PolicyStatement({
+              actions: ['logs:AssociateKmsKey'],
+              resources: [
+                Stack.of(this).formatArn({
+                  service: 'logs',
+                  resource: 'log-group',
+                  resourceName: `/aws-glue/jobs/${securityConfName}*`,
+                  sep: ':',
                 }),
               ],
             }),

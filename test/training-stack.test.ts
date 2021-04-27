@@ -185,6 +185,109 @@ describe('training stack test suite', () => {
         ],
       },
     });
+
+    // check custom KMS key grant logs to encrypt
+    expect(stack).toHaveResourceLike('AWS::KMS::Key', {
+      KeyPolicy: {
+        Statement: [
+          {
+            Action: [
+              'kms:Create*',
+              'kms:Describe*',
+              'kms:Enable*',
+              'kms:List*',
+              'kms:Put*',
+              'kms:Update*',
+              'kms:Revoke*',
+              'kms:Disable*',
+              'kms:Get*',
+              'kms:Delete*',
+              'kms:ScheduleKeyDeletion',
+              'kms:CancelKeyDeletion',
+              'kms:GenerateDataKey',
+              'kms:TagResource',
+              'kms:UntagResource',
+            ],
+            Effect: 'Allow',
+            Principal: {
+              AWS: {
+                'Fn::Join': [
+                  '',
+                  [
+                    'arn:',
+                    {
+                      Ref: 'AWS::Partition',
+                    },
+                    ':iam::',
+                    {
+                      Ref: 'AWS::AccountId',
+                    },
+                    ':root',
+                  ],
+                ],
+              },
+            },
+            Resource: '*',
+          },
+          {
+            Action: [
+              'kms:Encrypt*',
+              'kms:Decrypt*',
+              'kms:ReEncrypt*',
+              'kms:GenerateDataKey*',
+              'kms:Describe*',
+            ],
+            Condition: {
+              ArnLike: {
+                'kms:EncryptionContext:aws:logs:arn': {
+                  'Fn::Join': [
+                    '',
+                    [
+                      'arn:',
+                      {
+                        Ref: 'AWS::Partition',
+                      },
+                      ':logs:',
+                      {
+                        Ref: 'AWS::Region',
+                      },
+                      ':',
+                      {
+                        Ref: 'AWS::AccountId',
+                      },
+                      ':log-group:/aws-glue/jobs/SecConf-',
+                      {
+                        Ref: 'AWS::StackName',
+                      },
+                      '*',
+                    ],
+                  ],
+                },
+              },
+            },
+            Effect: 'Allow',
+            Principal: {
+              Service: {
+                'Fn::Join': [
+                  '',
+                  [
+                    'logs.',
+                    {
+                      Ref: 'AWS::Region',
+                    },
+                    '.',
+                    {
+                      Ref: 'AWS::URLSuffix',
+                    },
+                  ],
+                ],
+              },
+            },
+            Resource: '*',
+          },
+        ],
+      },
+    });
   });
 
   test('glue crawler is created.', () => {
@@ -410,6 +513,41 @@ describe('training stack test suite', () => {
             Version: '2012-10-17',
           },
           PolicyName: 'neptune',
+        },
+        {
+          PolicyDocument: {
+            Statement: [
+              {
+                Action: 'logs:AssociateKmsKey',
+                Effect: 'Allow',
+                Resource: {
+                  'Fn::Join': [
+                    '',
+                    [
+                      'arn:',
+                      {
+                        Ref: 'AWS::Partition',
+                      },
+                      ':logs:',
+                      {
+                        Ref: 'AWS::Region',
+                      },
+                      ':',
+                      {
+                        Ref: 'AWS::AccountId',
+                      },
+                      ':log-group:/aws-glue/jobs/SecConf-',
+                      {
+                        Ref: 'AWS::StackName',
+                      },
+                      '*',
+                    ],
+                  ],
+                },
+              },
+            ],
+          },
+          PolicyName: 'logs',
         },
       ],
     });
