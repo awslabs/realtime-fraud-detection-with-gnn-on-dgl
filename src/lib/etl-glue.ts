@@ -2,6 +2,7 @@ import * as path from 'path';
 import { IVpc, Port, SecurityGroup, ISecurityGroup } from '@aws-cdk/aws-ec2';
 import { Database, DataFormat, Table, Schema, CfnJob, CfnConnection, CfnCrawler, SecurityConfiguration, S3EncryptionMode, CloudWatchEncryptionMode, JobBookmarksEncryptionMode } from '@aws-cdk/aws-glue';
 import { CompositePrincipal, ManagedPolicy, PolicyDocument, PolicyStatement, ServicePrincipal, Role } from '@aws-cdk/aws-iam';
+import { IDatabaseCluster } from '@aws-cdk/aws-neptune';
 import { IBucket, Bucket, BucketEncryption } from '@aws-cdk/aws-s3';
 import { BucketDeployment, Source } from '@aws-cdk/aws-s3-deployment';
 import { Aws, Construct, RemovalPolicy, Stack } from '@aws-cdk/core';
@@ -14,11 +15,7 @@ export interface ETLProps {
   vpc: IVpc;
   transactionPrefix: string;
   identityPrefix: string;
-  neptune: {
-    endpoint: string;
-    port: string;
-    clusterResourceId: string;
-  };
+  neptune: IDatabaseCluster;
   dataColumnsArg: {
     id_cols: string;
     cat_cols: string;
@@ -176,20 +173,6 @@ export class ETLByGlue extends Construct {
             }),
           ],
         }),
-        neptune: new PolicyDocument({
-          statements: [
-            new PolicyStatement({
-              actions: ['neptune-db:connect'],
-              resources: [
-                Stack.of(this).formatArn({
-                  service: 'neptune-db',
-                  resource: props.neptune.clusterResourceId,
-                  resourceName: '*',
-                }),
-              ],
-            }),
-          ],
-        }),
         logs: new PolicyDocument({
           statements: [
             new PolicyStatement({
@@ -205,11 +188,12 @@ export class ETLByGlue extends Construct {
             }),
           ],
         }),
+
       },
     });
+    props.neptune.grantConnect(glueJobRole);
     identityTable.grantRead(glueJobRole);
     transactionTable.grantRead(glueJobRole);
-
 
     glueJobBucket.grantReadWrite(glueJobRole, 'tmp/*');
     const scriptPrefix = this._deployGlueArtifact(glueJobBucket,
@@ -244,8 +228,8 @@ export class ETLByGlue extends Construct {
         '--enable-continuous-log-filter': 'false',
         '--enable-metrics': '',
         '--extra-py-files': [glueJobBucket.s3UrlForObject(`${libPrefix}/${neptuneGlueConnectorLibName}`)].join(','),
-        '--neptune_endpoint': props.neptune.endpoint,
-        '--neptune_port': props.neptune.port,
+        '--neptune_endpoint': props.neptune.clusterEndpoint.hostname,
+        '--neptune_port': props.neptune.clusterEndpoint.port,
       },
       role: glueJobRole.roleArn,
       workerType: 'G.2X',
