@@ -1,6 +1,6 @@
 import { App, Tags } from '@aws-cdk/core';
-import { FraudDetectionStack } from './lib/stack';
 import { BootstraplessStackSynthesizer } from './BootstraplessStackSynthesizer';
+import { FraudDetectionStack } from './lib/stack';
 
 const app = new App();
 
