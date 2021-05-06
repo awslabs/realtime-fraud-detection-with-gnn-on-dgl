@@ -32,6 +32,12 @@ describe('fraud detection stack test suite', () => {
             },
           ],
         },
+        LoggingConfiguration: {
+          DestinationBucketName: {
+            Ref: 'BucketAccessLog9C13C446',
+          },
+          LogFilePrefix: 'dataBucketAccessLog',
+        },
       },
       UpdateReplacePolicy: 'Retain',
       DeletionPolicy: 'Retain',
@@ -56,6 +62,18 @@ describe('fraud detection stack test suite', () => {
         ],
       },
       VpcEndpointType: 'Gateway',
+    });
+
+    expect(stack).toHaveResourceLike('AWS::EC2::FlowLog', {
+      ResourceType: 'VPC',
+      TrafficType: 'ALL',
+      LogDestination: {
+        'Fn::GetAtt': [
+          'FraudDetectionVpcVpcFlowlogsBucket43753A7B',
+          'Arn',
+        ],
+      },
+      LogDestinationType: 's3',
     });
   });
 
@@ -88,6 +106,7 @@ describe('fraud detection stack test suite', () => {
         },
         IamAuthEnabled: true,
         Port: 8182,
+        BackupRetentionPeriod: 7,
         StorageEncrypted: true,
         VpcSecurityGroupIds: [
           {
@@ -109,6 +128,7 @@ describe('fraud detection stack test suite', () => {
         DBInstanceClass: {
           Ref: 'NeptuneInstaneType',
         },
+        AutoMinorVersionUpgrade: true,
         DBClusterIdentifier: {
           Ref: 'TransactionGraphCluster',
         },
@@ -191,7 +211,7 @@ describe('fraud detection stack test suite', () => {
   });
 
   test('nested stacks', () => {
-    expect(stack).toCountResources('AWS::CloudFormation::Stack', 2);
+    expect(stack).toCountResources('AWS::CloudFormation::Stack', 3);
   });
 
   test('report error when the specified vpc is without private subnet', () => {
@@ -211,7 +231,18 @@ describe('fraud detection stack test suite', () => {
       FifoQueue: true,
       KmsMasterKeyId: 'alias/aws/sqs',
       VisibilityTimeout: 60,
+      RedrivePolicy: {
+        deadLetterTargetArn: {
+          'Fn::GetAtt': [
+            'TransDLQ2CB8C42A',
+            'Arn',
+          ],
+        },
+        maxReceiveCount: 5,
+      },
     });
+
+    expect(stack).toCountResources('AWS::SQS::Queue', 2);
   });
 
   function _mockVpcWithoutPrivateSubnet(): (scope: Construct, options: GetContextValueOptions) => GetContextValueResult {

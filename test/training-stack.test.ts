@@ -34,6 +34,14 @@ describe('training stack test suite', () => {
         Statement: [
           {
             Action: [
+              'xray:PutTraceSegments',
+              'xray:PutTelemetryRecords',
+            ],
+            Effect: 'Allow',
+            Resource: '*',
+          },
+          {
+            Action: [
               's3:DeleteObject*',
               's3:PutObject*',
               's3:Abort*',
@@ -100,6 +108,9 @@ describe('training stack test suite', () => {
       MemorySize: 3008,
       Runtime: 'python3.8',
       Timeout: 900,
+      TracingConfig: {
+        Mode: 'Active',
+      },
     });
   });
 
@@ -108,6 +119,173 @@ describe('training stack test suite', () => {
       ConnectionInput: {
         ConnectionProperties: {},
         ConnectionType: 'NETWORK',
+        PhysicalConnectionRequirements: {
+          AvailabilityZone: {
+            'Fn::Select': [
+              0,
+              {
+                'Fn::GetAZs': '',
+              },
+            ],
+          },
+          SecurityGroupIdList: [
+            {
+              'Fn::GetAtt': [
+                'ETLCompGlueJobSG4513B7C4',
+                'GroupId',
+              ],
+            },
+          ],
+          SubnetId: {
+            Ref: 'referencetoTestStackVpcPrivateSubnet1Subnet707BB947Ref',
+          },
+        },
+      },
+    });
+
+    expect(stack).toCountResources('AWS::Glue::Connection', 2);
+  });
+
+  test('glue security configuration is created.', () => {
+    expect(stack).toHaveResourceLike('AWS::Glue::SecurityConfiguration', {
+      EncryptionConfiguration: {
+        CloudWatchEncryption: {
+          CloudWatchEncryptionMode: 'SSE-KMS',
+          KmsKeyArn: {
+            'Fn::GetAtt': [
+              'ETLCompFraudDetectionSecConfKey781FDC27',
+              'Arn',
+            ],
+          },
+        },
+        JobBookmarksEncryption: {
+          JobBookmarksEncryptionMode: 'CSE-KMS',
+          KmsKeyArn: {
+            'Fn::GetAtt': [
+              'ETLCompFraudDetectionSecConfKey781FDC27',
+              'Arn',
+            ],
+          },
+        },
+        S3Encryptions: [
+          {
+            S3EncryptionMode: 'SSE-S3',
+          },
+        ],
+      },
+      Name: {
+        'Fn::Join': [
+          '',
+          [
+            'SecConf-',
+            {
+              Ref: 'AWS::StackName',
+            },
+          ],
+        ],
+      },
+    });
+
+    // check custom KMS key grant logs to encrypt
+    expect(stack).toHaveResourceLike('AWS::KMS::Key', {
+      KeyPolicy: {
+        Statement: [
+          {
+            Action: [
+              'kms:Create*',
+              'kms:Describe*',
+              'kms:Enable*',
+              'kms:List*',
+              'kms:Put*',
+              'kms:Update*',
+              'kms:Revoke*',
+              'kms:Disable*',
+              'kms:Get*',
+              'kms:Delete*',
+              'kms:ScheduleKeyDeletion',
+              'kms:CancelKeyDeletion',
+              'kms:GenerateDataKey',
+              'kms:TagResource',
+              'kms:UntagResource',
+            ],
+            Effect: 'Allow',
+            Principal: {
+              AWS: {
+                'Fn::Join': [
+                  '',
+                  [
+                    'arn:',
+                    {
+                      Ref: 'AWS::Partition',
+                    },
+                    ':iam::',
+                    {
+                      Ref: 'AWS::AccountId',
+                    },
+                    ':root',
+                  ],
+                ],
+              },
+            },
+            Resource: '*',
+          },
+          {
+            Action: [
+              'kms:Encrypt*',
+              'kms:Decrypt*',
+              'kms:ReEncrypt*',
+              'kms:GenerateDataKey*',
+              'kms:Describe*',
+            ],
+            Condition: {
+              ArnLike: {
+                'kms:EncryptionContext:aws:logs:arn': {
+                  'Fn::Join': [
+                    '',
+                    [
+                      'arn:',
+                      {
+                        Ref: 'AWS::Partition',
+                      },
+                      ':logs:',
+                      {
+                        Ref: 'AWS::Region',
+                      },
+                      ':',
+                      {
+                        Ref: 'AWS::AccountId',
+                      },
+                      ':log-group:/aws-glue/jobs/SecConf-',
+                      {
+                        Ref: 'AWS::StackName',
+                      },
+                      '*',
+                    ],
+                  ],
+                },
+              },
+            },
+            Effect: 'Allow',
+            Principal: {
+              Service: {
+                'Fn::Join': [
+                  '',
+                  [
+                    'logs.',
+                    {
+                      Ref: 'AWS::Region',
+                    },
+                    '.',
+                    {
+                      Ref: 'AWS::URLSuffix',
+                    },
+                  ],
+                ],
+              },
+            },
+            Resource: '*',
+          },
+        ],
       },
     });
   });
@@ -174,6 +352,26 @@ describe('training stack test suite', () => {
       SchemaChangePolicy: {
         DeleteBehavior: 'LOG',
         UpdateBehavior: 'UPDATE_IN_DATABASE',
+      },
+    });
+  });
+
+  test('s3 bucket for glue job', () => {
+    expect(stack).toHaveResourceLike('AWS::S3::Bucket', {
+      BucketEncryption: {
+        ServerSideEncryptionConfiguration: [
+          {
+            ServerSideEncryptionByDefault: {
+              SSEAlgorithm: 'AES256',
+            },
+          },
+        ],
+      },
+      LoggingConfiguration: {
+        DestinationBucketName: {
+          Ref: 'referencetoTestStackAccessLogF5229892Ref',
+        },
+        LogFilePrefix: 'glueJobBucketAccessLog',
       },
     });
   });
@@ -251,7 +449,30 @@ describe('training stack test suite', () => {
                         },
                         ':connection/',
                         {
-                          Ref: 'ETLCompNetworkConnectionBE430FD7',
+                          Ref: 'ETLCompNetworkConnection1C8EC8091',
+                        },
+                      ],
+                    ],
+                  },
+                  {
+                    'Fn::Join': [
+                      '',
+                      [
+                        'arn:',
+                        {
+                          Ref: 'AWS::Partition',
+                        },
+                        ':glue:',
+                        {
+                          Ref: 'AWS::Region',
+                        },
+                        ':',
+                        {
+                          Ref: 'AWS::AccountId',
+                        },
+                        ':connection/',
+                        {
+                          Ref: 'ETLCompNetworkConnection25132F300',
                         },
                       ],
                     ],
@@ -292,6 +513,41 @@ describe('training stack test suite', () => {
             Version: '2012-10-17',
           },
           PolicyName: 'neptune',
+        },
+        {
+          PolicyDocument: {
+            Statement: [
+              {
+                Action: 'logs:AssociateKmsKey',
+                Effect: 'Allow',
+                Resource: {
+                  'Fn::Join': [
+                    '',
+                    [
+                      'arn:',
+                      {
+                        Ref: 'AWS::Partition',
+                      },
+                      ':logs:',
+                      {
+                        Ref: 'AWS::Region',
+                      },
+                      ':',
+                      {
+                        Ref: 'AWS::AccountId',
+                      },
+                      ':log-group:/aws-glue/jobs/SecConf-',
+                      {
+                        Ref: 'AWS::StackName',
+                      },
+                      '*',
+                    ],
+                  ],
+                },
+              },
+            ],
+          },
+          PolicyName: 'logs',
         },
       ],
     });
@@ -579,7 +835,10 @@ describe('training stack test suite', () => {
       Connections: {
         Connections: [
           {
-            Ref: 'ETLCompNetworkConnectionBE430FD7',
+            Ref: 'ETLCompNetworkConnection1C8EC8091',
+          },
+          {
+            Ref: 'ETLCompNetworkConnection25132F300',
           },
         ],
       },
@@ -645,6 +904,9 @@ describe('training stack test suite', () => {
       GlueVersion: '2.0',
       NumberOfWorkers: 2,
       WorkerType: 'G.2X',
+      SecurityConfiguration: {
+        Ref: 'ETLCompFraudDetectionSecConf653F0C00',
+      },
     });
   });
 
@@ -652,6 +914,14 @@ describe('training stack test suite', () => {
     expect(stack).toHaveResourceLike('AWS::IAM::Policy', {
       PolicyDocument: {
         Statement: [
+          {
+            Action: [
+              'xray:PutTraceSegments',
+              'xray:PutTelemetryRecords',
+            ],
+            Effect: 'Allow',
+            Resource: '*',
+          },
           {
             Action: 'glue:StartCrawler',
             Effect: 'Allow',
@@ -930,7 +1200,7 @@ describe('training stack test suite', () => {
           },
         ],
         IncludeExecutionData: true,
-        Level: 'ERROR',
+        Level: 'ALL',
       },
     });
   });
@@ -1029,6 +1299,9 @@ describe('training stack test suite', () => {
           LocalMountPath: '/mnt/efs',
         },
       ],
+      TracingConfig: {
+        Mode: 'Active',
+      },
     });
   });
 });
@@ -1040,10 +1313,12 @@ function initializeStackWithContextsAndEnvs(context: {} | undefined, env?: {} | 
   const parentStack = new Stack(app, 'TestStack', { env: env });
   const vpc = new Vpc(parentStack, 'Vpc');
   const bucket = new Bucket(parentStack, 'Bucket');
+  const accessLogBucket = new Bucket(parentStack, 'AccessLog');
 
   const stack = new TrainingStack(parentStack, 'TestStack', {
     vpc,
     bucket,
+    accessLogBucket,
     neptune: {
       endpoint: 'neptune-xxxx.us-east-1.aws.amazon.com',
       port: '8182',
@@ -1052,6 +1327,10 @@ function initializeStackWithContextsAndEnvs(context: {} | undefined, env?: {} | 
       loadObjectPrefix: 's3://bucket/object/folder',
     },
     dataPrefix: 'fraud-detection/',
+    dataColumnsArg: {
+      id_cols: 'card1,card2,card3,card4,card5,card6,ProductCD,addr1,addr2,P_emaildomain,R_emaildomain',
+      cat_cols: 'M1,M2,M3,M4,M5,M6,M7,M8,M9',
+    },
   });
   return { stack };
 }

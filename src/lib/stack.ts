@@ -1,4 +1,4 @@
-import { GatewayVpcEndpointAwsService, Vpc, SecurityGroup, IVpc, ISecurityGroup, Port } from '@aws-cdk/aws-ec2';
+import { GatewayVpcEndpointAwsService, Vpc, SecurityGroup, IVpc, ISecurityGroup, Port, FlowLogDestination } from '@aws-cdk/aws-ec2';
 import { Role, ServicePrincipal, PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
 import { CfnDBCluster, CfnDBSubnetGroup, CfnDBClusterParameterGroup, CfnDBParameterGroup, CfnDBInstance } from '@aws-cdk/aws-neptune';
 import { Bucket, BucketEncryption, IBucket } from '@aws-cdk/aws-s3';
@@ -6,6 +6,7 @@ import { Queue, QueueEncryption } from '@aws-cdk/aws-sqs';
 import { Construct, RemovalPolicy, Stack, StackProps, Duration, CfnParameter } from '@aws-cdk/core';
 import * as pjson from '../../package.json';
 import { TransactionDashboardStack } from './dashboard-stack';
+import { InferenceStack } from './inference-stack';
 import { TrainingStack } from './training-stack';
 
 export class FraudDetectionStack extends Stack {
@@ -16,24 +17,38 @@ export class FraudDetectionStack extends Stack {
     const vpc = vpcId ? Vpc.fromLookup(this, 'FraudDetectionVpc', {
       vpcId: vpcId === 'default' ? undefined : vpcId,
       isDefault: vpcId === 'default' ? true : undefined,
-    }) : new Vpc(this, 'FraudDetectionVpc', {
-      maxAzs: 2,
-      gatewayEndpoints: {
-        s3: {
-          service: GatewayVpcEndpointAwsService.S3,
+    }) : (() => {
+      const newVpc = new Vpc(this, 'FraudDetectionVpc', {
+        maxAzs: 2,
+        gatewayEndpoints: {
+          s3: {
+            service: GatewayVpcEndpointAwsService.S3,
+          },
+          dynamodb: {
+            service: GatewayVpcEndpointAwsService.DYNAMODB,
+          },
         },
-        dynamodb: {
-          service: GatewayVpcEndpointAwsService.DYNAMODB,
-        },
-      },
-    });
+      });
+      newVpc.addFlowLog('VpcFlowlogs', {
+        destination: FlowLogDestination.toS3(),
+      });
+      return newVpc;
+    })();
     if (vpc.privateSubnets.length < 1) {
       throw new Error('The VPC must have PRIVATE subnet.');
     }
 
+    const accessLogBucket = new Bucket(this, 'BucketAccessLog', {
+      encryption: BucketEncryption.S3_MANAGED,
+      removalPolicy: RemovalPolicy.RETAIN,
+      serverAccessLogsPrefix: 'accessLogBucketAccessLog',
+    });
+
     const bucket = new Bucket(this, 'FraudDetectionDataBucket', {
       encryption: BucketEncryption.S3_MANAGED,
       removalPolicy: RemovalPolicy.RETAIN,
+      serverAccessLogsBucket: accessLogBucket,
+      serverAccessLogsPrefix: 'dataBucketAccessLog',
     });
 
     const neptuneInstanceType = new CfnParameter(this, 'NeptuneInstaneType', {
@@ -56,11 +71,19 @@ export class FraudDetectionStack extends Stack {
       (replicaCount === undefined) ? 1 : parseInt(replicaCount),
     );
 
+    const dataColumnsArg = {
+      id_cols: 'card1,card2,card3,card4,card5,card6,ProductCD,addr1,addr2,P_emaildomain,R_emaildomain',
+      cat_cols: 'M1,M2,M3,M4,M5,M6,M7,M8,M9',
+      dummies_cols: 'M1_F,M1_T,M2_F,M2_T,M3_F,M3_T,M4_M0,M4_M1,M4_M2,M5_F,M5_T,M6_F,M6_T,M7_F,M7_T,M8_F,M8_T,M9_F,M9_T',
+    };
+
     const trainingStack = new TrainingStack(this, 'training', {
       vpc,
       bucket,
+      accessLogBucket,
       neptune: neptuneInfo,
       dataPrefix,
+      dataColumnsArg: dataColumnsArg,
     });
 
     neptuneInfo.neptuneSG.addIngressRule(trainingStack.glueJobSG,
@@ -74,8 +97,30 @@ export class FraudDetectionStack extends Stack {
       fifo: true,
       removalPolicy: RemovalPolicy.DESTROY,
       visibilityTimeout: Duration.seconds(60),
+      deadLetterQueue: {
+        queue: new Queue(this, 'TransDLQ', {
+          contentBasedDeduplication: true,
+          encryption: QueueEncryption.KMS_MANAGED,
+          fifo: true,
+          visibilityTimeout: Duration.seconds(60),
+          removalPolicy: RemovalPolicy.DESTROY,
+        }),
+        maxReceiveCount: 5,
+      },
     });
 
+    const inferenceStack = new InferenceStack(this, 'inference', {
+      vpc,
+      neptune: neptuneInfo,
+      queue: tranQueue,
+      sagemakerEndpointName: trainingStack.endpointName,
+      dataColumnsArg: dataColumnsArg,
+    });
+
+    neptuneInfo.neptuneSG.addIngressRule(inferenceStack.inferenceSG,
+      Port.tcp(Number(neptuneInfo.port)), 'access from inference job.');
+
+    const inferenceFnArn = inferenceStack.inferenceFn.functionArn;
     const interParameterGroups = [
       {
         Label: { default: 'The configuration of graph database Neptune' },
@@ -107,6 +152,8 @@ export class FraudDetectionStack extends Stack {
     new TransactionDashboardStack(this, 'dashboard', {
       vpc,
       queue: tranQueue,
+      inferenceArn: inferenceFnArn,
+      accessLogBucket,
       customDomain: customDomain,
       r53HostZoneId: r53HostZoneId,
     });
@@ -171,6 +218,7 @@ export class FraudDetectionStack extends Stack {
       port: clusterPort,
       iamAuthEnabled: true,
       storageEncrypted: true,
+      backupRetentionPeriod: 7,
     });
     graphDBCluster.addDependsOn(clusterParamGroup);
     graphDBCluster.addDependsOn(dbSubnetGroup);
@@ -186,6 +234,7 @@ export class FraudDetectionStack extends Stack {
       dbClusterIdentifier: graphDBCluster.ref,
       dbInstanceClass: instanceType,
       dbParameterGroupName: dbParamGroup.ref,
+      autoMinorVersionUpgrade: true,
     });
     primaryDB.addDependsOn(graphDBCluster);
     primaryDB.addDependsOn(dbParamGroup);
@@ -194,6 +243,7 @@ export class FraudDetectionStack extends Stack {
         dbClusterIdentifier: graphDBCluster.ref,
         dbInstanceClass: instanceType,
         dbInstanceIdentifier: `replica-${idx}`,
+        autoMinorVersionUpgrade: true,
       });
       replica.addDependsOn(primaryDB);
       replica.addDependsOn(graphDBCluster);

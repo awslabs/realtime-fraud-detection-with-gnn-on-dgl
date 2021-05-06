@@ -1,0 +1,4 @@
+sagemaker == 2.24.1
+numpy == 1.20.1
+pandas == 1.0.0
+gremlinpython == 3.4.10

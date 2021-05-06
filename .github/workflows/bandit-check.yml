@@ -1,0 +1,19 @@
+name: "Bnadit Check for Python code"
+
+on:
+  pull_request: {}
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Run bandit
+      uses: tj-actions/bandit@v4.1
+      with:
+        version: "1.7.0"
+        targets: |
+          src/sagemaker/FD_SL_DGL/
+          src/lambda.d/
+        options: "-r -s B301 -ll"
