@@ -4,16 +4,17 @@ import { Repository } from '@aws-cdk/aws-ecr';
 import { DockerImageAsset, DockerImageAssetProps } from '@aws-cdk/aws-ecr-assets';
 import { Cluster, FargateTaskDefinition, ContainerImage, LogDrivers, FargatePlatformVersion } from '@aws-cdk/aws-ecs';
 import { FileSystem, LifecyclePolicy } from '@aws-cdk/aws-efs';
-import { PolicyStatement, Effect, Role, ServicePrincipal, PolicyDocument } from '@aws-cdk/aws-iam';
+import { PolicyStatement, Effect, Role, ServicePrincipal } from '@aws-cdk/aws-iam';
 import { Runtime, LayerVersion, Code, Tracing, FileSystem as LambdaFileSystem } from '@aws-cdk/aws-lambda';
 import { NodejsFunction } from '@aws-cdk/aws-lambda-nodejs';
 import { PythonFunction, PythonLayerVersion } from '@aws-cdk/aws-lambda-python';
 import { LogGroup, RetentionDays } from '@aws-cdk/aws-logs';
+import { IDatabaseCluster } from '@aws-cdk/aws-neptune';
 import { IBucket } from '@aws-cdk/aws-s3';
 import { BucketDeployment, Source } from '@aws-cdk/aws-s3-deployment';
 import { IntegrationPattern, StateMachine, Fail, Errors, TaskInput, LogLevel, JsonPath, Choice, Condition } from '@aws-cdk/aws-stepfunctions';
 import { LambdaInvoke, S3DataType, GlueStartJobRun, SageMakerCreateModel, S3Location, ContainerDefinition, Mode, DockerImage, SageMakerCreateEndpointConfig, SageMakerCreateEndpoint, SageMakerUpdateEndpoint, EcsRunTask, EcsFargateLaunchTarget, SageMakerCreateTrainingJob, InputMode } from '@aws-cdk/aws-stepfunctions-tasks';
-import { Construct, Duration, NestedStack, NestedStackProps, Arn, Stack, CfnMapping, Aws, RemovalPolicy, IgnoreMode, Size } from '@aws-cdk/core';
+import { Construct, Duration, NestedStack, NestedStackProps, Arn, Stack, CfnMapping, Aws, RemovalPolicy, IgnoreMode, Size, Token } from '@aws-cdk/core';
 import { AwsCliLayer } from '@aws-cdk/lambda-layer-awscli';
 import { getDatasetMapping, IEEE } from './dataset';
 import { ETLByGlue } from './etl-glue';
@@ -24,11 +25,9 @@ export interface TrainingStackProps extends NestedStackProps {
   readonly accessLogBucket: IBucket;
   readonly vpc: IVpc;
   readonly neptune: {
-    endpoint: string;
-    port: string;
-    clusterResourceId: string;
-    loadRole: string;
+    cluster: IDatabaseCluster;
     loadObjectPrefix: string;
+    loadRole: string;
   };
   readonly dataPrefix: string;
   readonly dataColumnsArg: {
@@ -109,7 +108,7 @@ export class TrainingStack extends NestedStack {
       identityPrefix,
       bucket: props.bucket,
       vpc: props.vpc,
-      neptune: props.neptune,
+      neptune: props.neptune.cluster,
       dataColumnsArg: props.dataColumnsArg,
     });
     this.glueJobSG = etlConstruct.glueJobSG;
@@ -319,23 +318,8 @@ export class TrainingStack extends NestedStack {
 
     const loadPropTaskRole = new Role(this, 'LoadPropertiesECSTaskRole', {
       assumedBy: new ServicePrincipal('ecs-tasks.amazonaws.com'),
-      inlinePolicies: {
-        neptune: new PolicyDocument({
-          statements: [
-            new PolicyStatement({
-              actions: ['neptune-db:connect'],
-              resources: [
-                Stack.of(this).formatArn({
-                  service: 'neptune-db',
-                  resource: props.neptune.clusterResourceId,
-                  resourceName: '*',
-                }),
-              ],
-            }),
-          ],
-        }),
-      },
     });
+    props.neptune.cluster.grantConnect(loadPropTaskRole);
     props.bucket.grantRead(loadPropTaskRole, `${modelOutputPrefix}/*`);
     props.bucket.grantWrite(loadPropTaskRole, `${props.neptune.loadObjectPrefix}/*`);
 
@@ -409,9 +393,9 @@ export class TrainingStack extends NestedStack {
           '--temp_folder',
           mountPoint,
           '--neptune_endpoint',
-          props.neptune.endpoint,
+          props.neptune.cluster.clusterEndpoint.hostname,
           '--neptune_port',
-          props.neptune.port,
+          Token.asString(props.neptune.cluster.clusterEndpoint.port),
           '--region',
           Aws.REGION,
           '--neptune_iam_role_arn',

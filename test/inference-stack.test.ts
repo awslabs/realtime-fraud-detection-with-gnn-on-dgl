@@ -1,5 +1,6 @@
 import '@aws-cdk/assert/jest';
 import { Vpc } from '@aws-cdk/aws-ec2';
+import { DatabaseCluster, InstanceType } from '@aws-cdk/aws-neptune';
 import { Queue, QueueEncryption } from '@aws-cdk/aws-sqs';
 import { App, Stack, RemovalPolicy, Duration } from '@aws-cdk/core';
 import { InferenceStack } from '../src/lib/inference-stack';
@@ -20,6 +21,9 @@ describe('inference stack', () => {
         Variables: {
           QUEUE_URL: {
             Ref: 'referencetoTestStackTransQueue6E481EC7Ref',
+          },
+          CLUSTER_PORT: {
+            Ref: 'referencetoTestStackDatabase1EBED910Port',
           },
         },
       },
@@ -57,14 +61,15 @@ function initializeStackWithContextsAndEnvs(context: {} | undefined, env?: {} | 
     removalPolicy: RemovalPolicy.DESTROY,
     visibilityTimeout: Duration.seconds(60),
   });
+  const cluster = new DatabaseCluster(parentStack, 'Database', {
+    vpc,
+    instanceType: InstanceType.R5_LARGE,
+    port: 8182,
+  });
 
   const stack = new InferenceStack(parentStack, 'inferenceStack', {
     vpc,
-    neptune: {
-      endpoint: 'neptune-xxxx.us-east-1.aws.amazon.com',
-      port: '8182',
-      clusterResourceId: 'cluster-12345',
-    },
+    neptune: cluster,
     queue,
     sagemakerEndpointName: 'frauddetection',
     dataColumnsArg: {

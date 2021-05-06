@@ -3,16 +3,13 @@ import { IVpc, ISecurityGroup, SecurityGroup } from '@aws-cdk/aws-ec2';
 import { PolicyStatement } from '@aws-cdk/aws-iam';
 import { IFunction, Runtime, Tracing } from '@aws-cdk/aws-lambda';
 import { PythonFunction, PythonLayerVersion } from '@aws-cdk/aws-lambda-python';
+import { IDatabaseCluster } from '@aws-cdk/aws-neptune';
 import { IQueue } from '@aws-cdk/aws-sqs';
-import { Construct, Duration, Stack, NestedStack, NestedStackProps, Aws } from '@aws-cdk/core';
+import { Construct, Duration, Stack, NestedStack, NestedStackProps, Aws, Token } from '@aws-cdk/core';
 
 export interface InferenceProps extends NestedStackProps {
   readonly vpc: IVpc;
-  readonly neptune: {
-    endpoint: string;
-    port: string;
-    clusterResourceId: string;
-  };
+  readonly neptune: IDatabaseCluster;
   readonly queue:IQueue;
   readonly sagemakerEndpointName: string;
   readonly dataColumnsArg: {
@@ -49,8 +46,8 @@ export class InferenceStack extends NestedStack {
       tracing: Tracing.ACTIVE,
       environment: {
         MAX_FEATURE_NODE: '50',
-        CLUSTER_ENDPOINT: props.neptune.endpoint,
-        CLUSTER_PORT: props.neptune.port,
+        CLUSTER_ENDPOINT: props.neptune.clusterEndpoint.hostname,
+        CLUSTER_PORT: Token.asString(props.neptune.clusterEndpoint.port),
         CLUSTER_REGION: Aws.REGION,
         ENDPOINT_NAME: props.sagemakerEndpointName,
         MODEL_BTW: '0.2',
@@ -67,17 +64,7 @@ export class InferenceStack extends NestedStack {
     });
     props.queue.grantSendMessages(this.inferenceFn);
 
-    this.inferenceFn.addToRolePolicy(new PolicyStatement({
-      actions: ['neptune-db:connect'],
-      resources: [
-        Stack.of(this).formatArn({
-          service: 'neptune-db',
-          resource: props.neptune.clusterResourceId,
-          resourceName: '*',
-        }),
-      ],
-    }),
-    );
+    props.neptune.grantConnect(this.inferenceFn);
 
     this.inferenceFn.addToRolePolicy(new PolicyStatement({
       actions: ['sagemaker:InvokeEndpoint'],
