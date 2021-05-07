@@ -1,7 +1,8 @@
 import * as path from 'path';
 import { IVpc, Port, SecurityGroup, ISecurityGroup } from '@aws-cdk/aws-ec2';
-import { Database, DataFormat, Table, Schema, CfnJob, CfnConnection, CfnCrawler } from '@aws-cdk/aws-glue';
+import { Database, DataFormat, Table, Schema, CfnJob, CfnConnection, CfnCrawler, SecurityConfiguration, S3EncryptionMode, CloudWatchEncryptionMode, JobBookmarksEncryptionMode } from '@aws-cdk/aws-glue';
 import { CompositePrincipal, ManagedPolicy, PolicyDocument, PolicyStatement, ServicePrincipal, Role } from '@aws-cdk/aws-iam';
+import { IDatabaseCluster } from '@aws-cdk/aws-neptune';
 import { IBucket, Bucket, BucketEncryption } from '@aws-cdk/aws-s3';
 import { BucketDeployment, Source } from '@aws-cdk/aws-s3-deployment';
 import { Aws, Construct, RemovalPolicy, Stack } from '@aws-cdk/core';
@@ -9,14 +10,15 @@ import { artifactHash } from './utils';
 
 export interface ETLProps {
   bucket: IBucket;
+  accessLogBucket: IBucket;
   s3Prefix?: string;
   vpc: IVpc;
   transactionPrefix: string;
   identityPrefix: string;
-  neptune: {
-    endpoint: string;
-    port: string;
-    clusterResourceId: string;
+  neptune: IDatabaseCluster;
+  dataColumnsArg: {
+    id_cols: string;
+    cat_cols: string;
   };
 }
 
@@ -33,6 +35,8 @@ export class ETLByGlue extends Construct {
       encryption: BucketEncryption.S3_MANAGED,
       autoDeleteObjects: true,
       removalPolicy: RemovalPolicy.DESTROY,
+      serverAccessLogsBucket: props.accessLogBucket,
+      serverAccessLogsPrefix: 'glueJobBucketAccessLog',
     });
 
     const transactionDatabase = new Database(this, 'FraudDetectionDatabase', {
@@ -97,22 +101,57 @@ export class ETLByGlue extends Construct {
       allowAllOutbound: true,
     });
     this.glueJobSG.addIngressRule(this.glueJobSG, Port.allTraffic());
-    // TODO: get resource name from CfnConnection
-    const networkConn = new CfnConnection(this, 'NetworkConnection', {
+
+    var connCount = 1;
+    const networkConntions = props.vpc.privateSubnets.map(sub => new CfnConnection(this, `NetworkConnection-${connCount++}`, {
       catalogId: transactionDatabase.catalogId,
       connectionInput: {
         connectionType: 'NETWORK',
         connectionProperties: {},
         physicalConnectionRequirements: {
-          availabilityZone: props.vpc.privateSubnets[0].availabilityZone,
-          subnetId: props.vpc.privateSubnets[0].subnetId,
+          availabilityZone: sub.availabilityZone,
+          subnetId: sub.subnetId,
           securityGroupIdList: [
             this.glueJobSG.securityGroupId,
           ],
         },
       },
+    }));
+
+    const securityConfName = `SecConf-${Stack.of(this).stackName}`;
+    const securityConf = new SecurityConfiguration(this, 'FraudDetectionSecConf', {
+      securityConfigurationName: securityConfName,
+      s3Encryption: {
+        mode: S3EncryptionMode.S3_MANAGED,
+      },
+      cloudWatchEncryption: {
+        mode: CloudWatchEncryptionMode.KMS,
+      },
+      jobBookmarksEncryption: {
+        mode: JobBookmarksEncryptionMode.CLIENT_SIDE_KMS,
+      },
     });
-    const connName = networkConn.ref;
+    securityConf.cloudWatchEncryptionKey?.addToResourcePolicy(new PolicyStatement({
+      principals: [new ServicePrincipal('logs.amazonaws.com')],
+      actions: [
+        'kms:Encrypt*',
+        'kms:Decrypt*',
+        'kms:ReEncrypt*',
+        'kms:GenerateDataKey*',
+        'kms:Describe*',
+      ],
+      resources: ['*'],
+      conditions: {
+        ArnLike: {
+          'kms:EncryptionContext:aws:logs:arn': Stack.of(this).formatArn({
+            service: 'logs',
+            resource: 'log-group',
+            resourceName: `/aws-glue/jobs/${securityConfName}*`,
+            sep: ':',
+          }),
+        },
+      },
+    }));
 
     const glueJobRole = new Role(this, 'GlueJobRole', {
       assumedBy: new CompositePrincipal(
@@ -125,34 +164,36 @@ export class ETLByGlue extends Construct {
               actions: ['glue:GetConnection'],
               resources: [
                 transactionDatabase.catalogArn,
-                Stack.of(this).formatArn({
+                ...networkConntions.map(conn => Stack.of(this).formatArn({
                   service: 'glue',
                   resource: 'connection',
-                  resourceName: connName,
-                }),
+                  resourceName: conn.ref,
+                })),
               ],
             }),
           ],
         }),
-        neptune: new PolicyDocument({
+        logs: new PolicyDocument({
           statements: [
             new PolicyStatement({
-              actions: ['neptune-db:connect'],
+              actions: ['logs:AssociateKmsKey'],
               resources: [
                 Stack.of(this).formatArn({
-                  service: 'neptune-db',
-                  resource: props.neptune.clusterResourceId,
-                  resourceName: '*',
+                  service: 'logs',
+                  resource: 'log-group',
+                  resourceName: `/aws-glue/jobs/${securityConfName}*`,
+                  sep: ':',
                 }),
               ],
             }),
           ],
         }),
+
       },
     });
+    props.neptune.grantConnect(glueJobRole);
     identityTable.grantRead(glueJobRole);
     transactionTable.grantRead(glueJobRole);
-
 
     glueJobBucket.grantReadWrite(glueJobRole, 'tmp/*');
     const scriptPrefix = this._deployGlueArtifact(glueJobBucket,
@@ -177,8 +218,8 @@ export class ETLByGlue extends Construct {
         '--database': transactionDatabase.databaseName,
         '--transaction_table': transactionTable.tableName,
         '--identity_table': identityTable.tableName,
-        '--id_cols': 'card1,card2,card3,card4,card5,card6,ProductCD,addr1,addr2,P_emaildomain,R_emaildomain',
-        '--cat_cols': 'M1,M2,M3,M4,M5,M6,M7,M8,M9',
+        '--id_cols': props.dataColumnsArg.id_cols,
+        '--cat_cols': props.dataColumnsArg.cat_cols,
         '--output_prefix': props.bucket.s3UrlForObject(outputPrefix),
         '--job-language': 'python',
         '--job-bookmark-option': 'job-bookmark-disable',
@@ -187,18 +228,17 @@ export class ETLByGlue extends Construct {
         '--enable-continuous-log-filter': 'false',
         '--enable-metrics': '',
         '--extra-py-files': [glueJobBucket.s3UrlForObject(`${libPrefix}/${neptuneGlueConnectorLibName}`)].join(','),
-        '--neptune_endpoint': props.neptune.endpoint,
-        '--neptune_port': props.neptune.port,
+        '--neptune_endpoint': props.neptune.clusterEndpoint.hostname,
+        '--neptune_port': props.neptune.clusterEndpoint.port,
       },
       role: glueJobRole.roleArn,
-      workerType: 'G.2X',
+      workerType: 'Standard',
       numberOfWorkers: 2,
       glueVersion: '2.0',
       connections: {
-        connections: [
-          connName,
-        ],
+        connections: networkConntions.map(conn => conn.ref),
       },
+      securityConfiguration: securityConf.securityConfigurationName,
     });
     props.bucket.grantWrite(glueJobRole, `${outputPrefix}*`);
     this.jobName = etlJob.ref;

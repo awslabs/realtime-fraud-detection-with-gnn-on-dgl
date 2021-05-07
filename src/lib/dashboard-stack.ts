@@ -8,6 +8,7 @@ import {
   HttpMethod,
   CfnRoute,
   HttpStage,
+  CfnStage,
 } from '@aws-cdk/aws-apigatewayv2';
 import { LambdaProxyIntegration } from '@aws-cdk/aws-apigatewayv2-integrations';
 import {
@@ -32,7 +33,7 @@ import {
   ViewerCertificate,
 } from '@aws-cdk/aws-cloudfront';
 import { S3Origin, HttpOrigin } from '@aws-cdk/aws-cloudfront-origins';
-import { DatabaseCluster } from '@aws-cdk/aws-docdb';
+import { ClusterParameterGroup, DatabaseCluster } from '@aws-cdk/aws-docdb';
 import {
   IVpc,
   SubnetType,
@@ -50,14 +51,14 @@ import {
   ArnPrincipal,
   ManagedPolicy,
 } from '@aws-cdk/aws-iam';
-import { LayerVersion, Code, Runtime } from '@aws-cdk/aws-lambda';
+import { LayerVersion, Code, Runtime, Tracing } from '@aws-cdk/aws-lambda';
 import { SqsEventSource } from '@aws-cdk/aws-lambda-event-sources';
 import { NodejsFunction } from '@aws-cdk/aws-lambda-nodejs';
 import { PythonFunction, PythonLayerVersion } from '@aws-cdk/aws-lambda-python';
 import { RetentionDays, LogGroup } from '@aws-cdk/aws-logs';
 import { IHostedZone, ARecord, RecordTarget } from '@aws-cdk/aws-route53';
 import { CloudFrontTarget } from '@aws-cdk/aws-route53-targets';
-import { Bucket, BucketEncryption, BlockPublicAccess } from '@aws-cdk/aws-s3';
+import { Bucket, BucketEncryption, BlockPublicAccess, IBucket } from '@aws-cdk/aws-s3';
 import {
   BucketDeployment,
   Source,
@@ -102,6 +103,8 @@ import { artifactsHash } from './utils';
 export interface TransactionDashboardStackStackProps extends NestedStackProps {
   readonly vpc: IVpc;
   readonly queue: IQueue;
+  readonly inferenceArn: string;
+  readonly accessLogBucket: IBucket;
   readonly customDomain?: string;
   readonly r53HostZoneId?: string;
 }
@@ -114,19 +117,36 @@ export class TransactionDashboardStack extends NestedStack {
   ) {
     super(scope, id, props);
 
+    const engine = '4.0.0';
+    const docDBParameterGroup = new ClusterParameterGroup(this, 'DashboardDBParameterGroup', {
+      family: 'docdb4.0', // peer to engine
+      description: 'Parameter group of Dashboard DB.',
+      parameters: {
+        audit_logs: 'enabled',
+      },
+    });
     const dbUser = 'dashboard';
     const docDBCluster = new DatabaseCluster(this, 'DashboardDatabase', {
       masterUser: {
         username: dbUser,
       },
+      engineVersion: engine,
+      port: 27117,
       storageEncrypted: true,
       instanceType: InstanceType.of(InstanceClass.T3, InstanceSize.MEDIUM),
       vpcSubnets: {
         subnetType: SubnetType.PRIVATE,
       },
       vpc: props.vpc,
+      backup: {
+        retention: Duration.days(7),
+      },
+      parameterGroup: docDBParameterGroup,
       removalPolicy: RemovalPolicy.DESTROY,
     });
+    if (!this._targetCNRegion()) {
+      docDBCluster.addRotationSingleUser();
+    }
 
     const docDBCertLayer = new DocumentDBCertLayer(this, 'CertLayer');
     const caFileKey = 'CAFile';
@@ -177,6 +197,7 @@ export class TransactionDashboardStack extends NestedStack {
       }),
       securityGroup: dashboardSG,
       layers: [docDBCertLayer],
+      tracing: Tracing.ACTIVE,
     });
     docDBCluster.secret!.grantRead(transacationFn);
 
@@ -196,6 +217,7 @@ export class TransactionDashboardStack extends NestedStack {
       }),
       securityGroup: dashboardSG,
       layers: [docDBCertLayer],
+      tracing: Tracing.ACTIVE,
     });
     docDBCluster.secret!.grantRead(createIndexesFn);
 
@@ -321,6 +343,7 @@ export class TransactionDashboardStack extends NestedStack {
       }),
       securityGroup: dashboardSG,
       layers: [docDBCertLayer],
+      tracing: Tracing.ACTIVE,
     });
     docDBCluster.secret!.grantRead(tranEventFn);
     tranEventFn.addEventSource(
@@ -343,13 +366,18 @@ export class TransactionDashboardStack extends NestedStack {
       index: 'gen.py',
       runtime: Runtime.PYTHON_3_8,
       environment: {
-        QUEUE_URL: props.queue.queueUrl,
+        INFERENCE_ARN: props.inferenceArn,
         DATASET_URL: getDatasetMapping(this).findInMap(Aws.PARTITION, IEEE),
       },
       timeout: Duration.minutes(15),
       memorySize: 3008,
+      tracing: Tracing.ACTIVE,
     });
-    props.queue.grantSendMessages(tranSimFn);
+    tranSimFn.addToRolePolicy(new PolicyStatement({
+      actions: ['lambda:InvokeFunction'],
+      resources: [props.inferenceArn],
+    }),
+    );
     const tranSimTask = new (class extends LambdaInvoke {
       public toStateJson(): object {
         return {
@@ -378,6 +406,7 @@ export class TransactionDashboardStack extends NestedStack {
       timeout: Duration.seconds(30),
       memorySize: 128,
       runtime: Runtime.NODEJS_14_X,
+      tracing: Tracing.ACTIVE,
     });
     const parameterTask = new (class extends LambdaInvoke {
       public toStateJson(): object {
@@ -405,13 +434,15 @@ export class TransactionDashboardStack extends NestedStack {
             logGroupName: `/aws/vendedlogs/states/fraud-detetion/dashboard-simulator/${this.stackName}`,
           }),
           includeExecutionData: true,
-          level: LogLevel.ERROR,
+          level: LogLevel.ALL,
         },
         tracingEnabled: true,
       },
     );
 
-    const httpApi = new HttpApi(this, 'FraudDetectionDashboardApi');
+    const httpApi = new HttpApi(this, 'FraudDetectionDashboardApi', {
+      createDefaultStage: false,
+    });
     const apiRole = new Role(this, 'FraudDetectionDashboardApiRole', {
       assumedBy: new ServicePrincipal('apigateway.amazonaws.com'),
     });
@@ -466,6 +497,7 @@ export class TransactionDashboardStack extends NestedStack {
       memorySize: 256,
       role: tokenFnRole,
       runtime: Runtime.NODEJS_14_X,
+      tracing: Tracing.ACTIVE,
     });
     const tokenFnIntegration = new LambdaProxyIntegration({
       handler: tokenFn,
@@ -482,8 +514,27 @@ export class TransactionDashboardStack extends NestedStack {
       stageName: apiStageName,
       autoDeploy: true,
     });
+    // TODO: update it when https://github.com/aws/aws-cdk/issues/11100 is resolved
+    const apiCfnStage = apiStage.node.defaultChild as CfnStage;
+    const apiAccessLog = new LogGroup(this, `Stage${apiStageName}Log`);
+    apiCfnStage.accessLogSettings = {
+      destinationArn: apiAccessLog.logGroupArn,
+      format: JSON.stringify({
+        requestId: '$context.requestId',
+        ip: '$context.identity.sourceIp',
+        caller: '$context.identity.caller',
+        user: '$context.identity.user',
+        requestTime: '$context.requestTime',
+        httpMethod: '$context.httpMethod',
+        resourcePath: '$context.resourcePath',
+        status: '$context.status',
+        protocol: '$context.protocol',
+        responseLength: '$context.responseLength',
+      }),
+    };
 
     this._deployFrontend(
+      props.accessLogBucket,
       dashboardApi.graphqlUrl,
       httpApi.apiEndpoint,
       apiStage.stageName,
@@ -502,7 +553,12 @@ export class TransactionDashboardStack extends NestedStack {
     });
   }
 
+  _targetCNRegion(): boolean {
+    return process.env.CDK_DEFAULT_REGION?.startsWith('cn-') || 'aws-cn' === this.node.tryGetContext('TargetPartition');
+  }
+
   _deployFrontend(
+    accessLogBucket: IBucket,
     graphqlEndpoint: string,
     httpEndpoint: string,
     stageName: string,
@@ -515,10 +571,12 @@ export class TransactionDashboardStack extends NestedStack {
       autoDeleteObjects: true,
       encryption: BucketEncryption.S3_MANAGED,
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+      serverAccessLogsBucket: accessLogBucket,
+      serverAccessLogsPrefix: 'dashboardUIBucketAccessLog',
     });
 
     let distribution: IDistribution;
-    const isTargetCN = process.env.CDK_DEFAULT_REGION?.startsWith('cn-') || 'aws-cn' === this.node.tryGetContext('TargetPartition');
+    const isTargetCN = this._targetCNRegion();
 
     //TODO: improve this tricky for DnsValidatedCertificate's validate
     class Import extends Resource implements IHostedZone {

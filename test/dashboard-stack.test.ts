@@ -1,6 +1,7 @@
 import '@aws-cdk/assert/jest';
 import { ResourcePart } from '@aws-cdk/assert/lib/assertions/have-resource';
 import { Vpc } from '@aws-cdk/aws-ec2';
+import { Bucket } from '@aws-cdk/aws-s3';
 import { Queue, QueueEncryption } from '@aws-cdk/aws-sqs';
 import { App, Stack, RemovalPolicy, Duration, CfnParameter } from '@aws-cdk/core';
 import { TransactionDashboardStack } from '../src/lib/dashboard-stack';
@@ -16,6 +17,13 @@ describe('dashboard stack test suite', () => {
   });
 
   test('docdb is created.', () => {
+    expect(stack).toHaveResourceLike('AWS::DocDB::DBClusterParameterGroup', {
+      Family: 'docdb4.0',
+      Parameters: {
+        audit_logs: 'enabled',
+      },
+    });
+
     expect(stack).toHaveResourceLike('AWS::DocDB::DBCluster', {
       Properties: {
         MasterUsername: {
@@ -42,6 +50,12 @@ describe('dashboard stack test suite', () => {
             ],
           ],
         },
+        BackupRetentionPeriod: 7,
+        DBClusterParameterGroupName: {
+          Ref: 'DashboardDBParameterGroupB9B62F6B',
+        },
+        EngineVersion: '4.0.0',
+        Port: 27117,
         StorageEncrypted: true,
       },
       UpdateReplacePolicy: 'Delete',
@@ -79,12 +93,87 @@ describe('dashboard stack test suite', () => {
     });
   });
 
-  test('disable the feature of rotating password of DocDB', () => {
-    expect(stack).toCountResources('AWS::SecretsManager::RotationSchedule', 0);
+  test('rotating password of DocDB', () => {
+    expect(stack).toHaveResourceLike('AWS::SecretsManager::RotationSchedule', {
+      SecretId: {
+        Ref: 'DashboardDatabaseSecretAttachmentB749CF34',
+      },
+      RotationLambdaARN: {
+        'Fn::GetAtt': [
+          'DashboardDatabaseRotationSingleUser0EB18E12',
+          'Outputs.RotationLambdaARN',
+        ],
+      },
+      RotationRules: {
+        AutomaticallyAfterDays: 30,
+      },
+    });
 
-    expect(stack).toCountResources('AWS::SecretsManager::ResourcePolicy', 0);
+    expect(stack).toHaveResourceLike('AWS::SecretsManager::ResourcePolicy', {
+      ResourcePolicy: {
+        Statement: [
+          {
+            Action: 'secretsmanager:DeleteSecret',
+            Effect: 'Deny',
+            Principal: {
+              AWS: {
+                'Fn::Join': [
+                  '',
+                  [
+                    'arn:',
+                    {
+                      Ref: 'AWS::Partition',
+                    },
+                    ':iam::',
+                    {
+                      Ref: 'AWS::AccountId',
+                    },
+                    ':root',
+                  ],
+                ],
+              },
+            },
+            Resource: '*',
+          },
+        ],
+      },
+      SecretId: {
+        Ref: 'DashboardDatabaseSecretAttachmentB749CF34',
+      },
+    });
 
-    expect(stack).toCountResources('AWS::Serverless::Application', 0);
+    expect(stack).toHaveResourceLike('AWS::Serverless::Application', {
+      Location: {
+        ApplicationId: 'arn:aws:serverlessrepo:us-east-1:297356227824:applications/SecretsManagerMongoDBRotationSingleUser',
+      },
+      Parameters: {
+        endpoint: {
+          'Fn::Join': [
+            '',
+            [
+              'https://secretsmanager.',
+              {
+                Ref: 'AWS::Region',
+              },
+              '.',
+              {
+                Ref: 'AWS::URLSuffix',
+              },
+            ],
+          ],
+        },
+      },
+    });
+  });
+
+  test('disable the feature of rotating password of DocDB when deploying to China regions', () => {
+    const context = deployToCNRegion();
+
+    expect(context.stack).toCountResources('AWS::SecretsManager::RotationSchedule', 0);
+
+    expect(context.stack).toCountResources('AWS::SecretsManager::ResourcePolicy', 0);
+
+    expect(context.stack).toCountResources('AWS::Serverless::Application', 0);
   });
 
   test('layer for docdb cert is created', () => {
@@ -116,8 +205,13 @@ describe('dashboard stack test suite', () => {
       DependsOn: [
         'DashboardDatabaseInstance186709BD9',
         'DashboardDatabaseF93C7646',
+        'DashboardDatabaseRotationSingleUser0EB18E12',
+        'DashboardDatabaseRotationSingleUserSecurityGroupDCFB3DB6',
+        'DashboardDatabaseSecretAttachmentPolicyEDCE0207',
         'DashboardDatabaseSecretAttachmentB749CF34',
+        'DashboardDatabaseSecretAttachmentRotationScheduleD0CB8A1A',
         'DashboardDatabaseSecretCF9F4299',
+        'DashboardDatabaseSecurityGroupfromTestStackDashboardStackDashboardDatabaseRotationSingleUserSecurityGroupF16A65A2IndirectPortFE2473FE',
         'DashboardDatabaseSecurityGroupfromTestStackDashboardStackDashboardToDocDBSG004411E5IndirectPortF0F1D237',
         'DashboardDatabaseSecurityGroupECDE0B4B',
         'DashboardDatabaseSubnetsD80E6AA1',
@@ -246,9 +340,7 @@ describe('dashboard stack test suite', () => {
     expect(stack).toHaveResourceLike('AWS::Lambda::Function', {
       Environment: {
         Variables: {
-          QUEUE_URL: {
-            Ref: 'referencetoTestStackTransQueue6E481EC7Ref',
-          },
+          INFERENCE_ARN: 'arn:aws:lambda:ap-southeast-1:123456789012:function:inference-func',
           DATASET_URL: {
             'Fn::FindInMap': [
               'DataSet',
@@ -269,6 +361,9 @@ describe('dashboard stack test suite', () => {
       MemorySize: 3008,
       Runtime: 'python3.8',
       Timeout: 900,
+      TracingConfig: {
+        Mode: 'Active',
+      },
     });
 
     expect(stack).toHaveResourceLike('AWS::StepFunctions::StateMachine', {
@@ -343,7 +438,7 @@ describe('dashboard stack test suite', () => {
           },
         ],
         IncludeExecutionData: true,
-        Level: 'ERROR',
+        Level: 'ALL',
       },
     });
   });
@@ -402,6 +497,9 @@ describe('dashboard stack test suite', () => {
           },
         ],
       },
+      TracingConfig: {
+        Mode: 'Active',
+      },
     });
 
     expect(stack).toHaveResourceLike('AWS::Lambda::EventSourceMapping', {
@@ -422,9 +520,20 @@ describe('dashboard stack test suite', () => {
     });
 
     expect(stack).toHaveResourceLike('AWS::ApiGatewayV2::Stage', {
-      StageName: '$default',
+      StageName: 'api',
+      AccessLogSettings: {
+        DestinationArn: {
+          'Fn::GetAtt': [
+            'StageapiLog3FA18EF0',
+            'Arn',
+          ],
+        },
+        Format: '{"requestId":"$context.requestId","ip":"$context.identity.sourceIp","caller":"$context.identity.caller","user":"$context.identity.user","requestTime":"$context.requestTime","httpMethod":"$context.httpMethod","resourcePath":"$context.resourcePath","status":"$context.status","protocol":"$context.protocol","responseLength":"$context.responseLength"}',
+      },
       AutoDeploy: true,
     });
+
+    expect(stack).toCountResources('AWS::ApiGatewayV2::Stage', 1);
 
     expect(stack).toHaveResourceLike('AWS::ApiGatewayV2::Integration', {
       IntegrationType: 'AWS_PROXY',
@@ -533,6 +642,12 @@ describe('dashboard stack test suite', () => {
               },
             },
           ],
+        },
+        LoggingConfiguration: {
+          DestinationBucketName: {
+            Ref: 'referencetoTestStackAccessLogF5229892Ref',
+          },
+          LogFilePrefix: 'dashboardUIBucketAccessLog',
         },
         PublicAccessBlockConfiguration: {
           BlockPublicAcls: true,
@@ -886,24 +1001,9 @@ describe('dashboard stack test suite', () => {
   });
 
   test('distributed dashboard website by s3 and cloudfront in aws-cn regions', () => {
-    const app = new App({
-      context: {
-        TargetPartition: 'aws-cn',
-      },
-    });
-    const parentStack = new Stack(app, 'TestStack');
-    const dashboardDomainNamePara = new CfnParameter(parentStack, 'DashboardDomain', {
-      type: 'String',
-    });
-    const r53HostZoneIdPara = new CfnParameter(parentStack, 'Route53HostedZoneId', {
-      type: 'AWS::Route53::HostedZone::Id',
-    });
+    const context = deployToCNRegion();
 
-    ({ stack } = initializeStackWithContextsAndEnvs({
-      TargetPartition: 'aws-cn',
-    }, undefined, parentStack, dashboardDomainNamePara.valueAsString, r53HostZoneIdPara.valueAsString));
-
-    expect(stack).toHaveResourceLike('AWS::S3::BucketPolicy', {
+    expect(context.stack).toHaveResourceLike('AWS::S3::BucketPolicy', {
       PolicyDocument: {
         Statement: [
           {
@@ -975,10 +1075,10 @@ describe('dashboard stack test suite', () => {
       },
     });
 
-    expect(stack).toHaveResourceLike('AWS::CloudFront::Distribution', {
+    expect(context.stack).toHaveResourceLike('AWS::CloudFront::Distribution', {
       DistributionConfig: {
         Aliases: [
-          stack.resolve(dashboardDomainNamePara.valueAsString),
+          context.stack.resolve(context.dashboardDomainNamePara.valueAsString),
         ],
         ViewerCertificate: {
           CloudFrontDefaultCertificate: true,
@@ -1090,12 +1190,12 @@ describe('dashboard stack test suite', () => {
       },
     });
 
-    expect(stack).toHaveResourceLike('AWS::Route53::RecordSet', {
+    expect(context.stack).toHaveResourceLike('AWS::Route53::RecordSet', {
       Name: {
         'Fn::Join': [
           '',
           [
-            stack.resolve(dashboardDomainNamePara.valueAsString),
+            context.stack.resolve(context.dashboardDomainNamePara.valueAsString),
             '.',
           ],
         ],
@@ -1118,11 +1218,38 @@ describe('dashboard stack test suite', () => {
           ],
         },
       },
-      HostedZoneId: stack.resolve(r53HostZoneIdPara),
+      HostedZoneId: context.stack.resolve(context.r53HostZoneIdPara),
     });
 
   });
 });
+
+function deployToCNRegion(): {
+  stack: Stack;
+  dashboardDomainNamePara: CfnParameter;
+  r53HostZoneIdPara: CfnParameter;
+} {
+  const app = new App({
+    context: {
+      TargetPartition: 'aws-cn',
+    },
+  });
+  const parentStack = new Stack(app, 'TestStack');
+  const dashboardDomainNamePara = new CfnParameter(parentStack, 'DashboardDomain', {
+    type: 'String',
+  });
+  const r53HostZoneIdPara = new CfnParameter(parentStack, 'Route53HostedZoneId', {
+    type: 'AWS::Route53::HostedZone::Id',
+  });
+
+  return {
+    ...initializeStackWithContextsAndEnvs({
+      TargetPartition: 'aws-cn',
+    }, undefined, parentStack, dashboardDomainNamePara.valueAsString, r53HostZoneIdPara.valueAsString),
+    dashboardDomainNamePara,
+    r53HostZoneIdPara,
+  };
+}
 
 function initializeStackWithContextsAndEnvs(context: {} | undefined, env?: {} | undefined,
   _parentStack?: Stack, customDomain?: string, r53HostZoneId?: string) {
@@ -1138,10 +1265,14 @@ function initializeStackWithContextsAndEnvs(context: {} | undefined, env?: {} | 
     removalPolicy: RemovalPolicy.DESTROY,
     visibilityTimeout: Duration.seconds(60),
   });
+  const inferenceArn = 'arn:aws:lambda:ap-southeast-1:123456789012:function:inference-func';
+  const accessLogBucket = new Bucket(parentStack, 'AccessLog');
 
   const stack = new TransactionDashboardStack(parentStack, 'DashboardStack', {
     vpc,
     queue,
+    inferenceArn,
+    accessLogBucket,
     customDomain,
     r53HostZoneId,
   });
