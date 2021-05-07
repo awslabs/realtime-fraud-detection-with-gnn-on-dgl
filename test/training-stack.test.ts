@@ -905,7 +905,7 @@ describe('training stack test suite', () => {
       },
       GlueVersion: '2.0',
       NumberOfWorkers: 2,
-      WorkerType: 'G.2X',
+      WorkerType: 'Standard',
       SecurityConfiguration: {
         Ref: 'ETLCompFraudDetectionSecConf653F0C00',
       },
