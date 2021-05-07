@@ -6,8 +6,6 @@ from awsglue.dynamicframe import DynamicFrame
 from awsglue.transforms import DropFields, SelectFields
 import pyspark.sql.functions as fc
 from io import BytesIO, StringIO
-import pandas as pd
-import numpy as np
 import boto3
 from urllib.parse import urlparse
 from neptune_python_utils.gremlin_utils import GremlinUtils
@@ -25,7 +23,6 @@ def join_all(dfs, keys):
 dfs = []
 combined = []
 
-# TODO: use glue transform and spark ml instead of pandas
 def get_features_and_labels(transactions_df, transactions_id_cols, transactions_cat_cols):
     # Get features
     non_feature_cols = ['isFraud', 'TransactionDT'] + transactions_id_cols.split(",")
@@ -68,14 +65,14 @@ def get_relations_and_edgelist(transactions_df, identity_df, transactions_id_col
         edges[etype] = edgelist
     return edges
 
-#TODO: for dev purpose only, will be removed
 def dump_df_to_s3(df, objectName, header = True):
-    objectKey = f"{args['output_prefix']}{objectName}"
+    objectKey = f"{args['output_prefix']}{args['JOB_RUN_ID']}/{objectName}"
     logger.info(f'Dumping df to s3 object {objectKey}')
     glueContext.write_dynamic_frame.from_options(
-        frame=DynamicFrame.fromDF(df, glueContext, f"{objectName}.csv"),
+        frame=DynamicFrame.fromDF(df, glueContext, f"{objectName}DF"),
         connection_type="s3",
         connection_options={"path": objectKey},
+        format_options={"writeHeader": header},
         format="csv")
 
 def create_catagory_and_relation(name, dataframe, gremlin_client):
