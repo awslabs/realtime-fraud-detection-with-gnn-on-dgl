@@ -52,9 +52,6 @@ function _normalizeTrainingJobHyperparameters(para: Parameters) : {
 } {
   const hyperparameters = para?.trainingJob?.hyperparameters ?? {
   };
-  hyperparameters.nodes = para?.trainingJob?.hyperparameters?.nodes ?? 'features.csv';
-  hyperparameters.edges = para?.trainingJob?.hyperparameters?.edges ?? 'relation*';
-  hyperparameters.labels = para?.trainingJob?.hyperparameters?.labels ?? 'tags.csv';
   hyperparameters['n-hidden'] = para?.trainingJob?.hyperparameters?.['n-hidden'] ?? '16';
   hyperparameters['embedding-size'] = para?.trainingJob?.hyperparameters?.['embedding-size'] ?? '64';
   hyperparameters['n-layers'] = '2';

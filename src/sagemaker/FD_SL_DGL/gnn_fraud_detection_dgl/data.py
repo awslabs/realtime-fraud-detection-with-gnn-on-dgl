@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 
 
-def get_features(id_to_node, node_features):
+def get_features(id_to_node, node_feature_files):
     """
 
     :param id_to_node: dictionary mapping node names(id) to dgl node idx
@@ -13,30 +13,31 @@ def get_features(id_to_node, node_features):
     max_node = max(id_to_node.values())
 
     is_1st_line = True
-    with open(node_features, "r") as fh:
-        for line in fh:
-            # hard-coding to ignore the 1st line of header
-            if is_1st_line:
-                is_1st_line = False
-                continue
-
-            node_feats = line.strip().split(",")
-            node_id = node_feats[0]
-            feats = np.array(list(map(float, node_feats[1:])))
-            features.append(feats)
-            if node_id not in id_to_node:
-                max_node += 1
-                id_to_node[node_id] = max_node
-                new_nodes.append(max_node)
-
-            indices.append(id_to_node[node_id])
+    for node_file in node_feature_files:
+        with open(node_file, "r") as fh:
+            for line in fh:
+                # hard-coding to ignore the 1st line of header
+                if is_1st_line:
+                    is_1st_line = False
+                    continue
+    
+                node_feats = line.strip().split(",")
+                node_id = node_feats[0]
+                feats = np.array(list(map(float, node_feats[1:])))
+                features.append(feats)
+                if node_id not in id_to_node:
+                    max_node += 1
+                    id_to_node[node_id] = max_node
+                    new_nodes.append(max_node)
+    
+                indices.append(id_to_node[node_id])
 
     features = np.array(features).astype('float32')
     features = features[np.argsort(indices), :]
     return features, new_nodes
 
 
-def get_labels(id_to_node, n_nodes, target_node_type, labels_path, masked_nodes_path, additional_mask_rate=0):
+def get_labels(id_to_node, n_nodes, target_node_type, labels_files, masked_nodes_files, additional_mask_rate=0):
     """
 
     :param id_to_node: dictionary mapping node names(id) to dgl node idx
@@ -48,23 +49,28 @@ def get_labels(id_to_node, n_nodes, target_node_type, labels_path, masked_nodes_
     :return: (list, list) train and test mask array
     """
     node_to_id = {v: k for k, v in id_to_node.items()}
-    user_to_label = pd.read_csv(labels_path).set_index(target_node_type)
+
+    labels_from_each_file = (pd.read_csv(f) for f in labels_files)
+    user_to_label = pd.concat(labels_from_each_file, ignore_index=True).set_index(target_node_type)
+
     labels = user_to_label.loc[map(int, pd.Series(node_to_id)[np.arange(n_nodes)].values)].values.flatten()
-    masked_nodes = read_masked_nodes(masked_nodes_path)
+    masked_nodes = read_masked_nodes(masked_nodes_files)
     train_mask, test_mask = _get_mask(id_to_node, node_to_id, n_nodes, masked_nodes,
                                       additional_mask_rate=additional_mask_rate)
     return labels, train_mask, test_mask
 
 
-def read_masked_nodes(masked_nodes_path):
+def read_masked_nodes(masked_nodes_files):
     """
     Returns a list of nodes extracted from the path passed in
 
     :param masked_nodes_path: filepath containing list of nodes to be masked i.e test users
     :return: list
     """
-    with open(masked_nodes_path, "r") as fh:
-        masked_nodes = [line.strip() for line in fh]
+    masked_nodes = []
+    for f in masked_nodes_files:
+        with open(f, "r") as fh:
+            masked_nodes += [line.strip() for line in fh]
     return masked_nodes
 
 

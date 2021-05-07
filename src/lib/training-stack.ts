@@ -173,6 +173,36 @@ export class TrainingStack extends NestedStack {
       resultPath: '$.error',
     });
 
+    const hyperParaFn = new NodejsFunction(this, 'HyperParametersFunc', {
+      entry: path.join(__dirname, '../lambda.d/training-hyperparam/index.ts'),
+      handler: 'build',
+      timeout: Duration.seconds(60),
+      memorySize: 128,
+      runtime: Runtime.NODEJS_14_X,
+      tracing: Tracing.ACTIVE,
+      environment: {
+        InputDataRoot: props.bucket.urlForObject(etlConstruct.processedOutputPrefix),
+      },
+    });
+    const hyperParaTask = new class extends LambdaInvoke {
+      public toStateJson(): object {
+        return {
+          ...super.toStateJson(),
+          ResultSelector: {
+            'hyperParameters.$': '$.Payload.hyperParameters',
+            'inputDataUri.$': '$.Payload.inputDataUri',
+          },
+        };
+      }
+    }(this, 'Build hyperparameters', {
+      lambdaFunction: hyperParaFn,
+      integrationPattern: IntegrationPattern.REQUEST_RESPONSE,
+      resultPath: '$.trainingParametersOutput',
+    }).addCatch(failure, {
+      errors: [Errors.ALL],
+      resultPath: '$.error',
+    });
+
     const modelOutputPrefix = `${dataPrefix}model_output`;
     const trainingJobTask = new class extends SageMakerCreateTrainingJob {
       public toStateJson(): object {
@@ -185,13 +215,15 @@ export class TrainingStack extends NestedStack {
         };
         json.Parameters['TrainingJobName.$'] =
           "States.Format('fraud-detection-model-{}', $.dataProcessOutput.CompletedOn)";
-        json.Parameters['HyperParameters.$'] = '$.parameters.trainingJob.hyperparameters';
+        json.Parameters['HyperParameters.$'] = '$.trainingParametersOutput.hyperParameters';
         json.Parameters.ResourceConfig['InstanceCount.$'] = '$.parameters.trainingJob.instanceCount';
         json.Parameters.ResourceConfig['InstanceType.$'] = '$.parameters.trainingJob.instanceType';
         json.Parameters.StoppingCondition['MaxRuntimeInSeconds.$'] = '$.parameters.trainingJob.timeoutInSeconds';
+        json.Parameters.InputDataConfig[0].DataSource.S3DataSource['S3Uri.$'] = '$.trainingParametersOutput.inputDataUri';
         delete json.Parameters.ResourceConfig.InstanceCount;
         delete json.Parameters.ResourceConfig.InstanceType;
         delete json.Parameters.StoppingCondition.MaxRuntimeInSeconds;
+        delete json.Parameters.InputDataConfig[0].DataSource.S3DataSource.S3Uri;
         return json;
       }
     }(this, 'Train model', {
@@ -610,6 +642,7 @@ export class TrainingStack extends NestedStack {
       .next(dataIngestTask)
       .next(dataCatalogCrawlerTask)
       .next(dataProcessTask)
+      .next(hyperParaTask)
       .next(trainingJobTask)
       .next(runLoadPropsTask)
       .next(modelRepackagingTask)

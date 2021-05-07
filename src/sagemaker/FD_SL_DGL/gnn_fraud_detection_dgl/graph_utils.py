@@ -3,25 +3,22 @@ import re
 import dgl
 import numpy as np
 import torch as th
+import glob
 
 from data import parse_edgelist, get_features, read_edges, read_masked_nodes
 from estimator_fns import get_logger
 
 logging = get_logger(__name__)
 
-def get_edgelists(edgelist_expression, directory):
-    if "," in edgelist_expression:
-        return edgelist_expression.split(",")
-    files = os.listdir(directory)
-    compiled_expression = re.compile(edgelist_expression)
-    return [filename for filename in files if compiled_expression.match(filename)]
+def get_files(filename_pattern, root_dir):
+    return glob.iglob(os.path.join(root_dir, '') + filename_pattern, recursive=True)
 
-def construct_graph(training_dir, edges, nodes, target_node_type):
+def construct_graph(edges, nodes, target_node_type):
 
     print("Getting relation graphs from the following edge lists : {} ".format(edges))
     edgelists, id_to_node = {}, {}
     for i, edge in enumerate(edges):
-        edgelist, rev_edgelist, id_to_node, src, dst = parse_edgelist(os.path.join(training_dir, edge), id_to_node, header=True)
+        edgelist, rev_edgelist, id_to_node, src, dst = parse_edgelist(edge, id_to_node, header=True)
         if src == target_node_type:
             src = 'target'
         if dst == target_node_type:
@@ -32,10 +29,10 @@ def construct_graph(training_dir, edges, nodes, target_node_type):
         else:
             edgelists[(src, src + '<>' + dst, dst)] = edgelist
             edgelists[(dst, dst + '<>' + src, src)] = rev_edgelist
-            print("Read edges for {} from edgelist: {}".format(src + '<>' + dst, os.path.join(training_dir, edge)))
+            print("Read edges for {} from edgelist: {}".format(src + '<>' + dst, edge))
 
     # get features for target nodes
-    features, new_nodes = get_features(id_to_node[target_node_type], os.path.join(training_dir, nodes))
+    features, new_nodes = get_features(id_to_node[target_node_type], nodes)
     print("Read in features for target nodes")
 
     # add self relation

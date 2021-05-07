@@ -15,7 +15,7 @@ import pickle
 
 from sklearn.metrics import confusion_matrix
 from estimator_fns import parse_args, get_logger
-from graph_utils import get_edgelists, construct_graph
+from graph_utils import get_files, construct_graph
 from data import get_features, get_labels, read_masked_nodes, parse_edgelist, read_edges
 from utils import get_metrics
 from pytorch_model import HeteroRGCN
@@ -184,11 +184,8 @@ if __name__ == '__main__':
     args = parse_args()
     print(args)
 
-    args.edges = get_edgelists('relation*', args.training_dir)
-
-    g, features, target_id_to_node, id_to_node = construct_graph(args.training_dir,
-                                                                 args.edges,
-                                                                 args.nodes,
+    g, features, target_id_to_node, id_to_node = construct_graph(get_files(args.edges, args.training_dir),
+                                                                 get_files(args.nodes, args.training_dir),
                                                                  args.target_ntype)
 
     mean, stdev, features = normalize(th.from_numpy(features))
@@ -203,8 +200,8 @@ if __name__ == '__main__':
     labels, _, test_mask = get_labels(target_id_to_node,
                                                n_nodes,
                                                args.target_ntype,
-                                               os.path.join(args.training_dir, args.labels),
-                                               os.path.join(args.training_dir, args.new_accounts))
+                                               get_files(args.labels, args.training_dir),
+                                               get_files(args.new_accounts, args.training_dir))
     print("Got labels")
 
     labels = th.from_numpy(labels).float()

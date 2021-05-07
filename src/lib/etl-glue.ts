@@ -232,8 +232,7 @@ export class ETLByGlue extends Construct {
         '--neptune_port': props.neptune.clusterEndpoint.port,
       },
       role: glueJobRole.roleArn,
-      workerType: 'Standard',
-      numberOfWorkers: 2,
+      maxCapacity: 8,
       glueVersion: '2.0',
       connections: {
         connections: networkConntions.map(conn => conn.ref),
