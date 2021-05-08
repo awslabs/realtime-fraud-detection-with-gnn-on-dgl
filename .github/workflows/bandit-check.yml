@@ -16,4 +16,5 @@ jobs:
         targets: |
           src/sagemaker/FD_SL_DGL/
           src/lambda.d/
+          src/scripts/
         options: "-r -s B301 -ll"
