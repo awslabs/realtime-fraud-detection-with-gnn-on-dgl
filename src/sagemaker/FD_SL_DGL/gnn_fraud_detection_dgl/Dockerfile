@@ -15,4 +15,4 @@ COPY * /opt/ml/code/
 ENV SAGEMAKER_PROGRAM fd_sl_train_entry_point.py
 
 # Install requirements
-RUN pip install dgl==0.4.2
+RUN pip install dgl==0.6.*

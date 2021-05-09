@@ -7,10 +7,13 @@ This folder contains SageMaker-related notebooks and Python codes for"
 
 Requirements
 --------------
-- DGL == 0.6.0
+- DGL == 0.6.*
 - SageMaker == 1.72.0
 - awscli >= 1.18.140
-- SageMaker PyTorch == 1.6.0
-- Python == 3.6
+- SageMaker PyTorch >= 1.6.0 < 1.7.0
+- Python >= 3.6
+- pandas
+- sklearn
+- matplotlib
 
 
