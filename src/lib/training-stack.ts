@@ -7,7 +7,7 @@ import { FileSystem, LifecyclePolicy } from '@aws-cdk/aws-efs';
 import { PolicyStatement, Effect, Role, ServicePrincipal } from '@aws-cdk/aws-iam';
 import { Runtime, LayerVersion, Code, Tracing, FileSystem as LambdaFileSystem } from '@aws-cdk/aws-lambda';
 import { NodejsFunction } from '@aws-cdk/aws-lambda-nodejs';
-import { PythonFunction, PythonLayerVersion } from '@aws-cdk/aws-lambda-python';
+import { PythonFunction } from '@aws-cdk/aws-lambda-python';
 import { LogGroup, RetentionDays } from '@aws-cdk/aws-logs';
 import { IDatabaseCluster } from '@aws-cdk/aws-neptune';
 import { IBucket } from '@aws-cdk/aws-s3';
@@ -18,6 +18,7 @@ import { Construct, Duration, NestedStack, NestedStackProps, Arn, Stack, CfnMapp
 import { AwsCliLayer } from '@aws-cdk/lambda-layer-awscli';
 import { getDatasetMapping, IEEE } from './dataset';
 import { ETLByGlue } from './etl-glue';
+import { WranglerLayer } from './layer';
 import { dirArtifactHash } from './utils';
 
 export interface TrainingStackProps extends NestedStackProps {
@@ -82,10 +83,7 @@ export class TrainingStack extends NestedStack {
     const dataIngestFn = new PythonFunction(this, 'DataIngestFunc', {
       entry: path.join(__dirname, '../lambda.d/ingest'),
       layers: [
-        new PythonLayerVersion(this, 'DataIngestLayer', {
-          entry: path.join(__dirname, '../lambda.d/layer.d/awswrangler'),
-          compatibleRuntimes: [Runtime.PYTHON_3_8],
-        }),
+        new WranglerLayer(this, 'DataIngestLayer'),
       ],
       index: 'import.py',
       runtime: Runtime.PYTHON_3_8,

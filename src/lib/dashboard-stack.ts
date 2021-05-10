@@ -54,7 +54,7 @@ import {
 import { LayerVersion, Code, Runtime, Tracing } from '@aws-cdk/aws-lambda';
 import { SqsEventSource } from '@aws-cdk/aws-lambda-event-sources';
 import { NodejsFunction } from '@aws-cdk/aws-lambda-nodejs';
-import { PythonFunction, PythonLayerVersion } from '@aws-cdk/aws-lambda-python';
+import { PythonFunction } from '@aws-cdk/aws-lambda-python';
 import { RetentionDays, LogGroup } from '@aws-cdk/aws-logs';
 import { IHostedZone, ARecord, RecordTarget } from '@aws-cdk/aws-route53';
 import { CloudFrontTarget } from '@aws-cdk/aws-route53-targets';
@@ -98,6 +98,7 @@ import {
   AwsCustomResourcePolicy,
 } from '@aws-cdk/custom-resources';
 import { IEEE, getDatasetMapping } from './dataset';
+import { WranglerLayer } from './layer';
 import { artifactsHash } from './utils';
 
 export interface TransactionDashboardStackStackProps extends NestedStackProps {
@@ -358,10 +359,7 @@ export class TransactionDashboardStack extends NestedStack {
     const tranSimFn = new PythonFunction(this, 'TransactionSimulatorFunc', {
       entry: path.join(__dirname, '../lambda.d/simulator'),
       layers: [
-        new PythonLayerVersion(this, 'AwsDataWranglerLayer', {
-          entry: path.join(__dirname, '../lambda.d/layer.d/awswrangler'),
-          compatibleRuntimes: [Runtime.PYTHON_3_8],
-        }),
+        new WranglerLayer(this, 'AwsDataWranglerLayer'),
       ],
       index: 'gen.py',
       runtime: Runtime.PYTHON_3_8,
