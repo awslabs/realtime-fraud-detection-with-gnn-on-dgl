@@ -3,7 +3,7 @@
 This folder contains SageMaker-related notebooks and Python codes for"
 - Initial training of RGCN model with DGL;
 - Deployment notebooks;
-- Test clients;
+- [Test clients](code/);
 
 Requirements
 --------------
@@ -15,5 +15,3 @@ Requirements
 - pandas
 - sklearn
 - matplotlib
-
-
