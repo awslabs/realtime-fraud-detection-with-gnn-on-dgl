@@ -60,7 +60,7 @@
     },
     {
       "name": "@material-ui/core",
-      "version": "^4.11.3",
+      "version": "^4.11.4",
       "type": "runtime"
     },
     {
@@ -70,47 +70,47 @@
     },
     {
       "name": "@material-ui/lab",
-      "version": "^5.0.0-alpha.25",
+      "version": "^4.0.0-alpha.58",
       "type": "runtime"
     },
     {
       "name": "@testing-library/jest-dom",
-      "version": "^5.11.4",
+      "version": "^5.12.0",
       "type": "runtime"
     },
     {
       "name": "@testing-library/react",
-      "version": "^11.1.0",
+      "version": "^11.2.6",
       "type": "runtime"
     },
     {
       "name": "@testing-library/user-event",
-      "version": "^12.1.10",
+      "version": "^13.1.9",
       "type": "runtime"
     },
     {
       "name": "@types/jest",
-      "version": "^26.0.15",
+      "version": "^26.0.23",
       "type": "runtime"
     },
     {
       "name": "@types/node",
-      "version": "^12.0.0",
+      "version": "^15.0.3",
       "type": "runtime"
     },
     {
       "name": "@types/react-dom",
-      "version": "^17.0.0",
+      "version": "^17.0.4",
       "type": "runtime"
     },
     {
       "name": "@types/react",
-      "version": "^17.0.0",
+      "version": "^17.0.5",
       "type": "runtime"
     },
     {
       "name": "apexcharts",
-      "version": "^3.25.0",
+      "version": "^3.26.2",
       "type": "runtime"
     },
     {
@@ -120,12 +120,12 @@
     },
     {
       "name": "aws-appsync",
-      "version": "^1.0.0",
+      "version": "^4.0.3",
       "type": "runtime"
     },
     {
       "name": "aws-sdk",
-      "version": "^2.141.0",
+      "version": "^2.906.0",
       "type": "runtime"
     },
     {
@@ -140,22 +140,22 @@
     },
     {
       "name": "graphql-tag",
-      "version": "^2.5.0",
+      "version": "^2.12.4",
       "type": "runtime"
     },
     {
       "name": "i18next-browser-languagedetector",
-      "version": "^6.1.0",
+      "version": "^6.1.1",
       "type": "runtime"
     },
     {
       "name": "i18next-http-backend",
-      "version": "^1.2.1",
+      "version": "^1.2.4",
       "type": "runtime"
     },
     {
       "name": "i18next",
-      "version": "^20.1.0",
+      "version": "^20.2.2",
       "type": "runtime"
     },
     {
@@ -165,7 +165,7 @@
     },
     {
       "name": "node-sass",
-      "version": "^5.0.0",
+      "version": "^6.0.0",
       "type": "runtime"
     },
     {
@@ -188,7 +188,7 @@
     },
     {
       "name": "react-i18next",
-      "version": "^11.8.13",
+      "version": "^11.8.15",
       "type": "runtime"
     },
     {
@@ -198,7 +198,7 @@
     },
     {
       "name": "react-minimal-pie-chart",
-      "version": "^8.1.0",
+      "version": "^8.2.0",
       "type": "runtime"
     },
     {
@@ -218,17 +218,17 @@
     },
     {
       "name": "react",
-      "version": "^17.0.1",
+      "version": "^17.0.2",
       "type": "runtime"
     },
     {
       "name": "sweetalert2",
-      "version": "^10.15.5",
+      "version": "^10.16.7",
       "type": "runtime"
     },
     {
       "name": "typescript",
-      "version": "^4.1.2",
+      "version": "^4.2.4",
       "type": "runtime"
     },
     {
@@ -237,7 +237,7 @@
     },
     {
       "name": "web-vitals",
-      "version": "^1.0.1",
+      "version": "^1.1.2",
       "type": "runtime"
     }
   ],
