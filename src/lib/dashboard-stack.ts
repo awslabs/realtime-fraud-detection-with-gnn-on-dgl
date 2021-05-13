@@ -31,6 +31,8 @@ import {
   OriginAccessIdentity,
   CloudFrontAllowedMethods,
   ViewerCertificate,
+  LambdaEdgeEventType,
+  CfnDistribution,
 } from '@aws-cdk/aws-cloudfront';
 import { S3Origin, HttpOrigin } from '@aws-cdk/aws-cloudfront-origins';
 import { ClusterParameterGroup, DatabaseCluster } from '@aws-cdk/aws-docdb';
@@ -99,6 +101,7 @@ import {
 } from '@aws-cdk/custom-resources';
 import { IEEE, getDatasetMapping } from './dataset';
 import { WranglerLayer } from './layer';
+import { SARDeployment } from './sar';
 import { artifactsHash } from './utils';
 
 export interface TransactionDashboardStackStackProps extends NestedStackProps {
@@ -657,6 +660,13 @@ export class TransactionDashboardStack extends NestedStack {
         ],
       });
     } else {
+      const addSecurityHeaderSar = new SARDeployment(this, 'AddSecurityHeader', {
+        application: 'arn:aws:serverlessrepo:us-east-1:418289889111:applications/add-security-headers',
+        sematicVersion: '1.0.2',
+        region: 'us-east-1',
+        outputAtt: 'AddSecurityHeaderFunction',
+      });
+
       let cert: Certificate | undefined;
       if (customDomain && hostedZone) {
         cert = new DnsValidatedCertificate(this, 'CustomDomainCertificateForCloudFront', {
@@ -665,6 +675,7 @@ export class TransactionDashboardStack extends NestedStack {
           region: 'us-east-1',
         });
       }
+
       distribution = new Distribution(this, 'Distribution', {
         certificate: cert,
         domainNames: customDomain ? [customDomain] : [],
@@ -710,6 +721,19 @@ export class TransactionDashboardStack extends NestedStack {
           },
         ],
       });
+      const dist = distribution.node.defaultChild as CfnDistribution;
+      dist.addPropertyOverride('DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations', [
+        {
+          EventType: LambdaEdgeEventType.ORIGIN_RESPONSE,
+          LambdaFunctionARN: addSecurityHeaderSar.funcVersionArn,
+        },
+      ]);
+      dist.addPropertyOverride('DistributionConfig.CacheBehaviors.0.LambdaFunctionAssociations', [
+        {
+          EventType: LambdaEdgeEventType.ORIGIN_RESPONSE,
+          LambdaFunctionARN: addSecurityHeaderSar.funcVersionArn,
+        },
+      ]);
     }
 
     if (hostedZone) {

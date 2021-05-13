@@ -764,6 +764,20 @@ describe('dashboard stack test suite', () => {
       },
     });
 
+    // deploy sar application as lambda@edge
+    expect(stack).toHaveResourceLike('AWS::CloudFormation::CustomResource', {
+      ServiceToken: {
+        'Fn::GetAtt': [
+          'AddSecurityHeaderTransacationFunc920B9BE4',
+          'Arn',
+        ],
+      },
+      APPLICATION: 'arn:aws:serverlessrepo:us-east-1:418289889111:applications/add-security-headers',
+      SEMATIC_VERSION: '1.0.2',
+      REGION: 'us-east-1',
+      OUTPUT_ATT: 'AddSecurityHeaderFunction',
+    });
+
     expect(stack).toHaveResourceLike('AWS::CloudFront::Distribution', {
       DistributionConfig: {
         CacheBehaviors: [
@@ -782,6 +796,17 @@ describe('dashboard stack test suite', () => {
             PathPattern: '/api/*',
             TargetOriginId: 'TestStackDashboardStackDistributionOrigin2073DB050',
             ViewerProtocolPolicy: 'redirect-to-https',
+            LambdaFunctionAssociations: [
+              {
+                EventType: 'origin-response',
+                LambdaFunctionARN: {
+                  'Fn::GetAtt': [
+                    'AddSecurityHeaderSarDeploymentResourceAddSecurityHeader9B1FFD83',
+                    'FuncVersionArn',
+                  ],
+                },
+              },
+            ],
           },
         ],
         DefaultCacheBehavior: {
@@ -795,6 +820,17 @@ describe('dashboard stack test suite', () => {
           Compress: true,
           TargetOriginId: 'TestStackDashboardStackDistributionOrigin1D3E29DD1',
           ViewerProtocolPolicy: 'redirect-to-https',
+          LambdaFunctionAssociations: [
+            {
+              EventType: 'origin-response',
+              LambdaFunctionARN: {
+                'Fn::GetAtt': [
+                  'AddSecurityHeaderSarDeploymentResourceAddSecurityHeader9B1FFD83',
+                  'FuncVersionArn',
+                ],
+              },
+            },
+          ],
         },
         DefaultRootObject: 'index.html',
         Enabled: true,
