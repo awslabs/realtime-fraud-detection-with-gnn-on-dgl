@@ -5,11 +5,11 @@ and a subgraph file for testing by the client codes.
 
 Requirements
 --------------
-- Python == 3.6
-- DGL == 0.4.2
-- Boto3 == 2.49.0
-- Json5 == 0.9.1
-- Numpy == 1.18.1
+- Python >= 3.6
+- DGL == 0.6.*
+- Boto3
+- Json5
+- Numpy
 
 How to run the test client
 ---------------------------
