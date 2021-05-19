@@ -179,7 +179,7 @@ project.addTask('cdk-init', {
 });
 project.addTask('postinstall', {
   exec:
-    'git submodule init && git submodule sync && git submodule update && docker run --rm -v `pwd`/src/script-libs/amazon-neptune-tools/neptune-python-utils:/src --workdir /src python:3.8-buster bash -c "apt update && apt install -y sudo zip && rm -rf /src/target && /src/build.sh"',
+    'git submodule init && git submodule sync && git submodule update && docker run --rm -v `pwd`/src/script-libs/amazon-neptune-tools/neptune-python-utils:/src --workdir /src python:3.8-buster bash -c "apt update && apt install -y sudo zip && rm -rf /src/target && sed -i.bak \'s/gremlinpython$/gremlinpython==3.4.*/g\' /src/build.sh && /src/build.sh && mv /src/build.sh.bak /src/build.sh"',
 });
 
 const tsReactConfig = {
