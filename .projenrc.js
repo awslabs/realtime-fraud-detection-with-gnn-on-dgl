@@ -1,6 +1,9 @@
 const { AwsCdkTypeScriptApp, web } = require('projen');
 
 const tsExcludeConfig = {
+  compilerOptions: {
+    lib: ['dom', 'es2018'],
+  },
   exclude: ['src/frontend'],
 };
 

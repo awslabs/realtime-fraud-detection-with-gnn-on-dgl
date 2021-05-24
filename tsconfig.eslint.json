@@ -6,6 +6,7 @@
     "inlineSourceMap": true,
     "inlineSources": true,
     "lib": [
+      "dom",
       "es2018"
     ],
     "module": "CommonJS",
