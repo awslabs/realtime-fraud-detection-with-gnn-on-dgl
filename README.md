@@ -130,7 +130,7 @@ yarn test
 ```
 
 ## Data engineering/scientist
-There are [Jupyter notebooks](./src/sagemaker/) for data engineering/scientist playing with the data featuring, model training and deploying inference endpoint.
+There are [Jupyter notebooks](./src/sagemaker/) for data engineering/scientist playing with the data featuring, model training and deploying inference endpoint without deploying this solution.
 
 ## FAQ
 TBA
