@@ -35,7 +35,7 @@ import {
   TIME_TYPE,
 } from '../../assets/js/const';
 import { getTransactionStats, getFraudTransactions } from '../../graphql/queries';
-import useWindowSize from '../../hooks/useWindowSize';
+// import useWindowSize from '../../hooks/useWindowSize';
 
 import CountCard from './comps/CountCard';
 import RealtimeChart from './comps/RealtimeChart';
@@ -63,7 +63,7 @@ const Dashboard: React.FC = () => {
   const param: ParamType = useParams();
   const client: any = React.useContext(ClientContext);
   const [transList, setTransList] = useState<FraudType[]>([]);
-  const [dataHeight, setDataHeight] = useState(300);
+  // const [dataHeight, setDataHeight] = useState(300);
   // const [timeRange, setTimeRange] = useState(5);
   const [fraudCount, setFraudCount] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
@@ -86,7 +86,7 @@ const Dashboard: React.FC = () => {
   const [concurrent, setConcurrent] = useState<string | number>(10); // Unit Time (并发个数)
   const [dataInterval, setDataInterval] = useState<string | number>(3); // Unit Seconds, 传给后端需转换成 毫秒
 
-  const size = useWindowSize();
+  // const size = useWindowSize();
 
   useEffect(() => {
     if (param.lang) {
@@ -289,9 +289,9 @@ const Dashboard: React.FC = () => {
   }, [dataDurationTime, client]);
 
   // Resize window
-  useEffect(() => {
-    setDataHeight(size.height - size.height * 0.42 - 40);
-  }, [size]);
+  // useEffect(() => {
+  //   setDataHeight(size.height - size.height * 0.42 - 40);
+  // }, [size]);
 
   // Interval to polling Dashboard data
   useEffect(() => {
@@ -411,13 +411,13 @@ const Dashboard: React.FC = () => {
         </div>
       </div>
       <div className="fds-dashboard-summury">
-        <CountCard title={t('card.fraudCount')} value={fraudCount} bgColor="#da5b47" />
-        <CountCard title={t('card.transcationCount')} value={totalCount} bgColor="#5494db" />
-        <CountCard title={t('card.fraudAmount')} value={`$${numberFormatter(fraudAmount, 2)}`} bgColor="#f5bf4c" />
+        <CountCard title={t('card.fraudCount')} value={fraudCount} classIndex="1" />
+        <CountCard title={t('card.transcationCount')} value={totalCount} classIndex="2" />
+        <CountCard title={t('card.fraudAmount')} value={`$${numberFormatter(fraudAmount, 2)}`} classIndex="3" />
         <CountCard
           title={t('card.transcationAmount')}
           value={`$${numberFormatter(totalAmount, 2)}`}
-          bgColor="#67c47d"
+          classIndex="4"
         />
       </div>
       <div>
@@ -425,10 +425,10 @@ const Dashboard: React.FC = () => {
           <WbIncandescentIcon className="icon" />
           {t('recentFraudTransactions')}
         </div>
-        <div className="fds-data-table" style={{ height: dataHeight }}>
+        <div className="fds-data-table">
           <div className="fds-linechart">
             <RealtimeChart
-              height={dataHeight - 10}
+              // height={dataHeight - 10}
               totalData={totalCountArr}
               series={fraudCountArr}
               categories={dateTimeArr}

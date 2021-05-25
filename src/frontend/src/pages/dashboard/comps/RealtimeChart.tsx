@@ -3,7 +3,7 @@ import Chart from 'react-apexcharts';
 import { useTranslation } from 'react-i18next';
 
 interface DataProps {
-  height: number;
+  // height: number;
   series: number[];
   totalData: number[];
   categories: string[];
@@ -11,7 +11,7 @@ interface DataProps {
 
 const RealtimeChart: React.FC<DataProps> = (props: DataProps) => {
   const { t } = useTranslation();
-  const { height, series, categories } = props;
+  const { series, categories } = props;
 
   const chartData = {
     series: [
@@ -73,7 +73,7 @@ const RealtimeChart: React.FC<DataProps> = (props: DataProps) => {
   };
 
   return (
-    <div id="chart" className="csp-pl-10" style={{ height: height - 20 }}>
+    <div id="chart" className="csp-pl-10 csp-chart-height">
       <Chart options={chartData.options} series={chartData.series} type="line" height="100%" />
     </div>
   );

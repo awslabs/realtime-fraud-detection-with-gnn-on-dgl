@@ -668,19 +668,19 @@ export class TransactionDashboardStack extends NestedStack {
         outputAtt: 'AddSecurityHeaderFunction',
       });
       addSecurityHeaderSar.deployFunc.addToRolePolicy(new PolicyStatement({
-      actions: [
-        'lambda:InvokeFunction',
-      ],
-      resources: [
-        Arn.format({
-          region: 'us-east-1',
-          service: 'lambda',
-          resource: 'function',
-          resourceName: 'serverlessrepo-AddSecurityH-UpdateEdgeCodeFunction-*',
-          sep: ':',
-        }, Stack.of(this)),
-      ],
-    }))
+        actions: [
+          'lambda:InvokeFunction',
+        ],
+        resources: [
+          Arn.format({
+            region: 'us-east-1',
+            service: 'lambda',
+            resource: 'function',
+            resourceName: 'serverlessrepo-AddSecurityH-UpdateEdgeCodeFunction-*',
+            sep: ':',
+          }, Stack.of(this)),
+        ],
+      }));
 
       let cert: Certificate | undefined;
       if (customDomain && hostedZone) {

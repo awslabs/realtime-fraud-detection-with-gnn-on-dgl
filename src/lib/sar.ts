@@ -29,7 +29,7 @@ export interface SARDeploymentProps {
     {
       name: string;
       value: string;
-    }  
+    }
   ];
 }
 

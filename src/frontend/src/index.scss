@@ -132,6 +132,30 @@ code {
   padding: 5px 4px 0;
 }
 
+.csp-table-height {
+  min-height: 50vh;
+}
+
+.csp-chart-height {
+  height: 48vh;
+}
+
+.csp-card-bg-1 {
+  background-color: #da5b47;
+}
+
+.csp-card-bg-2 {
+  background-color: #5494db;
+}
+
+.csp-card-bg-3 {
+  background-color: #f5bf4c;
+}
+
+.csp-card-bg-4 {
+  background-color: #67c47d;
+}
+
 @keyframes fontFlash {
   0% {
     color: #f00;

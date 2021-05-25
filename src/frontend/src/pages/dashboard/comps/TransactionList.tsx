@@ -73,14 +73,14 @@ const TransactionList: React.FC<Props> = (props: Props) => {
   const { t } = useTranslation();
   const { transList } = props;
   const classes = useStyles();
-  const [tableHeight, settableHeight] = useState(100);
+  // const [tableHeight, settableHeight] = useState(100);
   const [curMomentLang, setCurMomentLang] = useState('');
 
   const size = useWindowSize();
 
   useEffect(() => {
     console.info('size:', size);
-    settableHeight(size.height - size.height * 0.5);
+    // settableHeight(size.height - size.height * 0.5);
   }, [size]);
 
   useEffect(() => {
@@ -94,7 +94,7 @@ const TransactionList: React.FC<Props> = (props: Props) => {
 
   return (
     <div>
-      <TableContainer style={{ maxHeight: tableHeight }} component={Paper}>
+      <TableContainer className="csp-table-height" component={Paper}>
         <Table className={classes.table} stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
