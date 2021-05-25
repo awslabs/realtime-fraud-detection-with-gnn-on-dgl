@@ -62,11 +62,11 @@ def get_features_and_labels(transactions_df, transactions_id_cols, transactions_
     features['TransactionAmt'] = features['TransactionAmt'].apply(np.log10)
     logging.info("Transformed feature columns: {}".format(list(features.columns)))
     logging.info("Shape of features: {}".format(features.shape))
-    features.to_csv(os.path.join(output_dir, 'features.csv'), index=False, header=False)
+    features.to_csv(os.path.join(output_dir, 'features.csv'), index=False, header=True)
     logging.info("Wrote features to file: {}".format(os.path.join(output_dir, 'features.csv')))
 
     # Get labels
-    transactions_df[['TransactionID', 'isFraud']].to_csv(os.path.join(output_dir, 'tags.csv'), index=False)
+    transactions_df[['TransactionID', 'isFraud']].to_csv(os.path.join(output_dir, 'tags.csv'), index=False, header=True)
     logging.info("Wrote labels to file: {}".format(os.path.join(output_dir, 'tags.csv')))
 
 
