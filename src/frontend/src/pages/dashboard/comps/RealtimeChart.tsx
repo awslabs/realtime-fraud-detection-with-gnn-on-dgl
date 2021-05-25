@@ -73,7 +73,7 @@ const RealtimeChart: React.FC<DataProps> = (props: DataProps) => {
   };
 
   return (
-    <div id="chart" style={{ paddingLeft: 10, height: height - 20 }}>
+    <div id="chart" className="csp-pl-10" style={{ height: height - 20 }}>
       <Chart options={chartData.options} series={chartData.series} type="line" height="100%" />
     </div>
   );

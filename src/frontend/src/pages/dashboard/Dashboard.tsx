@@ -360,7 +360,7 @@ const Dashboard: React.FC = () => {
         <div className="select">
           <b>{t('durationLabel')}: </b>
           <Select
-            style={{ marginRight: 15 }}
+            className="csp-mr-15"
             id="transcation-in-select"
             labelId="transcation-in-label"
             variant="outlined"
@@ -396,23 +396,12 @@ const Dashboard: React.FC = () => {
           </Select>
         </div>
         <div className="search">
-          {/* <TextField
-            placeholder="Search by Transcation ID, User, Card Type"
-            size="small"
-            variant="outlined"
-            color="primary"
-            style={{ width: 400 }}
-            type="text"
-          />
-          <Button style={{ marginLeft: 10 }} size="small" variant="contained" color="primary">
-            Search
-          </Button> */}
           <Button
             // disabled={disabledSimulate}
             onClick={() => {
               handleClickOpen();
             }}
-            style={{ marginLeft: 10 }}
+            className="csp-ml-10"
             variant="outlined"
             size="small"
             color="primary"
@@ -457,7 +446,7 @@ const Dashboard: React.FC = () => {
         aria-describedby="alert-dialog-description"
       >
         <DialogTitle id="alert-dialog-title">{t('simulate.title')}</DialogTitle>
-        <DialogContent style={{ width: 500 }}>
+        <DialogContent className="csp-w-500">
           <FormControl fullWidth variant="outlined">
             <div className="form-title">
               {t('simulate.durationTitle')}: <span>({t('simulate.durationTips')})</span>
@@ -474,7 +463,7 @@ const Dashboard: React.FC = () => {
               id="Duration"
             />
           </FormControl>
-          <FormControl fullWidth variant="outlined" style={{ marginTop: 10 }}>
+          <FormControl fullWidth variant="outlined" className="csp-mt-10">
             <div className="form-title">
               {t('simulate.concurrentTitle')}:<span>({t('simulate.concurrentTips')})</span>
             </div>
@@ -490,7 +479,7 @@ const Dashboard: React.FC = () => {
               id="Concurrent"
             />
           </FormControl>
-          <FormControl fullWidth variant="outlined" style={{ marginTop: 10 }}>
+          <FormControl fullWidth variant="outlined" className="csp-mt-10">
             <div className="form-title">
               {t('simulate.intervalTitle')}:<span>({t('simulate.intervalTips')})</span>
             </div>

@@ -77,6 +77,61 @@ code {
   margin-top: -2px;
 }
 
+.csp-pr {
+  position: relative;
+}
+
+.csp-color-white {
+  color: #fff;
+}
+
+.csp-fontsize-14 {
+  font-size: 14px;
+}
+
+.csp-fontsize-18 {
+  font-size: 14px;
+}
+
+.csp-margin-top-7 {
+  margin-top: 7px;
+}
+
+.csp-mr-15 {
+  margin-right: 15px;
+}
+
+.csp-ml-10 {
+  margin-left: 10px;
+}
+
+.csp-mt-10 {
+  margin-top: 10px;
+}
+
+.csp-pl-10 {
+  padding-left: 10px;
+}
+
+.csp-w-500 {
+  width: 500px;
+}
+
+.csp-w-250 {
+  width: 250px;
+}
+
+.csp-title {
+  position: absolute;
+  right: 10;
+  margin-top: -24px,
+}
+
+.csp-to {
+  display: inline-block;
+  padding: 5px 4px 0;
+}
+
 @keyframes fontFlash {
   0% {
     color: #f00;

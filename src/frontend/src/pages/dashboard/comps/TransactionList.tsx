@@ -127,7 +127,7 @@ const TransactionList: React.FC<Props> = (props: Props) => {
                     placement="right"
                     title={
                       <React.Fragment>
-                        <Typography color="inherit" style={{ fontSize: 18 }}>
+                        <Typography color="inherit" className="csp-fontsize-18">
                           <b>{t('table.transactionID')}</b>
                         </Typography>
                         <div>
@@ -152,7 +152,7 @@ const TransactionList: React.FC<Props> = (props: Props) => {
                       </React.Fragment>
                     }
                   >
-                    <span style={{ position: 'relative' }} className="link" color="primary">
+                    <span className="csp-pr link" color="primary">
                       <b>{row.id}</b> {row.isNew && <span className="new new-active">NEW</span>}
                     </span>
                   </HtmlTooltip>
@@ -172,7 +172,6 @@ const TransactionList: React.FC<Props> = (props: Props) => {
           </TableBody>
         </Table>
       </TableContainer>
-      {/* <div style={{ fontSize: 12, color: '#777', paddingTop: 2 }}>Total: {transList.length} transcations</div> */}
     </div>
   );
 };
