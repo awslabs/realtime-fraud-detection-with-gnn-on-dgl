@@ -56,6 +56,7 @@ export const handler: CloudFormationCustomResourceHandler = async (event, _conte
           StackName: `${name}-${id}`.substring(0, 127),
           SemanticVersion: sematicVersion,
           Capabilities: app.Version?.RequiredCapabilities,
+          ParameterOverrides: event.ResourceProperties.Parameters,
         })).ChangeSetId;
         console.info(`Changeset ${changeSetId} is created.`);
 

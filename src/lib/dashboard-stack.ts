@@ -92,6 +92,7 @@ import {
   Fn,
   Resource,
   Stack,
+  Arn,
 } from '@aws-cdk/core';
 import {
   Provider,
@@ -662,10 +663,24 @@ export class TransactionDashboardStack extends NestedStack {
     } else {
       const addSecurityHeaderSar = new SARDeployment(this, 'AddSecurityHeader', {
         application: 'arn:aws:serverlessrepo:us-east-1:418289889111:applications/add-security-headers',
-        sematicVersion: '1.0.2',
+        sematicVersion: '1.0.6',
         region: 'us-east-1',
         outputAtt: 'AddSecurityHeaderFunction',
       });
+      addSecurityHeaderSar.deployFunc.addToRolePolicy(new PolicyStatement({
+      actions: [
+        'lambda:InvokeFunction',
+      ],
+      resources: [
+        Arn.format({
+          region: 'us-east-1',
+          service: 'lambda',
+          resource: 'function',
+          resourceName: 'serverlessrepo-AddSecurityH-UpdateEdgeCodeFunction-*',
+          sep: ':',
+        }, Stack.of(this)),
+      ],
+    }))
 
       let cert: Certificate | undefined;
       if (customDomain && hostedZone) {

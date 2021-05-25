@@ -20,6 +20,17 @@ export interface SARDeploymentProps {
    * @defualt the id of construct
    */
   name?: string;
+  /**
+   * The parameters to be overrided.
+   *
+   * @defualt no overrided parameters
+   */
+  parameters?: [
+    {
+      name: string;
+      value: string;
+    }  
+  ];
 }
 
 /**
@@ -113,6 +124,10 @@ export class SARDeployment extends Construct {
         REGION: props.region ?? Aws.REGION,
         OUTPUT_ATT: props.outputAtt,
         NAME: props.name ?? id,
+        Parameters: props.parameters?.map(p => {
+          Name: p.name;
+          Value: p.value;
+        }),
       },
     });
 
