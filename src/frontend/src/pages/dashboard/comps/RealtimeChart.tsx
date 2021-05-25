@@ -27,7 +27,6 @@ const RealtimeChart: React.FC<DataProps> = (props: DataProps) => {
     ],
     options: {
       chart: {
-        height: height,
         type: 'line',
         animations: {
           enabled: true,
