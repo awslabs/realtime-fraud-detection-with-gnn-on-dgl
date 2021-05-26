@@ -1,6 +1,9 @@
 const { AwsCdkTypeScriptApp, web } = require('projen');
 
 const tsExcludeConfig = {
+  compilerOptions: {
+    lib: ['dom', 'es2018'],
+  },
   exclude: ['src/frontend'],
 };
 
@@ -57,9 +60,13 @@ const project = new AwsCdkTypeScriptApp({
   // bundledDeps: undefined,                                                   /* List of dependencies to bundle into this module. */
   deps: [
     'object-hash',
-    '@aws-sdk/client-glue@^3.8.0',
-    '@aws-sdk/client-secrets-manager@^3.8.0',
-    '@aws-sdk/client-sts@^3.8.0',
+    '@aws-sdk/client-glue@^3.16.0',
+    '@aws-sdk/client-secrets-manager@^3.16.0',
+    '@aws-sdk/client-sts@^3.16.0',
+    '@aws-sdk/client-serverlessapplicationrepository@^3.16.0',
+    '@aws-sdk/client-lambda@^3.16.0',
+    '@aws-sdk/client-cloudformation@^3.16.0',
+    'cfn-custom-resource@^5.0.12',
     'sync-fetch@^0.3.0',
     'mongodb@^3.6.6',
     'mongodb-client-encryption@^1.2.3',
@@ -67,7 +74,7 @@ const project = new AwsCdkTypeScriptApp({
   description:
     'Real-time Fraud Detection with Graph Neural Network on DGL' /* The description is just a string that helps people understand the purpose of the package. */,
   devDeps: [
-    '@types/aws-lambda@^8.10.72',
+    '@types/aws-lambda@^8.10.76',
     '@types/mongodb@^3.6.8',
     'typescript@^4.2.0',
   ] /* Build dependencies for this module. */,

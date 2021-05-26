@@ -764,6 +764,51 @@ describe('dashboard stack test suite', () => {
       },
     });
 
+    // deploy sar application as lambda@edge
+    expect(stack).toHaveResourceLike('AWS::CloudFormation::CustomResource', {
+      ServiceToken: {
+        'Fn::GetAtt': [
+          'AddSecurityHeaderTransacationFunc920B9BE4',
+          'Arn',
+        ],
+      },
+      APPLICATION: 'arn:aws:serverlessrepo:us-east-1:418289889111:applications/add-security-headers',
+      SEMATIC_VERSION: '1.0.6',
+      REGION: 'us-east-1',
+      OUTPUT_ATT: 'AddSecurityHeaderFunction',
+      NAME: 'AddSecurityHeader',
+      Parameters: [
+        {
+          Name: 'SecPolicy',
+          Value: {
+            'Fn::Join': [
+              '',
+              [
+                "default-src \\'none\\'; base-uri \\'self\\'; img-src \\'self\\'; script-src \\'self\\'; style-src \\'self\\' \\'unsafe-inline\\' https:; object-src \\'none\\'; frame-ancestors \\'none\\'; font-src \\'self\\' https:; form-action \\'self\\'; manifest-src \\'self\\'; connect-src \\'self\\' https://",
+                {
+                  'Fn::Select': [
+                    2,
+                    {
+                      'Fn::Split': [
+                        '/',
+                        {
+                          'Fn::GetAtt': [
+                            'FraudDetectionDashboardAPID13F00C7',
+                            'GraphQLUrl',
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+                '/',
+              ],
+            ],
+          },
+        },
+      ],
+    });
+
     expect(stack).toHaveResourceLike('AWS::CloudFront::Distribution', {
       DistributionConfig: {
         CacheBehaviors: [
@@ -795,6 +840,17 @@ describe('dashboard stack test suite', () => {
           Compress: true,
           TargetOriginId: 'TestStackDashboardStackDistributionOrigin1D3E29DD1',
           ViewerProtocolPolicy: 'redirect-to-https',
+          LambdaFunctionAssociations: [
+            {
+              EventType: 'origin-response',
+              LambdaFunctionARN: {
+                'Fn::GetAtt': [
+                  'AddSecurityHeaderSarDeploymentResourceAddSecurityHeader9B1FFD83',
+                  'FuncVersionArn',
+                ],
+              },
+            },
+          ],
         },
         DefaultRootObject: 'index.html',
         Enabled: true,

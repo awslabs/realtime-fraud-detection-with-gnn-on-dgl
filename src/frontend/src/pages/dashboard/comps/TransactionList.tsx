@@ -73,14 +73,14 @@ const TransactionList: React.FC<Props> = (props: Props) => {
   const { t } = useTranslation();
   const { transList } = props;
   const classes = useStyles();
-  const [tableHeight, settableHeight] = useState(100);
+  // const [tableHeight, settableHeight] = useState(100);
   const [curMomentLang, setCurMomentLang] = useState('');
 
   const size = useWindowSize();
 
   useEffect(() => {
     console.info('size:', size);
-    settableHeight(size.height - size.height * 0.5);
+    // settableHeight(size.height - size.height * 0.5);
   }, [size]);
 
   useEffect(() => {
@@ -94,7 +94,7 @@ const TransactionList: React.FC<Props> = (props: Props) => {
 
   return (
     <div>
-      <TableContainer style={{ maxHeight: tableHeight }} component={Paper}>
+      <TableContainer className="csp-table-height" component={Paper}>
         <Table className={classes.table} stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
@@ -127,7 +127,7 @@ const TransactionList: React.FC<Props> = (props: Props) => {
                     placement="right"
                     title={
                       <React.Fragment>
-                        <Typography color="inherit" style={{ fontSize: 18 }}>
+                        <Typography color="inherit" className="csp-fontsize-18">
                           <b>{t('table.transactionID')}</b>
                         </Typography>
                         <div>
@@ -152,7 +152,7 @@ const TransactionList: React.FC<Props> = (props: Props) => {
                       </React.Fragment>
                     }
                   >
-                    <span style={{ position: 'relative' }} className="link" color="primary">
+                    <span className="csp-pr link" color="primary">
                       <b>{row.id}</b> {row.isNew && <span className="new new-active">NEW</span>}
                     </span>
                   </HtmlTooltip>
@@ -172,7 +172,6 @@ const TransactionList: React.FC<Props> = (props: Props) => {
           </TableBody>
         </Table>
       </TableContainer>
-      {/* <div style={{ fontSize: 12, color: '#777', paddingTop: 2 }}>Total: {transList.length} transcations</div> */}
     </div>
   );
 };

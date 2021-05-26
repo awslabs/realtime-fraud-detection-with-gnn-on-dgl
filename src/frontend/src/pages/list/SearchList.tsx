@@ -16,33 +16,25 @@ const SearchList: React.FC = () => {
         </Link>
         <Typography color="textPrimary">Fraud Transaction List</Typography>
       </Breadcrumbs>
-      <div className="item-title-big" style={{ marginTop: 10 }}>
+      <div className="item-title-big csp-mt-10">
         <ViewHeadlineIcon className="icon" />
         Fraud Transaction List
-        <div
-          style={{
-            position: 'absolute',
-            right: 10,
-            marginTop: -24,
-            // marginBottom: 5,
-            // textAlign: "right",
-          }}
-        >
+        <div className="csp-title">
           <TextField
             id="datetime-local"
             type="datetime-local"
             defaultValue="2021-01-24T10:30"
-            style={{ width: 250 }}
+            className="csp-w-250"
             InputLabelProps={{
               shrink: true,
             }}
           />
-          <span style={{ display: 'inline-block', padding: '5px 4px 0' }}>to</span>
+          <span className="csp-to">to</span>
           <TextField
             id="datetime-local"
             type="datetime-local"
             defaultValue="2021-02-24T10:30"
-            style={{ width: 250 }}
+            className="csp-w-250"
             InputLabelProps={{
               shrink: true,
             }}

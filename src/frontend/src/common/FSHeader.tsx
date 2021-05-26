@@ -70,7 +70,7 @@ const FSHeader: React.FC<HeaderProps> = ({ changeLang }) => {
         <div>
           <Button
             startIcon={<LanguageIcon />}
-            style={{ color: '#fff' }}
+            className="csp-color-white"
             aria-controls="simple-menu"
             aria-haspopup="true"
             onClick={handleClick}
@@ -83,7 +83,7 @@ const FSHeader: React.FC<HeaderProps> = ({ changeLang }) => {
                 <MenuItem
                   key={index}
                   value={element.value}
-                  style={{ fontSize: 14 }}
+                  className="csp-fontsize-14"
                   onClick={() => {
                     changeLanguage(element);
                   }}
@@ -94,7 +94,7 @@ const FSHeader: React.FC<HeaderProps> = ({ changeLang }) => {
             })}
           </Menu>
         </div>
-        <div style={{ fontSize: '14px', marginTop: 7 }}>
+        <div className="csp-fontsize-14 csp-margin-top-7">
           <NotificationsIcon />
         </div>
         {/* <div>Admin User</div> */}
