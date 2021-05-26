@@ -115,6 +115,9 @@ export interface TransactionDashboardStackStackProps extends NestedStackProps {
 }
 
 export class TransactionDashboardStack extends NestedStack {
+
+  readonly distribution: IDistribution;
+
   constructor(
     scope: Construct,
     id: string,
@@ -535,7 +538,7 @@ export class TransactionDashboardStack extends NestedStack {
       }),
     };
 
-    this._deployFrontend(
+    this.distribution = this._deployFrontend(
       props.accessLogBucket,
       dashboardApi.graphqlUrl,
       httpApi.apiEndpoint,
@@ -567,7 +570,7 @@ export class TransactionDashboardStack extends NestedStack {
     apiKey?: string,
     customDomain?: string,
     r53HostZoneId?: string,
-  ) {
+  ): IDistribution {
     const websiteBucket = new Bucket(this, 'DashboardUI', {
       removalPolicy: RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
@@ -666,6 +669,10 @@ export class TransactionDashboardStack extends NestedStack {
         sematicVersion: '1.0.6',
         region: 'us-east-1',
         outputAtt: 'AddSecurityHeaderFunction',
+        parameters: [{
+          name: 'SecPolicy',
+          value: `default-src \\\'none\\\'; base-uri \\\'self\\\'; img-src \\\'self\\\'; script-src \\\'self\\\'; style-src \\\'self\\\' \\\'unsafe-inline\\\' https:; object-src \\\'none\\\'; frame-ancestors \\\'none\\\'; font-src \\\'self\\\' https:; form-action \\\'self\\\'; manifest-src \\\'self\\\'; connect-src \\\'self\\\' https://${Fn.select(2, Fn.split('/', graphqlEndpoint))}/`,
+        }],
       });
       addSecurityHeaderSar.deployFunc.addToRolePolicy(new PolicyStatement({
         actions: [
@@ -743,12 +750,6 @@ export class TransactionDashboardStack extends NestedStack {
           LambdaFunctionARN: addSecurityHeaderSar.funcVersionArn,
         },
       ]);
-      dist.addPropertyOverride('DistributionConfig.CacheBehaviors.0.LambdaFunctionAssociations', [
-        {
-          EventType: LambdaEdgeEventType.ORIGIN_RESPONSE,
-          LambdaFunctionARN: addSecurityHeaderSar.funcVersionArn,
-        },
-      ]);
     }
 
     if (hostedZone) {
@@ -812,6 +813,8 @@ export class TransactionDashboardStack extends NestedStack {
       value: `${distribution.distributionDomainName}`,
       description: 'url of dashboard website',
     });
+
+    return distribution;
   }
 }
 

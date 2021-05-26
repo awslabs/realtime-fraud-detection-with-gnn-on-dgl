@@ -773,9 +773,40 @@ describe('dashboard stack test suite', () => {
         ],
       },
       APPLICATION: 'arn:aws:serverlessrepo:us-east-1:418289889111:applications/add-security-headers',
-      SEMATIC_VERSION: '1.0.2',
+      SEMATIC_VERSION: '1.0.6',
       REGION: 'us-east-1',
       OUTPUT_ATT: 'AddSecurityHeaderFunction',
+      NAME: 'AddSecurityHeader',
+      Parameters: [
+        {
+          Name: 'SecPolicy',
+          Value: {
+            'Fn::Join': [
+              '',
+              [
+                "default-src \\'none\\'; base-uri \\'self\\'; img-src \\'self\\'; script-src \\'self\\'; style-src \\'self\\' \\'unsafe-inline\\' https:; object-src \\'none\\'; frame-ancestors \\'none\\'; font-src \\'self\\' https:; form-action \\'self\\'; manifest-src \\'self\\'; connect-src \\'self\\' https://",
+                {
+                  'Fn::Select': [
+                    2,
+                    {
+                      'Fn::Split': [
+                        '/',
+                        {
+                          'Fn::GetAtt': [
+                            'FraudDetectionDashboardAPID13F00C7',
+                            'GraphQLUrl',
+                          ],
+                        },
+                      ],
+                    },
+                  ],
+                },
+                '/',
+              ],
+            ],
+          },
+        },
+      ],
     });
 
     expect(stack).toHaveResourceLike('AWS::CloudFront::Distribution', {
@@ -796,17 +827,6 @@ describe('dashboard stack test suite', () => {
             PathPattern: '/api/*',
             TargetOriginId: 'TestStackDashboardStackDistributionOrigin2073DB050',
             ViewerProtocolPolicy: 'redirect-to-https',
-            LambdaFunctionAssociations: [
-              {
-                EventType: 'origin-response',
-                LambdaFunctionARN: {
-                  'Fn::GetAtt': [
-                    'AddSecurityHeaderSarDeploymentResourceAddSecurityHeader9B1FFD83',
-                    'FuncVersionArn',
-                  ],
-                },
-              },
-            ],
           },
         ],
         DefaultCacheBehavior: {

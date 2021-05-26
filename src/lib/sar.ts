@@ -125,8 +125,10 @@ export class SARDeployment extends Construct {
         OUTPUT_ATT: props.outputAtt,
         NAME: props.name ?? id,
         Parameters: props.parameters?.map(p => {
-          Name: p.name;
-          Value: p.value;
+          return {
+            Name: p.name,
+            Value: p.value,
+          };
         }),
       },
     });
