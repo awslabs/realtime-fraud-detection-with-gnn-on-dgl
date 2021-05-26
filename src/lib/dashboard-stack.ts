@@ -671,7 +671,7 @@ export class TransactionDashboardStack extends NestedStack {
               maxTtl: Duration.seconds(0),
               allowedMethods: CloudFrontAllowedMethods.ALL,
               compress: true,
-              pathPattern: `/graphql/*`,
+              pathPattern: '/graphql/*',
             }],
           },
         ],
@@ -732,7 +732,7 @@ export class TransactionDashboardStack extends NestedStack {
             cachePolicy: CachePolicy.CACHING_DISABLED,
             allowedMethods: AllowedMethods.ALLOW_ALL,
           },
-          [`graphql/*`]: {
+          ['graphql/*']: {
             origin: new HttpOrigin(Fn.select(2, Fn.split('/', graphqlEndpoint)), {
               protocolPolicy: OriginProtocolPolicy.HTTPS_ONLY,
             }),
@@ -797,7 +797,7 @@ export class TransactionDashboardStack extends NestedStack {
         Body: `{
             "api_path": "/${stageName}",
             "aws_project_region": "${Aws.REGION}",
-            "aws_appsync_graphqlEndpoint": "${distribution.distributionDomainName}/graphql",
+            "aws_appsync_graphqlEndpoint": "/graphql",
             "aws_appsync_region": "${Aws.REGION}",
             "aws_appsync_authenticationType": "${apiKey ? AuthorizationType.API_KEY : AuthorizationType.IAM}",
             "aws_appsync_apiKey": "${apiKey}"
