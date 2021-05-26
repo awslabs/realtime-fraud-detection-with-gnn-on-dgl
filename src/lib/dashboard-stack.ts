@@ -658,6 +658,22 @@ export class TransactionDashboardStack extends NestedStack {
               pathPattern: `/${stageName}/*`,
             }],
           },
+          {
+            customOriginSource: {
+              domainName: Fn.select(2, Fn.split('/', graphqlEndpoint)),
+              originProtocolPolicy: OriginProtocolPolicy.HTTPS_ONLY,
+            },
+            behaviors: [{
+              forwardedValues: {
+                queryString: false,
+              },
+              defaultTtl: Duration.seconds(0),
+              maxTtl: Duration.seconds(0),
+              allowedMethods: CloudFrontAllowedMethods.ALL,
+              compress: true,
+              pathPattern: `/graphql/*`,
+            }],
+          },
         ],
       });
     } else {
@@ -716,6 +732,14 @@ export class TransactionDashboardStack extends NestedStack {
             cachePolicy: CachePolicy.CACHING_DISABLED,
             allowedMethods: AllowedMethods.ALLOW_ALL,
           },
+          [`graphql/*`]: {
+            origin: new HttpOrigin(Fn.select(2, Fn.split('/', graphqlEndpoint)), {
+              protocolPolicy: OriginProtocolPolicy.HTTPS_ONLY,
+            }),
+            viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+            cachePolicy: CachePolicy.CACHING_DISABLED,
+            allowedMethods: AllowedMethods.ALLOW_ALL,
+          },
         },
         defaultRootObject: 'index.html',
         enableIpv6: true,
@@ -749,6 +773,12 @@ export class TransactionDashboardStack extends NestedStack {
           LambdaFunctionARN: addSecurityHeaderSar.funcVersionArn,
         },
       ]);
+      dist.addPropertyOverride('DistributionConfig.CacheBehaviors.1.LambdaFunctionAssociations', [
+        {
+          EventType: LambdaEdgeEventType.ORIGIN_RESPONSE,
+          LambdaFunctionARN: addSecurityHeaderSar.funcVersionArn,
+        },
+      ]);
     }
 
     if (hostedZone) {
@@ -767,7 +797,7 @@ export class TransactionDashboardStack extends NestedStack {
         Body: `{
             "api_path": "/${stageName}",
             "aws_project_region": "${Aws.REGION}",
-            "aws_appsync_graphqlEndpoint": "${graphqlEndpoint}",
+            "aws_appsync_graphqlEndpoint": "${distribution.distributionDomainName}/graphql",
             "aws_appsync_region": "${Aws.REGION}",
             "aws_appsync_authenticationType": "${apiKey ? AuthorizationType.API_KEY : AuthorizationType.IAM}",
             "aws_appsync_apiKey": "${apiKey}"
