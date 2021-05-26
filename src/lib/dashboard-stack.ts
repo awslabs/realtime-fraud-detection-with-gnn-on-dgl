@@ -115,6 +115,9 @@ export interface TransactionDashboardStackStackProps extends NestedStackProps {
 }
 
 export class TransactionDashboardStack extends NestedStack {
+
+  readonly distribution: IDistribution;
+
   constructor(
     scope: Construct,
     id: string,
@@ -535,7 +538,7 @@ export class TransactionDashboardStack extends NestedStack {
       }),
     };
 
-    this._deployFrontend(
+    this.distribution = this._deployFrontend(
       props.accessLogBucket,
       dashboardApi.graphqlUrl,
       httpApi.apiEndpoint,
@@ -567,7 +570,7 @@ export class TransactionDashboardStack extends NestedStack {
     apiKey?: string,
     customDomain?: string,
     r53HostZoneId?: string,
-  ) {
+  ): IDistribution {
     const websiteBucket = new Bucket(this, 'DashboardUI', {
       removalPolicy: RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
@@ -658,22 +661,6 @@ export class TransactionDashboardStack extends NestedStack {
               pathPattern: `/${stageName}/*`,
             }],
           },
-          {
-            customOriginSource: {
-              domainName: Fn.select(2, Fn.split('/', graphqlEndpoint)),
-              originProtocolPolicy: OriginProtocolPolicy.HTTPS_ONLY,
-            },
-            behaviors: [{
-              forwardedValues: {
-                queryString: false,
-              },
-              defaultTtl: Duration.seconds(0),
-              maxTtl: Duration.seconds(0),
-              allowedMethods: CloudFrontAllowedMethods.ALL,
-              compress: true,
-              pathPattern: '/graphql/*',
-            }],
-          },
         ],
       });
     } else {
@@ -682,6 +669,10 @@ export class TransactionDashboardStack extends NestedStack {
         sematicVersion: '1.0.6',
         region: 'us-east-1',
         outputAtt: 'AddSecurityHeaderFunction',
+        parameters: [{
+          name: 'SecPolicy',
+          value: `default-src \\\'none\\\'; base-uri \\\'self\\\'; img-src \\\'self\\\'; script-src \\\'self\\\'; style-src \\\'self\\\' \\\'unsafe-inline\\\' https:; object-src \\\'none\\\'; frame-ancestors \\\'none\\\'; font-src \\\'self\\\' https:; form-action \\\'self\\\'; manifest-src \\\'self\\\'; connect-src \\\'self\\\' https://${Fn.select(2, Fn.split('/', graphqlEndpoint))}/`,
+        }],
       });
       addSecurityHeaderSar.deployFunc.addToRolePolicy(new PolicyStatement({
         actions: [
@@ -732,14 +723,6 @@ export class TransactionDashboardStack extends NestedStack {
             cachePolicy: CachePolicy.CACHING_DISABLED,
             allowedMethods: AllowedMethods.ALLOW_ALL,
           },
-          ['graphql/*']: {
-            origin: new HttpOrigin(Fn.select(2, Fn.split('/', graphqlEndpoint)), {
-              protocolPolicy: OriginProtocolPolicy.HTTPS_ONLY,
-            }),
-            viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-            cachePolicy: CachePolicy.CACHING_DISABLED,
-            allowedMethods: AllowedMethods.ALLOW_ALL,
-          },
         },
         defaultRootObject: 'index.html',
         enableIpv6: true,
@@ -767,18 +750,6 @@ export class TransactionDashboardStack extends NestedStack {
           LambdaFunctionARN: addSecurityHeaderSar.funcVersionArn,
         },
       ]);
-      dist.addPropertyOverride('DistributionConfig.CacheBehaviors.0.LambdaFunctionAssociations', [
-        {
-          EventType: LambdaEdgeEventType.ORIGIN_RESPONSE,
-          LambdaFunctionARN: addSecurityHeaderSar.funcVersionArn,
-        },
-      ]);
-      dist.addPropertyOverride('DistributionConfig.CacheBehaviors.1.LambdaFunctionAssociations', [
-        {
-          EventType: LambdaEdgeEventType.ORIGIN_RESPONSE,
-          LambdaFunctionARN: addSecurityHeaderSar.funcVersionArn,
-        },
-      ]);
     }
 
     if (hostedZone) {
@@ -797,7 +768,7 @@ export class TransactionDashboardStack extends NestedStack {
         Body: `{
             "api_path": "/${stageName}",
             "aws_project_region": "${Aws.REGION}",
-            "aws_appsync_graphqlEndpoint": "/graphql",
+            "aws_appsync_graphqlEndpoint": "${graphqlEndpoint}",
             "aws_appsync_region": "${Aws.REGION}",
             "aws_appsync_authenticationType": "${apiKey ? AuthorizationType.API_KEY : AuthorizationType.IAM}",
             "aws_appsync_apiKey": "${apiKey}"
@@ -842,6 +813,8 @@ export class TransactionDashboardStack extends NestedStack {
       value: `${distribution.distributionDomainName}`,
       description: 'url of dashboard website',
     });
+
+    return distribution;
   }
 }
 
