@@ -14,12 +14,12 @@ This solution consists of below [stacks][cfn-stack],
 ### Model training and deployment stack
 
 The model training & deployment pipeline is orchestrated by [AWS Step Functions][step-functions] like below graph,
-![model training](./docs/model-training.png)
+![model training](./docs/images/model-training.png)
 
 ### Dashboard stack
 
 It creates a React based web portal that observes the recent fraud transactions detected by this solution. This web application also is orchestrated by [Amazon CloudFront][cloudfront], [AWS Amplify][amplify], [AWS AppSync][appsync], [Amazon API Gateway][api], [AWS Step Functions][step-functions] and [Amazon DocumentDB][docdb].
-![business system](./docs/system-arch.png)
+![business system](./docs/images/system-arch.png)
 
 #### How to train model and deploy inference endpoint
 
@@ -133,7 +133,29 @@ yarn test
 There are [Jupyter notebooks](./src/sagemaker/) for data engineering/scientist playing with the data featuring, model training and deploying inference endpoint without deploying this solution.
 
 ## FAQ
-TBA
+
+### What’s the benefits of using the graph neural network in the scenario Fraud Detection?
+In the scenario of fraud detection, fraudsters can work collaboratively as groups to hide their abnormal features but leave some traces of relations. Traditional machine leaning models utilize various features of samples. However, the relations among different samples are normally ignored, either because of no direct feature can represent these relations, or the unique values of a feature is too big to be encoded for models. For example, IP addresses and physical addresses can be a link of two accounts. But normally the unique values of these addresses are too big to be one-hot encoded. Many feature-based models, hence, fail to leverage these potential relations.
+
+Graph Neural Network models, on the other hand, directly benefit from links built among different samples, once reconstruct some categorical features of a sample into different nodes in a graph structure. Via using message pass and aggregation mechanism, GNN-based models can not only utilize features of samples, but also capture the relations among samples. With the advantages of capture relations, Graph Neural Network is more capable of detecting collaborated fraud event compared to traditional models.
+
+### Why using graph database in this solution?
+We use graph database to store the relationships between entities. The graph database provides the microseconds query performance to query the sub-graph of entities for real-time fraud detection inference.
+
+###	How differentiate this solution and Amazon Fraud Detector?
+This solution is based on Graph Neural Network and graph-structured data while the Amazon Fraud Detector use time-serial models and take advantage of Amazon’s own data on fraudsters. 
+
+In addition, this solution also serves as a reference architecture of graph analytics and real-time graph machine learning scenarios. Users can take this solution as a base and fit into their own environments.
+
+### How differentiate this solution and Amazon Neptune ML?
+This solution has a few additional components and features than the current Amazon Neptune ML, including but not limited:
+
+-	An end-to-end data process pipeline to show how a real-world data pipeline could be. This will help industrial customer to quickly hand on a total solution of graph neural network model-based system.
+-	Real-time online inference sub-system, while the Neptune ML supports offline batch inference mode.
+-	A demo GUI to show how the solution can solve real-world business problems, while the Neptune ML primarily uses graph database queries to show results.
+
+While this solution gives an overall architecture of an end-to-end real-time inference solution, the Amazon Neptune ML has been optimized for scalability and system-level performance, e.g. query latency. Therefore, later on when the Amazon Neptune ML supports real-time inference, it could be integrated into this solution as the main training and inference sub-system for customers who requires better scalability and low latency.
+
 
 ## Security
 
