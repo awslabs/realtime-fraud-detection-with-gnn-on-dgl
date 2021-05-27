@@ -6,6 +6,7 @@ import { PythonFunction, PythonLayerVersion } from '@aws-cdk/aws-lambda-python';
 import { IDatabaseCluster } from '@aws-cdk/aws-neptune';
 import { IQueue } from '@aws-cdk/aws-sqs';
 import { Construct, Duration, Stack, NestedStack, NestedStackProps, Aws, Token } from '@aws-cdk/core';
+import { NeptuneUtilLayer } from './layer';
 
 export interface InferenceProps extends NestedStackProps {
   readonly vpc: IVpc;
@@ -33,10 +34,7 @@ export class InferenceStack extends NestedStack {
           entry: path.join(__dirname, '../lambda.d/inference/layer'),
           compatibleRuntimes: [Runtime.PYTHON_3_8],
         }),
-        new PythonLayerVersion(this, 'InferenceNeptuneLibLayer', {
-          entry: path.join(__dirname, '../script-libs/amazon-neptune-tools/neptune-python-utils'),
-          compatibleRuntimes: [Runtime.PYTHON_3_8],
-        }),
+        new NeptuneUtilLayer(this, 'NeptuneUtilLayer'),
       ],
       index: 'inferenceApi.py',
       runtime: Runtime.PYTHON_3_8,

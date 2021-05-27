@@ -160,7 +160,6 @@ class GraphModelClient:
         
         conn = self.gremlin_utils.remote_connection()
         g = self.gremlin_utils.traversal_source(connection=conn) 
-        t1 = self.gremlin_utils.traversal_source(connection=conn) 
 
         target_name = target_id[(target_id.find('-')+1):]
         feature_list = g.V().has(id,target_id).out().id().toList()
@@ -181,7 +180,7 @@ class GraphModelClient:
         logger.info(f'subgraph_dict: {subgraph_dict}')
         new_s_t = e_t
 
-        union_li = [t1.V().has(id,target_id).both().hasLabel(label).both().limit(MAX_FEATURE_NODE) for label in union_id_cols]
+        union_li = [__.V().has(id,target_id).both().hasLabel(label).both().limit(MAX_FEATURE_NODE) for label in union_id_cols]
         logger.info(f'union_id_cols len: {len(union_id_cols)}  key: {union_id_cols}')
         logger.info(f'union_li len: {len(union_li)}  key: {union_li}')
 

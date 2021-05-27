@@ -34,3 +34,29 @@ export class WranglerLayer extends LayerVersion {
     });
   }
 }
+
+export class NeptuneUtilLayer extends LayerVersion {
+  constructor(scope: Construct, id: string) {
+
+    super(scope, id, {
+      compatibleRuntimes: [Runtime.PYTHON_3_8, Runtime.PYTHON_3_7, Runtime.PYTHON_3_6],
+      code: Code.fromAsset(path.join(__dirname, '../script-libs/amazon-neptune-tools/neptune-python-utils/target'), {
+        bundling: {
+          image: new Runtime('busybox', RuntimeFamily.OTHER, {
+            bundlingDockerImage: 'public.ecr.aws/runecast/busybox:1.32.1',
+          }).bundlingImage,
+          command: [
+            'sh',
+            '-c',
+            `
+              mkdir -p /asset-output/python/ &&
+              unzip neptune_python_utils.zip -d /asset-output/python
+            `,
+          ],
+        },
+        assetHash: artifactsHash([path.join(__dirname, '../script-libs/amazon-neptune-tools/neptune-python-utils/target/neptune_python_utils.zip')]),
+      }),
+      description: 'neptune-python-utils',
+    });
+  }
+}
