@@ -307,8 +307,13 @@ def handler(event, context):
 
     transaction_id = int(target_id[(target_id.find('-')+1):])
     
-    pred_prob = invoke_endpoint_with_idx(endpointname = ENDPOINT_NAME, target_id = transaction_id, subgraph_dict = subgraph_dict, n_feats = transaction_embed_value_dict)
-    
+    try:
+        pred_prob = invoke_endpoint_with_idx(endpointname = ENDPOINT_NAME, target_id = transaction_id, subgraph_dict = subgraph_dict, n_feats = transaction_embed_value_dict)
+    except:
+        logger.info(f'Warning: invoke_endpoint_with_idx ModelError catched. transaction - {transaction_id} query_target_subgraph rebooted. invoke_endpoint_with_idx called again.')
+        subgraph_dict, transaction_embed_value_dict = graph_input.query_target_subgraph(target_id, trans_dict, transaction_value_cols, union_li_cols, dummied_col)
+        pred_prob = invoke_endpoint_with_idx(endpointname = ENDPOINT_NAME, target_id = transaction_id, subgraph_dict = subgraph_dict, n_feats = transaction_embed_value_dict)
+
     e_t = dt.now()
     logger.info(f'invoke_endpoint_with_idx used {(G_e_t - G_new_s_t).total_seconds()} seconds. Total test cost {(G_e_t - G_s_t).total_seconds()} seconds.')
     G_new_s_t = G_e_t
