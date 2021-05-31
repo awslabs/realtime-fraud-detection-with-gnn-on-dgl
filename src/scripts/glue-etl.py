@@ -127,7 +127,8 @@ features_df, labels_df = get_features_and_labels(transaction_df, id_cols, cat_co
 
 spark = glueContext.spark_session
 
-spark_dataframe = spark.createDataFrame(features_df)
+spark_dataframe = spark.createDataFrame(features_df[[TRANSACTION_ID, 'TransactionAmt']])
+# spark_dataframe = spark.createDataFrame(features_df)
 logger.info(f'Creating glue dynamic frame from spark dataframe...')
 features_dynamic_df = DynamicFrame.fromDF(spark_dataframe, glueContext, 'FeaturesDF')
 features_dynamic_df = GlueGremlinCsvTransforms.create_prefixed_columns(features_dynamic_df, [('~id', TRANSACTION_ID, 't')])

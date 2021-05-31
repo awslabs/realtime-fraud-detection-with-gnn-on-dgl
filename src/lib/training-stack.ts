@@ -4,13 +4,13 @@ import { Repository } from '@aws-cdk/aws-ecr';
 import { DockerImageAsset, DockerImageAssetProps } from '@aws-cdk/aws-ecr-assets';
 import { Cluster, FargateTaskDefinition, ContainerImage, LogDrivers, FargatePlatformVersion } from '@aws-cdk/aws-ecs';
 import { FileSystem, LifecyclePolicy } from '@aws-cdk/aws-efs';
-import { PolicyStatement, Effect, Role, ServicePrincipal } from '@aws-cdk/aws-iam';
+import { PolicyStatement, Effect, Role, ServicePrincipal, ManagedPolicy } from '@aws-cdk/aws-iam';
 import { Runtime, LayerVersion, Code, Tracing, FileSystem as LambdaFileSystem } from '@aws-cdk/aws-lambda';
 import { NodejsFunction } from '@aws-cdk/aws-lambda-nodejs';
-import { PythonFunction } from '@aws-cdk/aws-lambda-python';
+import { PythonFunction, PythonLayerVersion } from '@aws-cdk/aws-lambda-python';
 import { LogGroup, RetentionDays } from '@aws-cdk/aws-logs';
 import { IDatabaseCluster } from '@aws-cdk/aws-neptune';
-import { IBucket } from '@aws-cdk/aws-s3';
+import { Bucket, BucketEncryption, IBucket } from '@aws-cdk/aws-s3';
 import { BucketDeployment, Source } from '@aws-cdk/aws-s3-deployment';
 import { IntegrationPattern, StateMachine, Fail, Errors, TaskInput, LogLevel, JsonPath, Choice, Condition } from '@aws-cdk/aws-stepfunctions';
 import { LambdaInvoke, S3DataType, GlueStartJobRun, SageMakerCreateModel, S3Location, ContainerDefinition, Mode, DockerImage, SageMakerCreateEndpointConfig, SageMakerCreateEndpoint, SageMakerUpdateEndpoint, EcsRunTask, EcsFargateLaunchTarget, SageMakerCreateTrainingJob, InputMode } from '@aws-cdk/aws-stepfunctions-tasks';
@@ -20,6 +20,8 @@ import { getDatasetMapping, IEEE } from './dataset';
 import { ETLByGlue } from './etl-glue';
 import { WranglerLayer } from './layer';
 import { dirArtifactHash } from './utils';
+import { CfnFeatureGroup } from '@aws-cdk/aws-sagemaker';
+import { FEATURE_DEFINITIONS } from './feature-group';
 
 export interface TrainingStackProps extends NestedStackProps {
   readonly bucket: IBucket;
@@ -40,6 +42,7 @@ export interface TrainingStackProps extends NestedStackProps {
 export class TrainingStack extends NestedStack {
   readonly glueJobSG: ISecurityGroup;
   readonly loadPropsSG: ISecurityGroup;
+  readonly featureStoreSG: ISecurityGroup;
   readonly endpointName = 'FraudDetection'.toLowerCase();
 
   constructor(scope: Construct, id: string, props: TrainingStackProps) {
@@ -48,6 +51,41 @@ export class TrainingStack extends NestedStack {
     const dataPrefix = props.dataPrefix;
     const transactionPrefix = `${dataPrefix}transactions`;
     const identityPrefix = `${dataPrefix}identity`;
+
+    const featureGroupRole = new Role(this, 'FeatureGroupRole', {
+      assumedBy: new ServicePrincipal('sagemaker.amazonaws.com'),
+    });
+
+    featureGroupRole.addManagedPolicy(ManagedPolicy.fromManagedPolicyArn(this, 'AmazonSageMakerFeatureStoreAccess', 'arn:aws:iam::aws:policy/AmazonSageMakerFeatureStoreAccess'));
+   
+    const featureStoreBucket = new Bucket(this, 'fraudDetectionSageMakerfeatureStoreBucket', {
+      removalPolicy: RemovalPolicy.DESTROY,
+      autoDeleteObjects: true,
+      encryption: BucketEncryption.S3_MANAGED,
+    });
+
+    const featurestoreGroup = new CfnFeatureGroup(this, 'frauddetectionfeats', {
+      featureGroupName: 'realfraudfeatures',
+      featureDefinitions: FEATURE_DEFINITIONS,
+      recordIdentifierFeatureName: 'TransactionID',
+      eventTimeFeatureName: 'EventTime',
+      roleArn: featureGroupRole.roleArn,
+      offlineStoreConfig: {
+        // DisableGlueTableCreation: false,
+        // DataCatalogConfig:{
+        //   Catalog:'AwsDataCatalog',
+        //   Database:'sagemaker_featurestore',
+        //   TableName:'modelfeatures',
+        // },
+        S3StorageConfig:
+        {
+          S3Uri: featureStoreBucket.urlForObject()
+        }
+      },
+      onlineStoreConfig: { 
+        EnableOnlineStore: true,
+     },
+    });
 
     // create states of step functions for pipeline
     const failure = new Fail(this, 'Fail', {
@@ -80,6 +118,7 @@ export class TrainingStack extends NestedStack {
     });
 
     const stateTimeout = Duration.minutes(15);
+    const dataset_url = getDatasetMapping(this).findInMap(Aws.PARTITION, IEEE)
     const dataIngestFn = new PythonFunction(this, 'DataIngestFunc', {
       entry: path.join(__dirname, '../lambda.d/ingest'),
       layers: [
@@ -91,7 +130,7 @@ export class TrainingStack extends NestedStack {
         TargetBucket: props.bucket.bucketName,
         TransactionPrefix: transactionPrefix,
         IdentityPrefix: identityPrefix,
-        DATASET_URL: getDatasetMapping(this).findInMap(Aws.PARTITION, IEEE),
+        DATASET_URL: dataset_url,
       },
       timeout: stateTimeout,
       memorySize: 3008,
@@ -313,6 +352,10 @@ export class TrainingStack extends NestedStack {
       vpc: props.vpc,
       containerInsights: true,
     });
+    const ecsClusterFeatureStore = new Cluster(this, 'FraudDetectionClusterFS', {
+      vpc: props.vpc,
+      containerInsights: true,
+    });
 
     const loadPropTaskRole = new Role(this, 'LoadPropertiesECSTaskRole', {
       assumedBy: new ServicePrincipal('ecs-tasks.amazonaws.com'),
@@ -419,6 +462,126 @@ export class TrainingStack extends NestedStack {
       errors: [Errors.ALL],
       resultPath: '$.error',
     });
+
+    const runFeatureStorePutRecordTaskRole = new Role(this, 'FeatureStorePutRecordTaskRole', {
+      assumedBy: new ServicePrincipal('ecs-tasks.amazonaws.com'),
+    });
+
+    const runFeatureStorePutRecordTaskDefinition = new FargateTaskDefinition(this, 'FeatureStorePutRecordTask', {
+      family: 'training-pipeline-feature-store-put-record',
+      taskRole: runFeatureStorePutRecordTaskRole,
+      memoryLimitMiB: 8192,
+      cpu: 2048,
+      // volumes: [
+      //   {
+      //     name: taskVolumeName,
+      //     efsVolumeConfiguration: {
+      //       fileSystemId: fileSystem.fileSystemId,
+      //       transitEncryption: 'ENABLED',
+      //       authorizationConfig: {
+      //         accessPointId: accessPoint.accessPointId,
+      //       },
+      //     },
+      //   },
+      // ],
+    });
+
+    const runFeatureStorePutRecordImage = new DockerImageAsset(this, 'runFeatureStorePutRecordImage', {
+      directory: path.join(__dirname, '../container.d/feature-store-put-record/'),
+      file: 'Dockerfile',
+      // exclude: [
+      //   'container.d/(!feature-store-put-record)',
+      //   'lambda.d/**',
+      //   'lib/**',
+      // ],
+      // ignoreMode: IgnoreMode.GLOB,
+    });
+    const runFeatureStorePutRecordTaskContainer = runFeatureStorePutRecordTaskDefinition.addContainer('container', {
+      image: ContainerImage.fromDockerImageAsset(runFeatureStorePutRecordImage),
+      memoryLimitMiB: 8192,
+      logging: LogDrivers.awsLogs({
+        streamPrefix: 'fraud-detection-feature-store-put-record',
+      }),
+      environment:{
+        DATASET_URL:dataset_url,
+        TRANSACTION_CAT_COLS:props.dataColumnsArg.cat_cols,
+        FEATURE_GROUP_NAME:featurestoreGroup.featureGroupName,
+      },
+    });
+    // runFeatureStorePutRecordTaskContainer.addMountPoints({
+    //   containerPath: mountPoint,
+    //   readOnly: false,
+    //   sourceVolume: taskVolumeName,
+    // });
+
+    this.featureStoreSG = new SecurityGroup(this, 'FeatureStoreSG', {
+      allowAllOutbound: true,
+      description: 'SG for Loading props to feature store in training pipeline',
+      vpc: props.vpc,
+    });
+    fileSystem.connections.allowDefaultPortFrom(this.featureStoreSG, 'featureStoreSG');
+    const runFeatureStorePutRecordTask = new EcsRunTask(this, 'Put Records to Feature Store', {
+      integrationPattern: IntegrationPattern.RUN_JOB,
+      cluster: ecsClusterFeatureStore,
+      taskDefinition: runFeatureStorePutRecordTaskDefinition,
+      assignPublicIp: false,
+      subnets: {
+        subnetType: SubnetType.PRIVATE,
+      },
+      securityGroups: [this.featureStoreSG],
+      containerOverrides: [{
+        containerDefinition: runFeatureStorePutRecordTaskContainer,
+        // environment: [
+        //   {
+        //     name: 'DATASET_URL',
+        //     value: dataset_url,
+        //   },
+        //   {
+        //     name: 'TRANSACTION_CAT_COLS',
+        //     value: props.dataColumnsArg.cat_cols,
+        //   },
+        //   {
+        //     name: 'FEATURE_GROUP_NAME',
+        //     value: featurestoreGroup.featureGroupName,
+        //   },
+        // ],
+      }],
+      launchTarget: new EcsFargateLaunchTarget({
+        platformVersion: FargatePlatformVersion.VERSION1_4,
+      }),
+      resultPath: JsonPath.DISCARD,
+      timeout: Duration.hours(2),
+    }).addCatch(failure, {
+      errors: [Errors.ALL],
+      resultPath: '$.error',
+    });
+
+    const getRecordFn = new PythonFunction(this, 'getRecordFunc', {
+      entry: path.join(__dirname, '../lambda.d/getRecord/func'),
+      index: 'getRecord.py',
+      handler: 'handler',
+      runtime: Runtime.PYTHON_3_8,
+      timeout: Duration.seconds(30),
+      memorySize: 5000,
+      layers: [
+        new PythonLayerVersion(this, 'getRecordLayer', {
+          entry: path.join(__dirname, '../lambda.d/getRecord/layer'),
+          compatibleRuntimes: [Runtime.PYTHON_3_8],
+        })
+      ],
+      environment: {
+        FEATURE_GROUP_NAME: featurestoreGroup.featureGroupName,
+        S3_BUCKET_NAME: featureStoreBucket.bucketName,
+      },
+    });
+
+    // featureStoreBucket.grantReadWrite(getRecordFn);
+
+    getRecordFn.addToRolePolicy(new PolicyStatement({
+      actions: ['s3:*','sagemaker:*'],
+      resources: ['*'],
+      }),
+    );
 
     const deepLearningImagesMapping = new CfnMapping(this, 'DeepLearningImagesMapping', {
       mapping: {
@@ -608,6 +771,7 @@ export class TrainingStack extends NestedStack {
       .next(dataIngestTask)
       .next(dataCatalogCrawlerTask)
       .next(dataProcessTask)
+      .next(runFeatureStorePutRecordTask)
       .next(trainingJobTask)
       .next(runLoadPropsTask)
       .next(modelRepackagingTask)

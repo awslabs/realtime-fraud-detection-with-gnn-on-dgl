@@ -317,7 +317,7 @@ def handler(event, context):
                     'timestamp': int(time.time()),
                     'isFraud': pred_prob > MODEL_BTW,
                     'id': event['transaction_data'][0]['TransactionID'],
-                    'amount': event['transaction_data'][0]['TransactionAmt'],
+                    'amount': 10 ** event['transaction_data'][0]['TransactionAmt'],
                     'productCD': event['transaction_data'][0]['ProductCD'],
                     'card1': event['transaction_data'][0]['card1'],
                     'card2': event['transaction_data'][0]['card2'],
