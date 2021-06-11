@@ -188,6 +188,9 @@ project.addTask('postinstall', {
   exec:
     'git submodule init && git submodule sync && git submodule update && docker run --rm -v `pwd`/src/script-libs/amazon-neptune-tools/neptune-python-utils:/src --workdir /src python:3.8-buster bash -c "apt update && apt install -y sudo zip && rm -rf /src/target && /src/build.sh"',
 });
+project.package.addField('resolutions', {
+  'trim-newlines': '^3.0.1',
+});
 
 const tsReactConfig = {
   compilerOptions: {
@@ -260,6 +263,9 @@ const reactPrj = new web.ReactTypeScriptProject({
 });
 reactPrj.addTask('postinstall', {
   exec: 'npx projen build',
+});
+reactPrj.package.addField('resolutions', {
+  'trim-newlines': '^3.0.1',
 });
 
 project.synth();
