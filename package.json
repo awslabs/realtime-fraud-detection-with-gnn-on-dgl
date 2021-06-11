@@ -38,7 +38,7 @@
     "jest": "^26.6.3",
     "jest-junit": "^12",
     "json-schema": "^0.2.5",
-    "projen": "^0.17.30",
+    "projen": "^0.24.1",
     "standard-version": "^9",
     "ts-jest": "^26.4.4",
     "ts-node": "^9.1.1",

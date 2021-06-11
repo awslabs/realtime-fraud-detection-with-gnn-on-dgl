@@ -76,7 +76,6 @@ const project = new AwsCdkTypeScriptApp({
   devDeps: [
     '@types/aws-lambda@^8.10.76',
     '@types/mongodb@^3.6.8',
-    'typescript@^4.2.0',
   ] /* Build dependencies for this module. */,
   // entrypoint: 'lib/index.js',                                               /* Module entrypoint (`main` in `package.json`). */
   // homepage: undefined,                                                      /* Package's Homepage / Website. */
@@ -229,17 +228,16 @@ const reactPrj = new web.ReactTypeScriptProject({
     'best-queue@^2.0.1',
     'moment@^2.29.1',
     'node-sass@^5.0.0',
-    'react@^17.0.1',
+    // 'react@^17.0.1',
     'react-apexcharts@^1.3.7',
-    'react-dom@^17.0.1',
+    // 'react-dom@^17.0.1',
     'react-i18next@^11.8.13',
     'react-loader-spinner@^4.0.0',
     'react-minimal-pie-chart@^8.1.0',
     'react-router-dom@^5.2.0',
-    'react-scripts@4.0.3',
+    // 'react-scripts@4.0.3',
     'sweetalert2@^10.15.5',
-    'typescript@^4.1.2',
-    'web-vitals@^1.0.1',
+    // 'web-vitals@^1.0.1',
   ],
   devDeps: [
     '@types/react-loader-spinner@^3.1.3',

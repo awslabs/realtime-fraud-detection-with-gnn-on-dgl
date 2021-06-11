@@ -18,10 +18,6 @@
     },
     {
       "name": "@types/node",
-      "type": "build"
-    },
-    {
-      "name": "@types/node",
       "version": "^10.17.0",
       "type": "build"
     },
@@ -44,13 +40,12 @@
       "type": "build"
     },
     {
-      "name": "projen",
-      "version": "^0.17.30",
+      "name": "npm-check-updates",
+      "version": "^11",
       "type": "build"
     },
     {
-      "name": "standard-version",
-      "version": "^9",
+      "name": "projen",
       "type": "build"
     },
     {
@@ -182,11 +177,6 @@
       "type": "runtime"
     },
     {
-      "name": "react-dom",
-      "version": "^17.0.1",
-      "type": "runtime"
-    },
-    {
       "name": "react-i18next",
       "version": "^11.8.13",
       "type": "runtime"
@@ -212,32 +202,12 @@
       "type": "runtime"
     },
     {
-      "name": "react-scripts",
-      "version": "4.0.3",
-      "type": "runtime"
-    },
-    {
-      "name": "react",
-      "version": "^17.0.1",
-      "type": "runtime"
-    },
-    {
       "name": "sweetalert2",
       "version": "^10.15.5",
       "type": "runtime"
     },
     {
-      "name": "typescript",
-      "version": "^4.1.2",
-      "type": "runtime"
-    },
-    {
       "name": "web-vitals",
-      "type": "runtime"
-    },
-    {
-      "name": "web-vitals",
-      "version": "^1.0.1",
       "type": "runtime"
     }
   ],
