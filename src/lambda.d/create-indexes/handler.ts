@@ -31,10 +31,8 @@ export const createIndexes: AWSCDKAsyncCustomResource.OnEventHandler =
           resourceId = hash(event.ResourceProperties);
           break;
         case 'Update':
-          resourceId = event.PhysicalResourceId;
-          // TODO: implement it if necessary
-          break;
         case 'Delete':
+          resourceId = event.PhysicalResourceId;
           // TODO: implement it if necessary
           break;
       }
