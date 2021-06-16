@@ -60,7 +60,7 @@
     },
     {
       "name": "@material-ui/core",
-      "version": "^4.11.3",
+      "version": "^4.11.4",
       "type": "runtime"
     },
     {
@@ -75,22 +75,22 @@
     },
     {
       "name": "@testing-library/jest-dom",
-      "version": "^5.11.4",
+      "version": "^5.14.1",
       "type": "runtime"
     },
     {
       "name": "@testing-library/react",
-      "version": "^11.1.0",
+      "version": "^11.2.7",
       "type": "runtime"
     },
     {
       "name": "@testing-library/user-event",
-      "version": "^12.1.10",
+      "version": "^13.1.9",
       "type": "runtime"
     },
     {
       "name": "@types/jest",
-      "version": "^26.0.15",
+      "version": "^26.0.23",
       "type": "runtime"
     },
     {
@@ -100,32 +100,32 @@
     },
     {
       "name": "@types/react-dom",
-      "version": "^17.0.0",
+      "version": "^17.0.7",
       "type": "runtime"
     },
     {
       "name": "@types/react",
-      "version": "^17.0.0",
+      "version": "^17.0.11",
       "type": "runtime"
     },
     {
       "name": "apexcharts",
-      "version": "^3.25.0",
+      "version": "^3.27.1",
       "type": "runtime"
     },
     {
       "name": "aws-amplify",
-      "version": "^3.3.22",
+      "version": "^3.4.3",
       "type": "runtime"
     },
     {
       "name": "aws-appsync",
-      "version": "^1.0.0",
+      "version": "^1.8.1",
       "type": "runtime"
     },
     {
       "name": "aws-sdk",
-      "version": "^2.141.0",
+      "version": "^2.929.0",
       "type": "runtime"
     },
     {
@@ -140,22 +140,22 @@
     },
     {
       "name": "graphql-tag",
-      "version": "^2.5.0",
+      "version": "^2.12.4",
       "type": "runtime"
     },
     {
       "name": "i18next-browser-languagedetector",
-      "version": "^6.1.0",
+      "version": "^6.1.1",
       "type": "runtime"
     },
     {
       "name": "i18next-http-backend",
-      "version": "^1.2.1",
+      "version": "^1.2.6",
       "type": "runtime"
     },
     {
       "name": "i18next",
-      "version": "^20.1.0",
+      "version": "^20.3.1",
       "type": "runtime"
     },
     {
@@ -174,7 +174,7 @@
     },
     {
       "name": "react-apexcharts",
-      "version": "^1.3.7",
+      "version": "^1.3.9",
       "type": "runtime"
     },
     {
@@ -183,22 +183,17 @@
     },
     {
       "name": "react-dom",
-      "version": "^17.0.1",
+      "version": "^17.0.2",
       "type": "runtime"
     },
     {
       "name": "react-i18next",
-      "version": "^11.8.13",
+      "version": "^11.11.0",
       "type": "runtime"
     },
     {
       "name": "react-loader-spinner",
       "version": "^4.0.0",
-      "type": "runtime"
-    },
-    {
-      "name": "react-minimal-pie-chart",
-      "version": "^8.1.0",
       "type": "runtime"
     },
     {
@@ -218,17 +213,17 @@
     },
     {
       "name": "react",
-      "version": "^17.0.1",
+      "version": "^17.0.2",
       "type": "runtime"
     },
     {
       "name": "sweetalert2",
-      "version": "^10.15.5",
+      "version": "^10.16.9",
       "type": "runtime"
     },
     {
       "name": "typescript",
-      "version": "^4.1.2",
+      "version": "^4.3.2",
       "type": "runtime"
     },
     {
@@ -237,7 +232,7 @@
     },
     {
       "name": "web-vitals",
-      "version": "^1.0.1",
+      "version": "^1.1.2",
       "type": "runtime"
     }
   ],
