@@ -265,6 +265,9 @@ reactPrj.addTask('postinstall', {
 });
 reactPrj.package.addField('resolutions', {
   'trim-newlines': '^3.0.1',
+  'glob-parent': '^5.1.2',
+  'normalize-url': '^4.5.1',
+  'browserslist': '^4.16.5',
 });
 
 project.synth();
