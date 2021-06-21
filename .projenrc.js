@@ -268,6 +268,7 @@ reactPrj.package.addField('resolutions', {
   'glob-parent': '^5.1.2',
   'normalize-url': '^4.5.1',
   'browserslist': '^4.16.5',
+  'css-what': '^5.0.1',
 });
 
 project.synth();
