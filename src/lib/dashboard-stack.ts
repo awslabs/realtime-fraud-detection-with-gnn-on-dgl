@@ -152,9 +152,7 @@ export class TransactionDashboardStack extends NestedStack {
       parameterGroup: docDBParameterGroup,
       removalPolicy: RemovalPolicy.DESTROY,
     });
-    if (!this._targetCNRegion()) {
-      docDBCluster.addRotationSingleUser();
-    }
+    docDBCluster.addRotationSingleUser();
 
     const docDBCertLayer = new DocumentDBCertLayer(this, 'CertLayer');
     const caFileKey = 'CAFile';

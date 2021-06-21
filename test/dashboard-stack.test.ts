@@ -144,7 +144,24 @@ describe('dashboard stack test suite', () => {
 
     expect(stack).toHaveResourceLike('AWS::Serverless::Application', {
       Location: {
-        ApplicationId: 'arn:aws:serverlessrepo:us-east-1:297356227824:applications/SecretsManagerMongoDBRotationSingleUser',
+        ApplicationId: {
+          'Fn::FindInMap': [
+            'DashboardDatabaseRotationSingleUserSARMappingFAC79544',
+            {
+              Ref: 'AWS::Partition',
+            },
+            'applicationId',
+          ],
+        },
+        SemanticVersion: {
+          'Fn::FindInMap': [
+            'DashboardDatabaseRotationSingleUserSARMappingFAC79544',
+            {
+              Ref: 'AWS::Partition',
+            },
+            'semanticVersion',
+          ],
+        },
       },
       Parameters: {
         endpoint: {
@@ -166,14 +183,14 @@ describe('dashboard stack test suite', () => {
     });
   });
 
-  test('disable the feature of rotating password of DocDB when deploying to China regions', () => {
+  test('rotating password of DocDB is supported since v1.109.0 when deploying to China regions', () => {
     const context = deployToCNRegion();
 
-    expect(context.stack).toCountResources('AWS::SecretsManager::RotationSchedule', 0);
+    expect(context.stack).toCountResources('AWS::SecretsManager::RotationSchedule', 1);
 
-    expect(context.stack).toCountResources('AWS::SecretsManager::ResourcePolicy', 0);
+    expect(context.stack).toCountResources('AWS::SecretsManager::ResourcePolicy', 1);
 
-    expect(context.stack).toCountResources('AWS::Serverless::Application', 0);
+    expect(context.stack).toCountResources('AWS::Serverless::Application', 1);
   });
 
   test('layer for docdb cert is created', () => {
@@ -665,7 +682,6 @@ describe('dashboard stack test suite', () => {
         Statement: [
           {
             Action: [
-              's3:GetObject*',
               's3:GetBucket*',
               's3:List*',
               's3:DeleteObject*',
@@ -1064,7 +1080,6 @@ describe('dashboard stack test suite', () => {
         Statement: [
           {
             Action: [
-              's3:GetObject*',
               's3:GetBucket*',
               's3:List*',
               's3:DeleteObject*',
