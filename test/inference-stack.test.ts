@@ -33,7 +33,7 @@ describe('inference stack', () => {
           Ref: 'InferenceDataLayer6B4E00D0',
         },
         {
-          Ref: 'InferenceNeptuneLibLayerEB74ABA0',
+          Ref: 'NeptuneUtilLayer79E71FD3',
         },
       ],
       MemorySize: 512,

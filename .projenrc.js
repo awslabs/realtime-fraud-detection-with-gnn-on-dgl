@@ -1,11 +1,14 @@
 const { AwsCdkTypeScriptApp, web } = require('projen');
 
 const tsExcludeConfig = {
+  compilerOptions: {
+    lib: ['dom', 'es2018'],
+  },
   exclude: ['src/frontend'],
 };
 
 const project = new AwsCdkTypeScriptApp({
-  cdkVersion: '1.102.0',
+  cdkVersion: '1.109.0',
   name: 'realtime-fraud-detection-with-gnn-on-dgl',
   /* AwsCdkTypeScriptAppOptions */
   // appEntrypoint: 'main.ts',                                                 /* The CDK app's entrypoint (relative to the source directory, which is "src" by default). */
@@ -57,9 +60,13 @@ const project = new AwsCdkTypeScriptApp({
   // bundledDeps: undefined,                                                   /* List of dependencies to bundle into this module. */
   deps: [
     'object-hash',
-    '@aws-sdk/client-glue@^3.8.0',
-    '@aws-sdk/client-secrets-manager@^3.8.0',
-    '@aws-sdk/client-sts@^3.8.0',
+    '@aws-sdk/client-glue@^3.16.0',
+    '@aws-sdk/client-secrets-manager@^3.16.0',
+    '@aws-sdk/client-sts@^3.16.0',
+    '@aws-sdk/client-serverlessapplicationrepository@^3.16.0',
+    '@aws-sdk/client-lambda@^3.16.0',
+    '@aws-sdk/client-cloudformation@^3.16.0',
+    'cfn-custom-resource@^5.0.12',
     'sync-fetch@^0.3.0',
     'mongodb@^3.6.6',
     'mongodb-client-encryption@^1.2.3',
@@ -67,7 +74,7 @@ const project = new AwsCdkTypeScriptApp({
   description:
     'Real-time Fraud Detection with Graph Neural Network on DGL' /* The description is just a string that helps people understand the purpose of the package. */,
   devDeps: [
-    '@types/aws-lambda@^8.10.72',
+    '@types/aws-lambda@^8.10.76',
     '@types/mongodb@^3.6.8',
     'typescript@^4.2.0',
   ] /* Build dependencies for this module. */,
@@ -181,6 +188,9 @@ project.addTask('postinstall', {
   exec:
     'git submodule init && git submodule sync && git submodule update && docker run --rm -v `pwd`/src/script-libs/amazon-neptune-tools/neptune-python-utils:/src --workdir /src python:3.8-buster bash -c "apt update && apt install -y sudo zip && rm -rf /src/target && /src/build.sh"',
 });
+project.package.addField('resolutions', {
+  'trim-newlines': '^3.0.1',
+});
 
 const tsReactConfig = {
   compilerOptions: {
@@ -200,39 +210,38 @@ const tsReactConfig = {
 
 const reactPrj = new web.ReactTypeScriptProject({
   deps: [
-    '@material-ui/core@^4.11.3',
+    '@material-ui/core@^4.11.4',
     '@material-ui/icons@^4.11.2',
     '@material-ui/lab@^5.0.0-alpha.25',
-    '@testing-library/jest-dom@^5.11.4',
-    '@testing-library/react@^11.1.0',
-    '@testing-library/user-event@^12.1.10',
-    '@types/jest@^26.0.15',
+    '@testing-library/jest-dom@^5.14.1',
+    '@testing-library/react@^11.2.7',
+    '@testing-library/user-event@^13.1.9',
+    '@types/jest@^26.0.23',
     '@types/node@^12.0.0',
-    '@types/react@^17.0.0',
-    '@types/react-dom@^17.0.0',
-    'apexcharts@^3.25.0',
-    'aws-sdk@^2.141.0',
-    'aws-appsync@^1.0.0',
-    'graphql-tag@^2.5.0',
-    'i18next@^20.1.0',
-    'i18next-browser-languagedetector@^6.1.0',
-    'i18next-http-backend@^1.2.1',
+    '@types/react@^17.0.11',
+    '@types/react-dom@^17.0.7',
+    'apexcharts@^3.27.1',
+    'aws-sdk@^2.929.0',
+    'aws-appsync@^1.8.1',
+    'graphql-tag@^2.12.4',
+    'i18next@^20.3.1',
+    'i18next-browser-languagedetector@^6.1.1',
+    'i18next-http-backend@^1.2.6',
     'axios@^0.21.1',
-    'aws-amplify@^3.3.22',
+    'aws-amplify@^3.4.3',
     'best-queue@^2.0.1',
     'moment@^2.29.1',
     'node-sass@^5.0.0',
-    'react@^17.0.1',
-    'react-apexcharts@^1.3.7',
-    'react-dom@^17.0.1',
-    'react-i18next@^11.8.13',
+    'react@^17.0.2',
+    'react-apexcharts@^1.3.9',
+    'react-dom@^17.0.2',
+    'react-i18next@^11.11.0',
     'react-loader-spinner@^4.0.0',
-    'react-minimal-pie-chart@^8.1.0',
     'react-router-dom@^5.2.0',
     'react-scripts@4.0.3',
-    'sweetalert2@^10.15.5',
-    'typescript@^4.1.2',
-    'web-vitals@^1.0.1',
+    'sweetalert2@^10.16.9',
+    'typescript@^4.3.2',
+    'web-vitals@^1.1.2',
   ],
   devDeps: [
     '@types/react-loader-spinner@^3.1.3',
@@ -253,6 +262,12 @@ const reactPrj = new web.ReactTypeScriptProject({
 });
 reactPrj.addTask('postinstall', {
   exec: 'npx projen build',
+});
+reactPrj.package.addField('resolutions', {
+  'trim-newlines': '^3.0.1',
+  'glob-parent': '^5.1.2',
+  'normalize-url': '^4.5.1',
+  'browserslist': '^4.16.5',
 });
 
 project.synth();

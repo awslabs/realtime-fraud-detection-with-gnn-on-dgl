@@ -31,6 +31,8 @@ import {
   OriginAccessIdentity,
   CloudFrontAllowedMethods,
   ViewerCertificate,
+  LambdaEdgeEventType,
+  CfnDistribution,
 } from '@aws-cdk/aws-cloudfront';
 import { S3Origin, HttpOrigin } from '@aws-cdk/aws-cloudfront-origins';
 import { ClusterParameterGroup, DatabaseCluster } from '@aws-cdk/aws-docdb';
@@ -54,7 +56,7 @@ import {
 import { LayerVersion, Code, Runtime, Tracing } from '@aws-cdk/aws-lambda';
 import { SqsEventSource } from '@aws-cdk/aws-lambda-event-sources';
 import { NodejsFunction } from '@aws-cdk/aws-lambda-nodejs';
-import { PythonFunction, PythonLayerVersion } from '@aws-cdk/aws-lambda-python';
+import { PythonFunction } from '@aws-cdk/aws-lambda-python';
 import { RetentionDays, LogGroup } from '@aws-cdk/aws-logs';
 import { IHostedZone, ARecord, RecordTarget } from '@aws-cdk/aws-route53';
 import { CloudFrontTarget } from '@aws-cdk/aws-route53-targets';
@@ -90,6 +92,7 @@ import {
   Fn,
   Resource,
   Stack,
+  Arn,
 } from '@aws-cdk/core';
 import {
   Provider,
@@ -98,6 +101,8 @@ import {
   AwsCustomResourcePolicy,
 } from '@aws-cdk/custom-resources';
 import { IEEE, getDatasetMapping } from './dataset';
+import { WranglerLayer } from './layer';
+import { SARDeployment } from './sar';
 import { artifactsHash } from './utils';
 
 export interface TransactionDashboardStackStackProps extends NestedStackProps {
@@ -110,6 +115,9 @@ export interface TransactionDashboardStackStackProps extends NestedStackProps {
 }
 
 export class TransactionDashboardStack extends NestedStack {
+
+  readonly distribution: IDistribution;
+
   constructor(
     scope: Construct,
     id: string,
@@ -144,9 +152,7 @@ export class TransactionDashboardStack extends NestedStack {
       parameterGroup: docDBParameterGroup,
       removalPolicy: RemovalPolicy.DESTROY,
     });
-    if (!this._targetCNRegion()) {
-      docDBCluster.addRotationSingleUser();
-    }
+    docDBCluster.addRotationSingleUser();
 
     const docDBCertLayer = new DocumentDBCertLayer(this, 'CertLayer');
     const caFileKey = 'CAFile';
@@ -358,10 +364,7 @@ export class TransactionDashboardStack extends NestedStack {
     const tranSimFn = new PythonFunction(this, 'TransactionSimulatorFunc', {
       entry: path.join(__dirname, '../lambda.d/simulator'),
       layers: [
-        new PythonLayerVersion(this, 'AwsDataWranglerLayer', {
-          entry: path.join(__dirname, '../lambda.d/layer.d/awswrangler'),
-          compatibleRuntimes: [Runtime.PYTHON_3_8],
-        }),
+        new WranglerLayer(this, 'AwsDataWranglerLayer'),
       ],
       index: 'gen.py',
       runtime: Runtime.PYTHON_3_8,
@@ -533,7 +536,7 @@ export class TransactionDashboardStack extends NestedStack {
       }),
     };
 
-    this._deployFrontend(
+    this.distribution = this._deployFrontend(
       props.accessLogBucket,
       dashboardApi.graphqlUrl,
       httpApi.apiEndpoint,
@@ -565,7 +568,7 @@ export class TransactionDashboardStack extends NestedStack {
     apiKey?: string,
     customDomain?: string,
     r53HostZoneId?: string,
-  ) {
+  ): IDistribution {
     const websiteBucket = new Bucket(this, 'DashboardUI', {
       removalPolicy: RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
@@ -659,6 +662,31 @@ export class TransactionDashboardStack extends NestedStack {
         ],
       });
     } else {
+      const addSecurityHeaderSar = new SARDeployment(this, 'AddSecurityHeader', {
+        application: 'arn:aws:serverlessrepo:us-east-1:418289889111:applications/add-security-headers',
+        sematicVersion: '1.0.6',
+        region: 'us-east-1',
+        outputAtt: 'AddSecurityHeaderFunction',
+        parameters: [{
+          name: 'SecPolicy',
+          value: `default-src \\\'none\\\'; base-uri \\\'self\\\'; img-src \\\'self\\\'; script-src \\\'self\\\'; style-src \\\'self\\\' \\\'unsafe-inline\\\' https:; object-src \\\'none\\\'; frame-ancestors \\\'none\\\'; font-src \\\'self\\\' https:; form-action \\\'self\\\'; manifest-src \\\'self\\\'; connect-src \\\'self\\\' https://${Fn.select(2, Fn.split('/', graphqlEndpoint))}/`,
+        }],
+      });
+      addSecurityHeaderSar.deployFunc.addToRolePolicy(new PolicyStatement({
+        actions: [
+          'lambda:InvokeFunction',
+        ],
+        resources: [
+          Arn.format({
+            region: 'us-east-1',
+            service: 'lambda',
+            resource: 'function',
+            resourceName: 'serverlessrepo-AddSecurityH-UpdateEdgeCodeFunction-*',
+            sep: ':',
+          }, Stack.of(this)),
+        ],
+      }));
+
       let cert: Certificate | undefined;
       if (customDomain && hostedZone) {
         cert = new DnsValidatedCertificate(this, 'CustomDomainCertificateForCloudFront', {
@@ -667,6 +695,7 @@ export class TransactionDashboardStack extends NestedStack {
           region: 'us-east-1',
         });
       }
+
       distribution = new Distribution(this, 'Distribution', {
         certificate: cert,
         domainNames: customDomain ? [customDomain] : [],
@@ -712,6 +741,13 @@ export class TransactionDashboardStack extends NestedStack {
           },
         ],
       });
+      const dist = distribution.node.defaultChild as CfnDistribution;
+      dist.addPropertyOverride('DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations', [
+        {
+          EventType: LambdaEdgeEventType.ORIGIN_RESPONSE,
+          LambdaFunctionARN: addSecurityHeaderSar.funcVersionArn,
+        },
+      ]);
     }
 
     if (hostedZone) {
@@ -775,6 +811,8 @@ export class TransactionDashboardStack extends NestedStack {
       value: `${distribution.distributionDomainName}`,
       description: 'url of dashboard website',
     });
+
+    return distribution;
   }
 }
 

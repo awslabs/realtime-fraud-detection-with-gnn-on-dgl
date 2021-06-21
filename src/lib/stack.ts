@@ -3,7 +3,7 @@ import { Role, ServicePrincipal, PolicyDocument, PolicyStatement } from '@aws-cd
 import { ClusterParameterGroup, ParameterGroup, DatabaseCluster, InstanceType, IDatabaseCluster, CfnDBInstance } from '@aws-cdk/aws-neptune';
 import { Bucket, BucketEncryption, IBucket } from '@aws-cdk/aws-s3';
 import { Queue, QueueEncryption } from '@aws-cdk/aws-sqs';
-import { Construct, RemovalPolicy, Stack, StackProps, Duration, CfnParameter } from '@aws-cdk/core';
+import { Construct, RemovalPolicy, Stack, StackProps, Duration, CfnParameter, CfnOutput } from '@aws-cdk/core';
 import * as pjson from '../../package.json';
 import { TransactionDashboardStack } from './dashboard-stack';
 import { InferenceStack } from './inference-stack';
@@ -146,7 +146,7 @@ export class FraudDetectionStack extends Stack {
       r53HostZoneId = r53HostZoneIdPara.valueAsString;
     }
 
-    new TransactionDashboardStack(this, 'dashboard', {
+    const dashboardStack = new TransactionDashboardStack(this, 'dashboard', {
       vpc,
       queue: tranQueue,
       inferenceArn: inferenceFnArn,
@@ -161,6 +161,11 @@ export class FraudDetectionStack extends Stack {
       },
     };
     this.templateOptions.description = `(SO8013) - Real-time Fraud Detection with Graph Neural Network on DGL. Template version ${pjson.version}`;
+
+    new CfnOutput(this, 'DashboardWebsiteUrl', {
+      value: customDomain ?? dashboardStack.distribution.distributionDomainName,
+      description: 'url of dashboard website',
+    });
   }
 
   private _createGraphDB_Neptune(vpc: IVpc, bucket: IBucket, dataPrefix: string, instanceType: string, replicaCount: number): {

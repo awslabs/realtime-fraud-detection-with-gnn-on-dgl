@@ -3,7 +3,7 @@ import Chart from 'react-apexcharts';
 import { useTranslation } from 'react-i18next';
 
 interface DataProps {
-  height: number;
+  // height: number;
   series: number[];
   totalData: number[];
   categories: string[];
@@ -11,33 +11,24 @@ interface DataProps {
 
 const RealtimeChart: React.FC<DataProps> = (props: DataProps) => {
   const { t } = useTranslation();
-  const { height, series, categories } = props;
+  const { series, categories } = props;
 
-  const chartData = {
-    series: [
-      {
-        // color: '#f00',
-        name: t('fraudChart'),
-        data: series,
+  const options = {
+    id: 'basic-bar',
+    type: 'line',
+    chart: {
+      title: {
+        text: t('chartTitle'),
+        align: 'left',
       },
-      // {
-      //   name: 'total',
-      //   data: totalData,
-      // },
-    ],
-    options: {
-      chart: {
-        height: height,
-        type: 'line',
-        animations: {
-          enabled: true,
-          easing: 'linear',
-          dynamicAnimation: {
-            speed: 1000,
-          },
-        },
-        zoom: {
-          enabled: false,
+      toolbar: {
+        tools: {
+          download: true,
+          selection: false,
+          zoom: false,
+          zoomin: false,
+          zoomout: false,
+          pan: false,
         },
       },
       dataLabels: {
@@ -46,35 +37,44 @@ const RealtimeChart: React.FC<DataProps> = (props: DataProps) => {
       stroke: {
         curve: 'straight',
       },
-      title: {
-        text: t('chartTitle'),
-        align: 'left',
+    },
+    animations: {
+      enabled: true,
+      easing: 'linear',
+      dynamicAnimation: {
+        speed: 1000,
       },
-      grid: {
-        padding: {
-          left: 30,
-        },
-        row: {
-          colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
-          opacity: 0.5,
-        },
-      },
-      yaxis: {
-        labels: {
-          formatter: function (val: number) {
-            return val.toFixed(0);
-          },
+    },
+    yaxis: {
+      labels: {
+        formatter: function (val: number) {
+          return val.toFixed(0);
         },
       },
-      xaxis: {
-        categories: categories,
+    },
+    xaxis: {
+      categories: categories,
+    },
+    grid: {
+      padding: {
+        left: 30,
+      },
+      row: {
+        colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+        opacity: 0.5,
       },
     },
   };
+  const seriesData = [
+    {
+      name: t('fraudChart'),
+      data: series,
+    },
+  ];
 
   return (
-    <div id="chart" style={{ paddingLeft: 10, height: height - 20 }}>
-      <Chart options={chartData.options} series={chartData.series} type="line" height="100%" />
+    <div id="chart" className="csp-pl-10 csp-chart-height">
+      <Chart options={options} series={seriesData} type="line" height="100%" />
     </div>
   );
 };
