@@ -8,7 +8,7 @@ const tsExcludeConfig = {
 };
 
 const project = new AwsCdkTypeScriptApp({
-  cdkVersion: '1.102.0',
+  cdkVersion: '1.109.0',
   name: 'realtime-fraud-detection-with-gnn-on-dgl',
   /* AwsCdkTypeScriptAppOptions */
   // appEntrypoint: 'main.ts',                                                 /* The CDK app's entrypoint (relative to the source directory, which is "src" by default). */
