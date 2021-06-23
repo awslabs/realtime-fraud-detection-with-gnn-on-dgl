@@ -58,7 +58,7 @@ def load_data_from_event(input_event, transactions_id_cols, transactions_cat_col
     if input_event['identity_data'] != []:
         input_event = {**input_event['transaction_data'][0], **input_event['identity_data'][0]} 
     else:
-        input_event = input_event['transaction_data'][0] 
+        input_event = {**input_event['transaction_data'][0]}
     
     input_event[TRANSACTION_ID] = f't-{input_event[TRANSACTION_ID]}'
     input_event['TransactionAmt'] = np.log10(input_event['TransactionAmt'])
@@ -343,7 +343,7 @@ def handler(event, context):
     data_output = {
                     'timestamp': int(time.time()),
                     'isFraud': pred_prob > MODEL_BTW,
-                    'id': event['transaction_data'][0]['TransactionID'],
+                    'id': transaction_id, #event['transaction_data'][0]['TransactionID'],
                     'amount': event['transaction_data'][0]['TransactionAmt'],
                     'productCD': event['transaction_data'][0]['ProductCD'],
                     'card1': event['transaction_data'][0]['card1'],
@@ -374,5 +374,7 @@ def handler(event, context):
                     'pred_prob': pred_prob,
                     'time': (G_e_t - G_s_t).total_seconds()
                     }
-
+    
+    logger.info(f'Return function_res {function_res}.')
+    
     return function_res
