@@ -251,7 +251,8 @@ def recreate_grpha_data(graph_dict, n_feats, target_id):
 
         if in_ntype == 'target':
             global TARGET_FEAT_MEAN, TARGET_FEAT_STD
-            th_feat = th.Tensor(feats)
+            np_feats = np.array(feats).astype(np.float32)
+            th_feat = th.from_numpy(np_feats)
             norm_feat = (th_feat - TARGET_FEAT_MEAN) / TARGET_FEAT_STD
 
             new_n_feats[in_ntype] = norm_feat
