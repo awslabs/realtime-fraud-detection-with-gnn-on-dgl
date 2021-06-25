@@ -1,6 +1,6 @@
 import '@aws-cdk/assert/jest';
 import { ResourcePart } from '@aws-cdk/assert/lib/assertions/have-resource';
-import { App, Stack, Construct, GetContextValueOptions, GetContextValueResult } from '@aws-cdk/core';
+import { App, Stack, Construct, GetContextValueOptions, GetContextValueResult, Tags } from '@aws-cdk/core';
 import * as cxapi from '@aws-cdk/cx-api';
 import { FraudDetectionStack } from '../src/lib/stack';
 import * as mock from './context-provider-mock';
@@ -114,6 +114,12 @@ describe('fraud detection stack test suite', () => {
               'TransactionGraphClusterSecurityGroupDB59E630',
               'GroupId',
             ],
+          },
+        ],
+        Tags: [
+          {
+            Key: 'app',
+            Value: 'test-app',
           },
         ],
       },
@@ -291,6 +297,15 @@ function initializeStackWithContextsAndEnvs(context: {} | undefined, env?: {} | 
 
   const stack = new FraudDetectionStack(app, 'TestStack', {
     env: env,
+  });
+  Tags.of(stack).add('app', 'test-app', {
+    includeResourceTypes: [
+      'AWS::Neptune::DBClusterParameterGroup',
+      'AWS::Neptune::DBParameterGroup',
+      'AWS::Neptune::DBCluster',
+      'AWS::Neptune::DBInstance',
+      'AWS::Neptune::DBSubnetGroup',
+    ],
   });
   return { app, stack };
 }
