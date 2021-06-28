@@ -661,6 +661,8 @@ export class TrainingStack extends NestedStack {
       },
       tracingEnabled: true,
     });
+
+    this.templateOptions.description = '(SO8013) - Real-time Fraud Detection with Graph Neural Network on DGL -- model training and deployment stack.';
   }
 
   _trainingImageAssets(): DockerImageAssetProps {
