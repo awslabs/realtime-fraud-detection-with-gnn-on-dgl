@@ -79,15 +79,15 @@ def load_data_from_event(input_event, transactions_id_cols, transactions_cat_col
     # trans_dict = [input_event[transaction_value_cols].iloc[0].fillna(0.0).to_dict()]
     trans_dict = [{TRANSACTION_ID:target_id,
                     # 'props_values':str(input_event[transaction_value_cols].iloc[0].fillna(0.0).to_json(orient='index'))}] 
-                    'props_values':','.join(input_event[transaction_value_cols].iloc[0].fillna(0.0).values.astype(str))}]
+                    'props_values':'_'.join(input_event[transaction_value_cols].iloc[0].fillna(0.0).values.astype(str))}]
 
     identity_dict = [input_event[union_id_cols].iloc[0].fillna(0.0).to_dict()]
-    logger.info(f'trans_dict len: {len(trans_dict[0].keys())}  key: {trans_dict[0].keys()}')
-    logger.info(f'trans_dict: {trans_dict[0]}')
-    logger.info(f'identity_dict len: {len(identity_dict[0].keys())}  key: {identity_dict[0].keys()}')
-    logger.info(f'identity_dict: {identity_dict[0]}')
-    logger.info(f'union_id_cols len: {len(union_id_cols)}')
-    logger.info(f'union_id_cols: {union_id_cols}')
+    # logger.info(f'trans_dict len: {len(trans_dict[0].keys())}  key: {trans_dict[0].keys()}')
+    # logger.info(f'trans_dict: {trans_dict[0]}')
+    # logger.info(f'identity_dict len: {len(identity_dict[0].keys())}  key: {identity_dict[0].keys()}')
+    # logger.info(f'identity_dict: {identity_dict[0]}')
+    # logger.info(f'union_id_cols len: {len(union_id_cols)}')
+    # logger.info(f'union_id_cols: {union_id_cols}')
     return trans_dict, identity_dict, target_id, transaction_value_cols, union_id_cols
 
 class GraphModelClient:
@@ -134,19 +134,23 @@ class GraphModelClient:
                             )
                 ).iterate()         
                 
-        attr_cols = [f'val{x}' for x in range(1,391)]
-        empty_node_dict ={}
-        for attr in attr_cols:
-            empty_node_dict[attr] = 0.0
-        empty_node_dict = [empty_node_dict]
-
-        # attr_version = 'Version1'
+        # attr_cols = [f'val{x}' for x in range(1,391)]
         # empty_node_dict ={}
-        # empty_node_dict[attr_version] = ','.join(['0.0' for x in range(390)])
+        # for attr in attr_cols:
+        #     empty_node_dict[attr] = 0.0
         # empty_node_dict = [empty_node_dict]
+
             
+        # for node_k, node_v in connectted_node_dict[0].items():
+        #     node_id = node_k + '-' + str(node_v)
+        #     insert_attr(g, empty_node_dict, target_id, node_id, vertex_type = node_k)   
+
         for node_k, node_v in connectted_node_dict[0].items():
+            attr_version = 'Version1'
             node_id = node_k + '-' + str(node_v)
+            empty_node_dict = {}
+            empty_node_dict[attr_version] = '_'.join(['0.0' for x in range(390)])
+            empty_node_dict = [empty_node_dict]
             insert_attr(g, empty_node_dict, target_id, node_id, vertex_type = node_k)   
 
         conn.close()                    
@@ -215,7 +219,7 @@ class GraphModelClient:
         logger.info(f'INSIDE query_target_subgraph: node_dict used {(e_t - new_s_t).total_seconds()} seconds.')
         new_s_t = e_t
 
-        logger.info(f'node_dict len: {len(node_dict)}  key: {node_dict}')
+        # logger.info(f'node_dict len: {len(node_dict)}  key: {node_dict}')
 
         # FOR OLD ETL in 390 diff args
         # for item in node_dict:
@@ -226,36 +230,36 @@ class GraphModelClient:
         for item in node_dict:
             node = item.get(list(item)[0])
             node_value = node[(node.find('-')+1):]
-            neighbor_dict[node_value] = [float(x) for x in item.get('props_values').split(',')]
+            neighbor_dict[node_value] = [float(x) for x in item.get('props_values').split('_')]
 
         target_value = target_id[(target_id.find('-')+1):]
         # neighbor_dict[target_value] = [tr_dict[0].get(key) for key in transaction_value_cols]
-        neighbor_dict[target_value] = tr_dict[0].get('props_values').split(',')
+        neighbor_dict[target_value] = tr_dict[0].get('props_values').split('_')
         
         logger.info(f'INSIDE query_target_subgraph: node_dict used {(e_t - new_s_t).total_seconds()} seconds.')
-        logger.info(f'neighbor_dict len: {len(neighbor_dict.keys())}  key: {neighbor_dict.keys()}')
-        logger.info(f'neighbor_dict: {neighbor_dict}')
+        # logger.info(f'neighbor_dict len: {len(neighbor_dict.keys())}  key: {neighbor_dict.keys()}')
+        # logger.info(f'neighbor_dict: {neighbor_dict}')
         
         
-        attr_cols = ['val'+str(x) for x in range(1,391)]
-        for attr in feature_list:
-            attr_name = attr[:attr.find('-')]
-            attr_value = attr[(attr.find('-')+1):]
-            attr_dict = g.V().has(id,attr).valueMap().toList()[0]
-            attr_dict = [attr_dict.get(key)[-1] for key in attr_cols]
-            attr_input_dict = {}
-            attr_input_dict[attr_value] =  attr_dict
-            transaction_embed_value_dict[attr_name] = attr_input_dict
-
-        # attr_version = 'Version1'
+        # attr_cols = ['val'+str(x) for x in range(1,391)]
         # for attr in feature_list:
         #     attr_name = attr[:attr.find('-')]
         #     attr_value = attr[(attr.find('-')+1):]
         #     attr_dict = g.V().has(id,attr).valueMap().toList()[0]
-        #     attr_dict = [float(x) for x in attr_dict.get(attr_version).split(',')]
+        #     attr_dict = [attr_dict.get(key)[-1] for key in attr_cols]
         #     attr_input_dict = {}
         #     attr_input_dict[attr_value] =  attr_dict
         #     transaction_embed_value_dict[attr_name] = attr_input_dict
+
+        attr_version = 'Version1'
+        for attr in feature_list:
+            attr_name = attr[:attr.find('-')]
+            attr_value = attr[(attr.find('-')+1):]
+            attr_dict = g.V().has(id,attr).valueMap().toList()[0]
+            attr_dict = [float(x) for x in attr_dict.get(attr_version)[0].split('_')]
+            attr_input_dict = {}
+            attr_input_dict[attr_value] =  attr_dict
+            transaction_embed_value_dict[attr_name] = attr_input_dict
         
         e_t = dt.now()
         logger.info(f'INSIDE query_target_subgraph: transaction_embed_value_dict used {(e_t - new_s_t).total_seconds()} seconds. Total test cost {(e_t - s_t).total_seconds()} seconds.')
@@ -265,8 +269,8 @@ class GraphModelClient:
 
         conn.close()   
 
-        logger.info(f'transaction_embed_value_dict len: {len(transaction_embed_value_dict.keys())} key: {transaction_embed_value_dict.keys()}')
-        logger.info(f'transaction_embed_value_dict: {transaction_embed_value_dict}')
+        # logger.info(f'transaction_embed_value_dict len: {len(transaction_embed_value_dict.keys())} key: {transaction_embed_value_dict.keys()}')
+        # logger.info(f'transaction_embed_value_dict: {transaction_embed_value_dict}')
 
         return subgraph_dict, transaction_embed_value_dict    
 

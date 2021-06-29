@@ -153,7 +153,8 @@ def save_model(g, model, model_dir, id_to_node, mean, stdev):
         node_ids_df['node_id'] = node_id_list
 
         # create feature dataframe columns
-        cols = {'val' + str(i + 1) + ':Double': node_feats[:, i] for i in range(num_feats)}
+        # cols = {'val' + str(i + 1) + ':Double': node_feats[:, i] for i in range(num_feats)}
+        cols ={'Version1:String': ['_'.join([str(node_val)for node_val in node_feats[i, :]]) for i in range(num_nodes)]}
         node_feats_df = pd.DataFrame(cols)
 
         # merge id with feature, where feature_df use index
