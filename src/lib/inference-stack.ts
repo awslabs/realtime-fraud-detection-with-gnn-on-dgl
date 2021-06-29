@@ -76,6 +76,7 @@ export class InferenceStack extends NestedStack {
     }),
     );
 
+    this.templateOptions.description = '(SO8013) - Real-time Fraud Detection with Graph Neural Network on DGL -- real-time inference for fraudulent transactions stack.';
   }
 }
 

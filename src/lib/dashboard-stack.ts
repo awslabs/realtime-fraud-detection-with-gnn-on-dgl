@@ -546,6 +546,8 @@ export class TransactionDashboardStack extends NestedStack {
       props.r53HostZoneId,
     );
 
+    this.templateOptions.description = '(SO8013) - Real-time Fraud Detection with Graph Neural Network on DGL -- Dashboard stack.';
+
     new CfnOutput(this, 'DashboardDBEndpoint', {
       value: `${docDBCluster.clusterEndpoint.socketAddress}`,
       description: 'endpoint of documentDB for dashboard',
