@@ -1,7 +1,6 @@
 import numpy as np
 import pandas as pd
 
-
 def get_features(id_to_node, node_feature_files):
     """
 
@@ -12,8 +11,8 @@ def get_features(id_to_node, node_feature_files):
     indices, features, new_nodes = [], [], []
     max_node = max(id_to_node.values())
 
-    is_1st_line = True
     for node_file in node_feature_files:
+        is_1st_line = True
         with open(node_file, "r") as fh:
             for line in fh:
                 # hard-coding to ignore the 1st line of header
@@ -36,6 +35,11 @@ def get_features(id_to_node, node_feature_files):
     features = features[np.argsort(indices), :]
     return features, new_nodes
 
+def loadDF(f):
+    try:
+        return pd.read_csv(f)
+    except pd.errors.EmptyDataError as e:
+        return pd.DataFrame()
 
 def get_labels(id_to_node, n_nodes, target_node_type, labels_files, masked_nodes_files, additional_mask_rate=0):
     """
@@ -50,8 +54,8 @@ def get_labels(id_to_node, n_nodes, target_node_type, labels_files, masked_nodes
     """
     node_to_id = {v: k for k, v in id_to_node.items()}
 
-    labels_from_each_file = (pd.read_csv(f) for f in labels_files)
-    user_to_label = pd.concat(labels_from_each_file, ignore_index=True).set_index(target_node_type)
+    labels_df_from_files = map(loadDF, labels_files)
+    user_to_label = pd.concat(labels_df_from_files, ignore_index=True).set_index(target_node_type)
 
     labels = user_to_label.loc[map(int, pd.Series(node_to_id)[np.arange(n_nodes)].values)].values.flatten()
     masked_nodes = read_masked_nodes(masked_nodes_files)
