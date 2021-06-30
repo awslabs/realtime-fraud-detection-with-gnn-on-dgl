@@ -228,6 +228,7 @@ export class ETLByGlue extends Construct {
         '--enable-continuous-log-filter': 'false',
         '--enable-metrics': '',
         '--extra-py-files': [glueJobBucket.s3UrlForObject(`${libPrefix}/${neptuneGlueConnectorLibName}`)].join(','),
+        '--additional-python-modules': 'koalas==1.8.1',
         '--neptune_endpoint': props.neptune.clusterEndpoint.hostname,
         '--neptune_port': props.neptune.clusterEndpoint.port,
       },
