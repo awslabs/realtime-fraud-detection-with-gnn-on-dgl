@@ -27,9 +27,14 @@ def construct_graph(edges, nodes, target_node_type):
         if src == 'target' and dst == 'target':
             print("Will add self loop for target later......")
         else:
-            edgelists[(src, src + '<>' + dst, dst)] = edgelist
-            edgelists[(dst, dst + '<>' + src, src)] = rev_edgelist
-            print("Read edges for {} from edgelist: {}".format(src + '<>' + dst, edge))
+            if (src, src + '<>' + dst, dst) in edgelists:
+                edgelists[(src, src + '<>' + dst, dst)] = edgelists[(src, src + '<>' + dst, dst)] + edgelist
+                edgelists[(dst, dst + '<>' + src, src)] = edgelists[(dst, dst + '<>' + src, src)] +rev_edgelist
+                print("Append edges for {} from edgelist: {}".format(src + '<>' + dst, edge))
+            else:
+                edgelists[(src, src + '<>' + dst, dst)] = edgelist
+                edgelists[(dst, dst + '<>' + src, src)] = rev_edgelist
+                print("Read edges for {} from edgelist: {}".format(src + '<>' + dst, edge))
 
     # get features for target nodes
     features, new_nodes = get_features(id_to_node[target_node_type], nodes)
