@@ -49,3 +49,19 @@ logger.info(f"Bulk load status is {json}...")
 
 load_status.wait()
 logger.info('Bulk load request is completed.')
+
+bulkload_2 = BulkLoad(
+        source=args.data_prefix,
+        endpoints=endpoints,
+        role=args.neptune_iam_role_arn,
+        region=args.region,
+        update_single_cardinality_properties=True)
+        
+load_status_2 = bulkload_2.load_async()
+logger.info('Bulk load request is submmitted.')
+
+status, json = load_status_2.status(details=True, errors=True)
+logger.info(f"Bulk load status is {json}...")
+
+load_status_2.wait()
+logger.info('Bulk load request is completed.')

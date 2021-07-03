@@ -106,7 +106,7 @@ export class TrainingStack extends NestedStack {
       identityPrefix,
       bucket: props.bucket,
       vpc: props.vpc,
-      neptune: props.neptune.cluster,
+      neptune: props.neptune,
       dataColumnsArg: props.dataColumnsArg,
     });
     this.glueJobSG = etlConstruct.glueJobSG;

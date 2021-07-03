@@ -15,7 +15,10 @@ export interface ETLProps {
   vpc: IVpc;
   transactionPrefix: string;
   identityPrefix: string;
-  neptune: IDatabaseCluster;
+  neptune: {
+    cluster: IDatabaseCluster;
+    loadObjectPrefix: string;
+  },
   dataColumnsArg: {
     id_cols: string;
     cat_cols: string;
@@ -191,7 +194,7 @@ export class ETLByGlue extends Construct {
 
       },
     });
-    props.neptune.grantConnect(glueJobRole);
+    props.neptune.cluster.grantConnect(glueJobRole);
     identityTable.grantRead(glueJobRole);
     transactionTable.grantRead(glueJobRole);
 
@@ -205,6 +208,8 @@ export class ETLByGlue extends Construct {
       path.join(__dirname, `../script-libs/amazon-neptune-tools/neptune-python-utils/target/${neptuneGlueConnectorLibName}`),
       'src/script-libs/amazon-neptune-tools/neptune-python-utils/target/');
     glueJobBucket.grantRead(glueJobRole, `${libPrefix}/*`);
+
+    props.bucket.grantReadWrite(glueJobRole, `${props.neptune.loadObjectPrefix}/*`);
 
     const outputPrefix = `${props.s3Prefix ?? ''}processed-data/`;
     const etlJob = new CfnJob(this, 'PreprocessingJob', {
@@ -221,6 +226,7 @@ export class ETLByGlue extends Construct {
         '--id_cols': props.dataColumnsArg.id_cols,
         '--cat_cols': props.dataColumnsArg.cat_cols,
         '--output_prefix': props.bucket.s3UrlForObject(outputPrefix),
+        '--bulk_load_prefix':props.bucket.s3UrlForObject(props.neptune.loadObjectPrefix),
         '--job-language': 'python',
         '--job-bookmark-option': 'job-bookmark-disable',
         '--TempDir': glueJobBucket.s3UrlForObject('tmp/'),
@@ -228,8 +234,8 @@ export class ETLByGlue extends Construct {
         '--enable-continuous-log-filter': 'false',
         '--enable-metrics': '',
         '--extra-py-files': [glueJobBucket.s3UrlForObject(`${libPrefix}/${neptuneGlueConnectorLibName}`)].join(','),
-        '--neptune_endpoint': props.neptune.clusterEndpoint.hostname,
-        '--neptune_port': props.neptune.clusterEndpoint.port,
+        '--neptune_endpoint': props.neptune.cluster.clusterEndpoint.hostname,
+        '--neptune_port': props.neptune.cluster.clusterEndpoint.port,
       },
       role: glueJobRole.roleArn,
       workerType: 'G.2X',

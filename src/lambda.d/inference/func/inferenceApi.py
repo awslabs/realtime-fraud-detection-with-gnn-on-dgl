@@ -190,13 +190,13 @@ class GraphModelClient:
         
         e_t = dt.now()
         logger.info(f'INSIDE query_target_subgraph: subgraph_dict used {(e_t - s_t).total_seconds()} seconds')
-        logger.info(f'subgraph_dict len: {len(subgraph_dict.keys())}  key: {subgraph_dict.keys()}')
-        logger.info(f'subgraph_dict: {subgraph_dict}')
+        # logger.info(f'subgraph_dict len: {len(subgraph_dict.keys())}  key: {subgraph_dict.keys()}')
+        # logger.info(f'subgraph_dict: {subgraph_dict}')
         new_s_t = e_t
 
         union_li = [__.V().has(id,target_id).both().hasLabel(label).both().limit(MAX_FEATURE_NODE) for label in union_id_cols]
-        logger.info(f'union_id_cols len: {len(union_id_cols)}  key: {union_id_cols}')
-        logger.info(f'union_li len: {len(union_li)}  key: {union_li}')
+        # logger.info(f'union_id_cols len: {len(union_id_cols)}  key: {union_id_cols}')
+        # logger.info(f'union_li len: {len(union_li)}  key: {union_li}')
 
         if len(union_id_cols) == 51:
             node_dict = g.V().has(id,target_id).union(__.both().hasLabel('card1').both().limit(MAX_FEATURE_NODE),\
@@ -236,7 +236,7 @@ class GraphModelClient:
         # neighbor_dict[target_value] = [tr_dict[0].get(key) for key in transaction_value_cols]
         neighbor_dict[target_value] = tr_dict[0].get('props_values').split('_')
         
-        logger.info(f'INSIDE query_target_subgraph: node_dict used {(e_t - new_s_t).total_seconds()} seconds.')
+        logger.info(f'INSIDE query_target_subgraph: neighbor_dict used {(e_t - new_s_t).total_seconds()} seconds.')
         # logger.info(f'neighbor_dict len: {len(neighbor_dict.keys())}  key: {neighbor_dict.keys()}')
         # logger.info(f'neighbor_dict: {neighbor_dict}')
         
@@ -310,7 +310,7 @@ def invoke_endpoint_with_idx(endpointname, target_id, subgraph_dict, n_feats):
 
 
 def handler(event, context):
-
+    
     logger.info('Endpoint name: {}'.format(ENDPOINT_NAME))
     
     logger.info(f'Receive event: {event}')
