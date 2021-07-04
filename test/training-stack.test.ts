@@ -896,6 +896,7 @@ describe('training stack test suite', () => {
             ],
           ],
         },
+        '--additional-python-modules': 'koalas==1.8.1',
         '--neptune_endpoint': {
           Ref: 'referencetoTestStackDatabase1EBED910Endpoint',
         },
