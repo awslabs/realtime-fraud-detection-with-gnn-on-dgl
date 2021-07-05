@@ -896,6 +896,7 @@ describe('training stack test suite', () => {
             ],
           ],
         },
+        '--additional-python-modules': 'koalas==1.8.1',
         '--neptune_endpoint': {
           Ref: 'referencetoTestStackDatabase1EBED910Endpoint',
         },
@@ -904,8 +905,7 @@ describe('training stack test suite', () => {
         },
       },
       GlueVersion: '2.0',
-      NumberOfWorkers: 2,
-      WorkerType: 'G.2X',
+      MaxCapacity: 8,
       SecurityConfiguration: {
         Ref: 'ETLCompFraudDetectionSecConf653F0C00',
       },
@@ -1005,7 +1005,7 @@ describe('training stack test suite', () => {
             {
               Ref: 'ETLCompDataCrawlerE8BE0214',
             },
-            '"}}},"Data Process":{"Next":"Train model","Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","ResultPath":"$.dataProcessOutput","Resource":"arn:',
+	          '"}}},"Data Process":{"Next":"Build hyperparameters","Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","ResultPath":"$.dataProcessOutput","Resource":"arn:',
             {
               Ref: 'AWS::Partition',
             },
@@ -1013,7 +1013,18 @@ describe('training stack test suite', () => {
             {
               Ref: 'ETLCompPreprocessingJobB535A575',
             },
-            '","Timeout":300}},"Train model":{"Next":"Load the props to graph","Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","ResultPath":"$.trainingJobOutput","Resource":"arn:',
+            '","Timeout":300}},"Build hyperparameters":{"Next":"Train model","Retry":[{"ErrorEquals":["Lambda.ServiceException","Lambda.AWSLambdaException","Lambda.SdkClientException"],"IntervalSeconds":2,"MaxAttempts":6,"BackoffRate":2}],"Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","ResultPath":"$.trainingParametersOutput","Resource":"arn:',
+            {
+              Ref: 'AWS::Partition',
+            },
+            ':states:::lambda:invoke","Parameters":{"FunctionName":"',
+            {
+              'Fn::GetAtt': [
+                'HyperParametersFuncA3553E53',
+                'Arn',
+              ],
+            },
+            '","Payload.$":"$"},"ResultSelector":{"hyperParameters.$":"$.Payload.hyperParameters","inputDataUri.$":"$.Payload.inputDataUri"}},"Train model":{"Next":"Load the props to graph","Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","ResultPath":"$.trainingJobOutput","Resource":"arn:',
             {
               Ref: 'AWS::Partition',
             },
@@ -1036,7 +1047,7 @@ describe('training stack test suite', () => {
             {
               Ref: 'AWS::URLSuffix',
             },
-            `/aws-cdk/assets:${trainingImageHash}"},"InputDataConfig":[{"ChannelName":"train","DataSource":{"S3DataSource":{"S3Uri":"https://s3.`,
+            `/aws-cdk/assets:${trainingImageHash}\"},\"InputDataConfig\":[{\"ChannelName\":\"train\",\"DataSource\":{\"S3DataSource\":{\"S3DataType\":\"S3Prefix\",\"S3Uri.$\":\"$.trainingParametersOutput.inputDataUri\"}}}],\"OutputDataConfig\":{\"S3OutputPath\":\"https://s3.`,
             {
               Ref: 'AWS::Region',
             },
@@ -1048,19 +1059,7 @@ describe('training stack test suite', () => {
             {
               Ref: 'referencetoTestStackBucket80A092C2Ref',
             },
-            '/fraud-detection/processed-data/","S3DataType":"S3Prefix"}}}],"OutputDataConfig":{"S3OutputPath":"https://s3.',
-            {
-              Ref: 'AWS::Region',
-            },
-            '.',
-            {
-              Ref: 'AWS::URLSuffix',
-            },
-            '/',
-            {
-              Ref: 'referencetoTestStackBucket80A092C2Ref',
-            },
-            '/fraud-detection/model_output"},"ResourceConfig":{"VolumeSizeInGB":50,"InstanceCount.$":"$.parameters.trainingJob.instanceCount","InstanceType.$":"$.parameters.trainingJob.instanceType"},"StoppingCondition":{"MaxRuntimeInSeconds.$":"$.parameters.trainingJob.timeoutInSeconds"},"HyperParameters.$":"$.parameters.trainingJob.hyperparameters"},"ResultSelector":{"TrainingJobName.$":"$.TrainingJobName","ModelArtifacts.$":"$.ModelArtifacts"}},"Load the props to graph":{"Next":"Package model with code","Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","TimeoutSeconds":7200,"ResultPath":null,"Resource":"arn:',
+            '/fraud-detection/model_output"},"ResourceConfig":{"VolumeSizeInGB":50,"InstanceCount.$":"$.parameters.trainingJob.instanceCount","InstanceType.$":"$.parameters.trainingJob.instanceType"},"StoppingCondition":{"MaxRuntimeInSeconds.$":"$.parameters.trainingJob.timeoutInSeconds"},"HyperParameters.$":"$.trainingParametersOutput.hyperParameters"},"ResultSelector":{"TrainingJobName.$":"$.TrainingJobName","ModelArtifacts.$":"$.ModelArtifacts"}},"Load the props to graph":{"Next":"Package model with code","Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","TimeoutSeconds":7200,"ResultPath":null,"Resource":"arn:',
             {
               Ref: 'AWS::Partition',
             },

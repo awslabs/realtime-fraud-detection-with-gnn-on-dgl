@@ -16,9 +16,6 @@ describe('parameters normalize tests', () => {
       parameters: {
         trainingJob: {
           hyperparameters: {
-            'nodes': 'features.csv',
-            'edges': 'relation*',
-            'labels': 'tags.csv',
             'embedding-size': '64',
             'n-layers': '2',
             'n-epochs': '50',
