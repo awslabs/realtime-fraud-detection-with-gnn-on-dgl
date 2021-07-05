@@ -7,6 +7,7 @@ from pathlib import Path
 import argparse
 from neptune_python_utils.endpoints import Endpoints
 from neptune_python_utils.bulkload import BulkLoad
+import boto3
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -25,6 +26,25 @@ modelS3Url = urlparse(environ['MODEL_PACKAGE'], allow_fragments=False)
 originModelArtifact = f's3:/{modelS3Url.path}'
 targetDataPath = f"{args.data_prefix}/{environ['JOB_NAME']}"
 tempFolder = args.temp_folder
+
+s3client = boto3.client('s3')
+s3resource = boto3.resource('s3')
+
+sourceUrl = urlparse(args.data_prefix, allow_fragments=False)
+destUrl = urlparse(targetDataPath, allow_fragments=False)
+
+sourcePrefix = sourceUrl.path[1:]
+destPrefix = destUrl.path[1:]
+
+theobjects = s3client.list_objects(Bucket=sourceUrl.netloc, Prefix=sourcePrefix, Delimiter='/')
+for object in theobjects['Contents']:
+        if object['Key'].endswith('.csv'):
+                file_name = object['Key'].split('bulk-load/')[-1]
+                old_source = {'Bucket': sourceUrl.netloc,
+                                'Key': object['Key']}
+                destKey = destPrefix + file_name
+                destBucket = s3resource.Bucket(destUrl.netloc)
+                destBucket.copy(old_source, destKey)
 
 dataArgs = (originModelArtifact, targetDataPath, tempFolder)
 
@@ -48,20 +68,4 @@ status, json = load_status.status(details=True, errors=True)
 logger.info(f"Bulk load status is {json}...")
 
 load_status.wait()
-logger.info('Bulk load request is completed.')
-
-bulkload_2 = BulkLoad(
-        source=args.data_prefix,
-        endpoints=endpoints,
-        role=args.neptune_iam_role_arn,
-        region=args.region,
-        update_single_cardinality_properties=True)
-        
-load_status_2 = bulkload_2.load_async()
-logger.info('Bulk load request is submmitted.')
-
-status, json = load_status_2.status(details=True, errors=True)
-logger.info(f"Bulk load status is {json}...")
-
-load_status_2.wait()
 logger.info('Bulk load request is completed.')
