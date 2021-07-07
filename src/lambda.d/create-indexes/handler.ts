@@ -9,14 +9,14 @@ export const createIndexes: AWSCDKAsyncCustomResource.OnEventHandler =
   async (event: AWSCDKAsyncCustomResource.OnEventRequest) : Promise<AWSCDKAsyncCustomResource.OnEventResponse> => {
     console.info(`Receiving create indexes event ${JSON.stringify(event, null, 2)}`);
 
-    if (!cachedClient) {
-      cachedClient = await initMongoClient();
-    }
-
     var resourceId: string | undefined = undefined;
     try {
       switch (event.RequestType) {
         case 'Create':
+          // only connect to mongo when it's the event of creating resource
+          if (!cachedClient) {
+            cachedClient = await initMongoClient();
+          }
           const databaseStr = event.ResourceProperties.Database;
           const collectionStr = event.ResourceProperties.Collection;
 
@@ -32,6 +32,7 @@ export const createIndexes: AWSCDKAsyncCustomResource.OnEventHandler =
           break;
         case 'Update':
         case 'Delete':
+          // never connects to mongo, there is no guarantee of db secret in secret manager still exists
           resourceId = event.PhysicalResourceId;
           // TODO: implement it if necessary
           break;
