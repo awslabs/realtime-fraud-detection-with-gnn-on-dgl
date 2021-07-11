@@ -35,8 +35,13 @@ destUrl = urlparse(targetDataPath, allow_fragments=False)
 
 sourcePrefix = sourceUrl.path[1:]
 destPrefix = destUrl.path[1:]
+logger.info(f'sourcePrefix: {sourcePrefix}')
+logger.info(f'destPrefix: {destPrefix}')
 
 theobjects = s3client.list_objects(Bucket=sourceUrl.netloc, Prefix=sourcePrefix, Delimiter='/')
+
+logger.info(f'theobjects: {theobjects}')
+
 for object in theobjects['Contents']:
         if object['Key'].endswith('.csv'):
                 file_name = object['Key'].split('bulk-load/')[-1]

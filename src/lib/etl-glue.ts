@@ -203,11 +203,11 @@ export class ETLByGlue extends Construct {
       path.join(__dirname, '../scripts/glue-etl.py'), 'src/scripts/');
     glueJobBucket.grantRead(glueJobRole, `${scriptPrefix}/*`);
 
-    const neptuneGlueConnectorLibName = 'neptune_python_utils.zip';
-    const libPrefix = this._deployGlueArtifact(glueJobBucket,
-      path.join(__dirname, `../script-libs/amazon-neptune-tools/neptune-python-utils/target/${neptuneGlueConnectorLibName}`),
-      'src/script-libs/amazon-neptune-tools/neptune-python-utils/target/');
-    glueJobBucket.grantRead(glueJobRole, `${libPrefix}/*`);
+    // const neptuneGlueConnectorLibName = 'neptune_python_utils.zip';
+    // const libPrefix = this._deployGlueArtifact(glueJobBucket,
+    //   path.join(__dirname, `../script-libs/amazon-neptune-tools/neptune-python-utils/target/${neptuneGlueConnectorLibName}`),
+    //   'src/script-libs/amazon-neptune-tools/neptune-python-utils/target/');
+    // glueJobBucket.grantRead(glueJobRole, `${libPrefix}/*`);
 
     props.bucket.grantReadWrite(glueJobRole, `${props.neptune.loadObjectPrefix}/*`);
 
@@ -233,7 +233,7 @@ export class ETLByGlue extends Construct {
         '--enable-continuous-cloudwatch-log': 'true',
         '--enable-continuous-log-filter': 'false',
         '--enable-metrics': '',
-        '--extra-py-files': [glueJobBucket.s3UrlForObject(`${libPrefix}/${neptuneGlueConnectorLibName}`)].join(','),
+        // '--extra-py-files': [glueJobBucket.s3UrlForObject(`${libPrefix}/${neptuneGlueConnectorLibName}`)].join(','),
         '--additional-python-modules': 'koalas==1.8.1',
         '--neptune_endpoint': props.neptune.cluster.clusterEndpoint.hostname,
         '--neptune_port': props.neptune.cluster.clusterEndpoint.port,

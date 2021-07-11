@@ -11,10 +11,10 @@ import pyspark.sql.functions as fc
 from io import BytesIO, StringIO
 import boto3
 from urllib.parse import urlparse
-from neptune_python_utils.gremlin_utils import GremlinUtils
-from neptune_python_utils.endpoints import Endpoints
-from neptune_python_utils.glue_gremlin_client import GlueGremlinClient
-from neptune_python_utils.glue_gremlin_csv_transforms import GlueGremlinCsvTransforms
+# from neptune_python_utils.gremlin_utils import GremlinUtils
+# from neptune_python_utils.endpoints import Endpoints
+# from neptune_python_utils.glue_gremlin_client import GlueGremlinClient
+# from neptune_python_utils.glue_gremlin_csv_transforms import GlueGremlinCsvTransforms
 import databricks.koalas as ks
 
 def join_all(dfs, keys):
@@ -77,7 +77,7 @@ def dump_df_to_s3(df, objectName, header = True, bulk_load = False):
         format_options={"writeHeader": header},
         format="csv")
 
-def create_catagory_and_relation(name, dataframe, gremlin_client):
+def create_catagory_and_relation(name, dataframe): #, gremlin_client):
     # upsert category vertices
     # cateDF = dataframe.select(name).distinct()
     # dynamic_df = DynamicFrame.fromDF(cateDF, glueContext, f'{name}DF')
@@ -121,10 +121,10 @@ args = getResolvedOptions(sys.argv,
 
 logger.info(f'Resolved options are: {args}')
 
-GremlinUtils.init_statics(globals())
-endpoints = Endpoints(neptune_endpoint=args['neptune_endpoint'], neptune_port=args['neptune_port'], region_name=args['region'])
+# GremlinUtils.init_statics(globals())
+# endpoints = Endpoints(neptune_endpoint=args['neptune_endpoint'], neptune_port=args['neptune_port'], region_name=args['region'])
 logger.info(f'Initializing gremlin client to Neptune ${endpoints.gremlin_endpoint()}.')
-gremlin_client = GlueGremlinClient(endpoints)
+# gremlin_client = GlueGremlinClient(endpoints)
 
 TRANSACTION_ID = 'TransactionID'
 
@@ -177,4 +177,4 @@ relational_edges = get_relations_and_edgelist(transactions.toDF(), identities.to
 for name, df in relational_edges.items():
     if name != TRANSACTION_ID:
         dump_df_to_s3(df, f'relation_{name}_edgelist')
-        create_catagory_and_relation(name, df, gremlin_client)
+        create_catagory_and_relation(name, df) #, gremlin_client)
