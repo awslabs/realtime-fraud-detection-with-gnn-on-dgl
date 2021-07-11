@@ -350,7 +350,8 @@ export class TrainingStack extends NestedStack {
       assumedBy: new ServicePrincipal('ecs-tasks.amazonaws.com'),
     });
     props.neptune.cluster.grantConnect(loadPropTaskRole);
-    props.bucket.grantRead(loadPropTaskRole, `${modelOutputPrefix}/*`);
+    props.bucket.grantRead(loadPropTaskRole, `${dataPrefix}model_output/*`);
+    props.bucket.grantRead(loadPropTaskRole, `${dataPrefix}processed-data/*`);
     props.bucket.grantWrite(loadPropTaskRole, `${props.neptune.loadObjectPrefix}/*`);
 
     const taskVolumeName = 'efs-volume';
