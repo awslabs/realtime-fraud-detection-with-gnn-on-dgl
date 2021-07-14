@@ -2,7 +2,6 @@ import * as path from 'path';
 import { IVpc, Port, SecurityGroup, ISecurityGroup } from '@aws-cdk/aws-ec2';
 import { Database, DataFormat, Table, Schema, CfnJob, CfnConnection, CfnCrawler, SecurityConfiguration, S3EncryptionMode, CloudWatchEncryptionMode, JobBookmarksEncryptionMode } from '@aws-cdk/aws-glue';
 import { CompositePrincipal, ManagedPolicy, PolicyDocument, PolicyStatement, ServicePrincipal, Role } from '@aws-cdk/aws-iam';
-import { IDatabaseCluster } from '@aws-cdk/aws-neptune';
 import { IBucket, Bucket, BucketEncryption } from '@aws-cdk/aws-s3';
 import { BucketDeployment, Source } from '@aws-cdk/aws-s3-deployment';
 import { Aws, Construct, RemovalPolicy, Stack } from '@aws-cdk/core';
@@ -15,10 +14,6 @@ export interface ETLProps {
   vpc: IVpc;
   transactionPrefix: string;
   identityPrefix: string;
-  neptune: {
-    cluster: IDatabaseCluster;
-    loadObjectPrefix: string;
-  },
   dataColumnsArg: {
     id_cols: string;
     cat_cols: string;
@@ -194,7 +189,6 @@ export class ETLByGlue extends Construct {
 
       },
     });
-    props.neptune.cluster.grantConnect(glueJobRole);
     identityTable.grantRead(glueJobRole);
     transactionTable.grantRead(glueJobRole);
 
@@ -203,13 +197,11 @@ export class ETLByGlue extends Construct {
       path.join(__dirname, '../scripts/glue-etl.py'), 'src/scripts/');
     glueJobBucket.grantRead(glueJobRole, `${scriptPrefix}/*`);
 
-    // const neptuneGlueConnectorLibName = 'neptune_python_utils.zip';
-    // const libPrefix = this._deployGlueArtifact(glueJobBucket,
-    //   path.join(__dirname, `../script-libs/amazon-neptune-tools/neptune-python-utils/target/${neptuneGlueConnectorLibName}`),
-    //   'src/script-libs/amazon-neptune-tools/neptune-python-utils/target/');
-    // glueJobBucket.grantRead(glueJobRole, `${libPrefix}/*`);
-
-    props.bucket.grantReadWrite(glueJobRole, `${props.neptune.loadObjectPrefix}/*`);
+    const neptuneGlueConnectorLibName = 'neptune_python_utils.zip';
+    const libPrefix = this._deployGlueArtifact(glueJobBucket,
+      path.join(__dirname, `../script-libs/amazon-neptune-tools/neptune-python-utils/target/${neptuneGlueConnectorLibName}`),
+      'src/script-libs/amazon-neptune-tools/neptune-python-utils/target/');
+    glueJobBucket.grantRead(glueJobRole, `${libPrefix}/*`);
 
     const outputPrefix = `${props.s3Prefix ?? ''}processed-data/`;
     const etlJob = new CfnJob(this, 'PreprocessingJob', {
@@ -226,17 +218,14 @@ export class ETLByGlue extends Construct {
         '--id_cols': props.dataColumnsArg.id_cols,
         '--cat_cols': props.dataColumnsArg.cat_cols,
         '--output_prefix': props.bucket.s3UrlForObject(outputPrefix),
-        '--bulk_load_prefix':props.bucket.s3UrlForObject(props.neptune.loadObjectPrefix),
         '--job-language': 'python',
         '--job-bookmark-option': 'job-bookmark-disable',
         '--TempDir': glueJobBucket.s3UrlForObject('tmp/'),
         '--enable-continuous-cloudwatch-log': 'true',
         '--enable-continuous-log-filter': 'false',
         '--enable-metrics': '',
-        // '--extra-py-files': [glueJobBucket.s3UrlForObject(`${libPrefix}/${neptuneGlueConnectorLibName}`)].join(','),
+        '--extra-py-files': [glueJobBucket.s3UrlForObject(`${libPrefix}/${neptuneGlueConnectorLibName}`)].join(','),
         '--additional-python-modules': 'koalas==1.8.1',
-        '--neptune_endpoint': props.neptune.cluster.clusterEndpoint.hostname,
-        '--neptune_port': props.neptune.cluster.clusterEndpoint.port,
       },
       role: glueJobRole.roleArn,
       maxCapacity: 8,
