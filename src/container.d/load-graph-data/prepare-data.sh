@@ -7,10 +7,11 @@ main() {
   check_args "$@"
 
   local origin_model=$1
-  local target_path=$2
-  local tmpFolder=$3
+  local graph_data_path=$2
+  local target_path=$3
+  local tmpFolder=$4
 
-  export WORK_DIR=`mktemp -d --suffix '-properties' -p "$tmpFolder"`
+  export WORK_DIR=`mktemp -d --suffix '-graph-data' -p "$tmpFolder"`
 
   if [[ ! "$WORK_DIR" || ! -d "$WORK_DIR" ]]; then
     echo "Could not create temp dir under $tmpFolder"
@@ -24,6 +25,8 @@ main() {
   mkdir -p "$DATA_DIR"
   tar -xvf "$WORK_DIR"/model.tar.gz -C "$DATA_DIR" --wildcards '*.csv'
   aws s3 cp --recursive "$DATA_DIR" "$target_path"
+  
+  aws s3 sync "$graph_data_path" "$target_path"
 }
 
 # deletes the temp directory
@@ -35,7 +38,7 @@ function cleanup {
 # Makes sure that we provided (from the cli) 
 # enough arguments.
 check_args() {
-  if (($# != 3)); then
+  if (($# != 4)); then
     echo "Error:
     Three arguments must be provided - $# provided.
     Usage:

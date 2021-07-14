@@ -138,16 +138,8 @@ features_graph_dynamic_df = DynamicFrame.fromDF(featurs_graph_df, glueContext, '
 features_graph_dynamic_df = GlueGremlinCsvTransforms.create_prefixed_columns(features_graph_dynamic_df, [('~id', TRANSACTION_ID, 't')])
 features_graph_dynamic_df = GlueGremlinCsvTransforms.addLabel(features_graph_dynamic_df,'Transaction')
 features_graph_dynamic_df = SelectFields.apply(frame = features_graph_dynamic_df, paths = ["~id",'~label', 'props_values:String'])
-logger.info(f'Dumping labels data as graph data...')
-dump_df_to_s3(features_graph_dynamic_df.toDF(), f'features', graph = True)
-
-logger.info(f'Creating glue DF from labels dataframe')
-labels_dynamic_df = DynamicFrame.fromDF(labels_df, glueContext, 'LabelsDF')
-labels_dynamic_df = GlueGremlinCsvTransforms.addLabel(labels_dynamic_df,'Transaction')
-labels_dynamic_df = GlueGremlinCsvTransforms.create_prefixed_columns(labels_dynamic_df, [('~id', TRANSACTION_ID, 't')])
-logger.info(f'Dumping labels data as graph data...')
-dump_df_to_s3(labels_dynamic_df.toDF(), f'labels', graph = True)
-
+logger.info(f'Dumping transaction data as graph data...')
+dump_df_to_s3(features_graph_dynamic_df.toDF(), f'transaction', graph = True)
 
 relational_edges = get_relations_and_edgelist(transactions.toDF(), identities.toDF(), id_cols)
 for name, df in relational_edges.items():

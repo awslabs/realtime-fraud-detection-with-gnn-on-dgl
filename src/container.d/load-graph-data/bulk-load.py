@@ -7,7 +7,6 @@ from pathlib import Path
 import argparse
 from neptune_python_utils.endpoints import Endpoints
 from neptune_python_utils.bulkload import BulkLoad
-import boto3
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -24,47 +23,29 @@ args = parser.parse_args()
 
 modelS3Url = urlparse(environ['MODEL_PACKAGE'], allow_fragments=False)
 originModelArtifact = f's3:/{modelS3Url.path}'
+graphDataUrl = urlparse(environ['GRAPH_DATA_PATH'], allow_fragments=False)
+graphDataPath = f's3:/{graphDataUrl.path}/graph/'
 targetDataPath = f"{args.data_prefix}/{environ['JOB_NAME']}"
 tempFolder = args.temp_folder
 
-s3client = boto3.client('s3')
-s3resource = boto3.resource('s3')
-
-sourceUrl = urlparse(args.data_prefix, allow_fragments=False)
-destUrl = urlparse(targetDataPath, allow_fragments=False)
-
-sourcePrefix = sourceUrl.path[1:]
-destPrefix = destUrl.path[1:]
-logger.info(f'sourcePrefix: {sourcePrefix}')
-logger.info(f'destPrefix: {destPrefix}')
-
-theobjects = s3client.list_objects(Bucket=sourceUrl.netloc, Prefix=sourcePrefix, Delimiter='/')
-
-logger.info(f'theobjects: {theobjects}')
-
-for object in theobjects['Contents']:
-        if object['Key'].endswith('.csv'):
-                file_name = object['Key'].split('bulk-load/')[-1]
-                old_source = {'Bucket': sourceUrl.netloc,
-                                'Key': object['Key']}
-                destKey = destPrefix + file_name
-                destBucket = s3resource.Bucket(destUrl.netloc)
-                destBucket.copy(old_source, destKey)
-
-dataArgs = (originModelArtifact, targetDataPath, tempFolder)
+dataArgs = (originModelArtifact, graphDataPath, targetDataPath, tempFolder)
 
 prepareDataCmd=Path(os.path.abspath(__file__)).parent.joinpath('prepare-data.sh')
 logger.info(f"| {prepareDataCmd} {' '.join(dataArgs)}")
 subprocess.check_call([prepareDataCmd] + list(dataArgs))
+logger.info(f'Prepared graph data for bulk load...')
 
 endpoints = Endpoints(neptune_endpoint=args.neptune_endpoint, neptune_port=args.neptune_port, region_name=args.region)
+
+logger.info(f'Created Neptune endpoint ${endpoints.gremlin_endpoint()}.')
 
 bulkload = BulkLoad(
         source=targetDataPath,
         endpoints=endpoints,
         role=args.neptune_iam_role_arn,
         region=args.region,
-        update_single_cardinality_properties=True)
+        update_single_cardinality_properties=True,
+        fail_on_error=True)
         
 load_status = bulkload.load_async()
 logger.info('Bulk load request is submmitted.')
