@@ -177,34 +177,6 @@ describe('fraud detection stack test suite', () => {
       SourceSecurityGroupId: {
         'Fn::GetAtt': [
           'trainingNestedStacktrainingNestedStackResourceAA446BCB',
-          'Outputs.TestStacktrainingLoadPropsSG17993BE1GroupId',
-        ],
-      },
-      ToPort: {
-        'Fn::GetAtt': [
-          'TransactionGraphClusterA4FB4FE0',
-          'Port',
-        ],
-      },
-    });
-
-    expect(stack).toHaveResourceLike('AWS::EC2::SecurityGroupIngress', {
-      IpProtocol: 'tcp',
-      FromPort: {
-        'Fn::GetAtt': [
-          'TransactionGraphClusterA4FB4FE0',
-          'Port',
-        ],
-      },
-      GroupId: {
-        'Fn::GetAtt': [
-          'TransactionGraphClusterSecurityGroupDB59E630',
-          'GroupId',
-        ],
-      },
-      SourceSecurityGroupId: {
-        'Fn::GetAtt': [
-          'trainingNestedStacktrainingNestedStackResourceAA446BCB',
           'Outputs.TestStacktrainingETLCompGlueJobSG3879196AGroupId',
         ],
       },
