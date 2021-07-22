@@ -48,7 +48,7 @@ bulkload = BulkLoad(
         fail_on_error=True)
         
 load_status = bulkload.load_async()
-logger.info('Bulk load request is submmitted.')
+logger.info(f'Bulk load request from {targetDataPath} is submmitted.')
 
 status, json = load_status.status(details=True, errors=True)
 logger.info(f"Bulk load status is {json}...")

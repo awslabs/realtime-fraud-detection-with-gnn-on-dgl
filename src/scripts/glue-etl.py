@@ -80,8 +80,7 @@ def dump_edge_as_graph(name, dataframe):
     dynamic_df = DynamicFrame.fromDF(dataframe, glueContext, f'{name}EdgeDF')
     relation = GlueGremlinCsvTransforms.create_prefixed_columns(dynamic_df, [('~from', TRANSACTION_ID, 't'),('~to', name, name)])
     relation = GlueGremlinCsvTransforms.create_edge_id_column(relation, '~from', '~to')
-    relation = GlueGremlinCsvTransforms.addLabel(relation,'CATEGORY')
-    relation = SelectFields.apply(frame = relation, paths = ["~id",'~label', '~from', '~to'], transformation_ctx = f'selection_{name}')
+    relation = SelectFields.apply(frame = relation, paths = ["~id", '~from', '~to'], transformation_ctx = f'selection_{name}')
     logger.info(f'Upserting edges between \'{name}\' and transaction...')
     dump_df_to_s3(relation.toDF(), f'relation_{name}_edgelist', graph = True)
 

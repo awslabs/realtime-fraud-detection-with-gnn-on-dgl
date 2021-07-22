@@ -131,27 +131,33 @@ def parse_edgelist(edges, id_to_node, header=False, source_type='user', sink_typ
     edge_list = []
     rev_edge_list = []
     source_pointer, sink_pointer = 0, 0
-    with open(edges, "r") as fh:
-        for i, line in enumerate(fh):
-            source, sink = line.strip().split(",")
-            if i == 0:
-                if header:
-                    source_type, sink_type = source, sink
-                if source_type in id_to_node:
-                    source_pointer = max(id_to_node[source_type].values()) + 1
-                if sink_type in id_to_node:
-                    sink_pointer = max(id_to_node[sink_type].values()) + 1
-                continue
+    
+    if header:
+        edgeDF = pd.read_csv(edges)
+    else:
+        edgeDF = pd.read_csv(edges, header=None)
 
-            source_node, id_to_node, source_pointer = _get_node_idx(id_to_node, source_type, source, source_pointer)
-            if source_type == sink_type:
-                sink_node, id_to_node, source_pointer = _get_node_idx(id_to_node, sink_type, sink, source_pointer)
-            else:
-                sink_node, id_to_node, sink_pointer = _get_node_idx(id_to_node, sink_type, sink, sink_pointer)
+    if header:
+        columns = list(edgeDF.columns)
+        source_type = columns[0]
+        sink_type = columns[1]
+    if source_type in id_to_node:
+        source_pointer = max(id_to_node[source_type].values()) + 1
+    if sink_type in id_to_node:
+        sink_pointer = max(id_to_node[sink_type].values()) + 1
+                
+    for i, row in edgeDF.iterrows():
+        source = row[source_type]
+        sink = row[sink_type]
+        source_node, id_to_node, source_pointer = _get_node_idx(id_to_node, source_type, source, source_pointer)
+        if source_type == sink_type:
+            sink_node, id_to_node, source_pointer = _get_node_idx(id_to_node, sink_type, sink, source_pointer)
+        else:
+            sink_node, id_to_node, sink_pointer = _get_node_idx(id_to_node, sink_type, sink, sink_pointer)
 
-            edge_list.append((source_node, sink_node))
-            rev_edge_list.append((sink_node, source_node))
-
+        edge_list.append((source_node, sink_node))
+        rev_edge_list.append((sink_node, source_node))
+            
     return edge_list, rev_edge_list, id_to_node, source_type, sink_type
 
 

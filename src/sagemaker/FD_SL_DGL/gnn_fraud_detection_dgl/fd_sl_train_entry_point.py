@@ -151,7 +151,7 @@ def save_model(g, model, model_dir, id_to_node, mean, stdev):
         # create id dataframe
         node_ids_df = pd.DataFrame({'~label': [ntype] * num_nodes})
         node_ids_df['~id_tmp'] = old_id_list
-        node_ids_df['~id'] = node_ids_df['~label'] + '-' + node_ids_df['~id_tmp']
+        node_ids_df['~id'] = node_ids_df['~id_tmp'].apply(lambda col: f'{ntype}-{col}')
         node_ids_df['node_id'] = node_id_list
 
         # create feature dataframe columns
