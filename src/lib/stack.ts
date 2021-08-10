@@ -61,7 +61,7 @@ export class FraudDetectionStack extends Stack {
         'db.r5.8xlarge',
         'db.r5.12xlarge',
       ],
-      default: 'db.r5.8xlarge',
+      default: 'db.r5.xlarge',
     });
 
     const dataPrefix = 'fraud-detection/';
