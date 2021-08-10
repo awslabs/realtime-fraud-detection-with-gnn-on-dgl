@@ -2,9 +2,11 @@ from __future__  import print_function
 import boto3
 import os, sys
 import json
+from collections import OrderedDict
 from neptune_python_utils.gremlin_utils import GremlinUtils
 from neptune_python_utils.endpoints import Endpoints
 from gremlin_python.process.graph_traversal import __
+from gremlin_python.process.traversal import Cardinality
 from gremlin_python.process.traversal import Column
 from io import BytesIO, StringIO
 from datetime import datetime as dt
@@ -30,6 +32,8 @@ dummied_col = os.environ['DUMMIED_COL']
 
 sqs = boto3.client('sqs')
 runtime = boto3.client('runtime.sagemaker')
+
+attr_version_key = 'props_values'
 
 endpoints = Endpoints(neptune_endpoint = CLUSTER_ENDPOINT, neptune_port = CLUSTER_PORT, region_name = CLUSTER_REGION)
 
@@ -58,32 +62,32 @@ def load_data_from_event(input_event, transactions_id_cols, transactions_cat_col
     if input_event['identity_data'] != []:
         input_event = {**input_event['transaction_data'][0], **input_event['identity_data'][0]} 
     else:
-        input_event = input_event['transaction_data'][0] 
+        input_event = {**input_event['transaction_data'][0]}
     
     input_event[TRANSACTION_ID] = f't-{input_event[TRANSACTION_ID]}'
     input_event['TransactionAmt'] = np.log10(input_event['TransactionAmt'])
-    input_event = pd.DataFrame.from_dict(input_event, orient='index').transpose()
+    
+    inputDF = pd.DataFrame.from_dict(input_event, orient='index').transpose()
 
     union_id_cols = transactions_id_cols + identities_cols 
 
-    target_id = input_event[TRANSACTION_ID].iloc[0]
+    target_id = inputDF[TRANSACTION_ID].iloc[0]
 
     for dummy in dummied_col:
         col_name = dummy[:2]
-        if input_event[col_name].iloc[0] == dummy[3:]:
-            input_event[dummy] = 1.0
+        if inputDF[col_name].iloc[0] == dummy[3:]:
+            inputDF[dummy] = 1.0
         else:
-            input_event[dummy] = 0.0
+            inputDF[dummy] = 0.0
             
-    transaction_value_cols = neighbor_cols+dummied_col        
-    trans_dict = [input_event[transaction_value_cols].iloc[0].fillna(0.0).to_dict()]
-    identity_dict = [input_event[union_id_cols].iloc[0].fillna(0.0).to_dict()]
-    logger.info(f'trans_dict len: {len(trans_dict[0].keys())}  key: {trans_dict[0].keys()}')
-    logger.info(f'trans_dict: {trans_dict[0]}')
-    logger.info(f'identity_dict len: {len(identity_dict[0].keys())}  key: {identity_dict[0].keys()}')
-    logger.info(f'identity_dict: {identity_dict[0]}')
-    logger.info(f'union_id_cols len: {len(union_id_cols)}')
-    logger.info(f'union_id_cols: {union_id_cols}')
+    transaction_value_cols = neighbor_cols+dummied_col
+    
+    transformedDF = inputDF[transaction_value_cols].fillna(0.0).apply(lambda row: json.dumps(dict(row), default=str), axis=1).to_frame('json') 
+    trans_dict = [{TRANSACTION_ID:target_id,
+                    'props_values': transformedDF.iloc[0]['json']}]
+    logger.debug(f'transformed trans dict is {trans_dict}')
+
+    identity_dict = [inputDF[union_id_cols].iloc[0].fillna(0.0).to_dict()]
     return trans_dict, identity_dict, target_id, transaction_value_cols, union_id_cols
 
 class GraphModelClient:
@@ -105,17 +109,22 @@ class GraphModelClient:
                 g.inject(attr_val_dict).unfold().as_(vertex_type).\
                 addV(vertex_type).as_('v').property(id,node_id).\
                 sideEffect(__.select(vertex_type).unfold().as_('kv').select('v').\
-                    property(__.select('kv').by(Column.keys),
+                    property(Cardinality.single, __.select('kv').by(Column.keys),
                                 __.select('kv').by(Column.values)
                                 )
                     ).iterate()
+            else:
+                logger.debug(f'Ignore inserting existing Vertex with id {node_id}')
 
             # Insert_edge
 
             to_node = g.V().has(id,node_id).next()
-            if(not g.E().has(id,target_id+'-'+node_id).hasNext()):
+            edgeId = target_id+'-'+node_id
+            if(not g.E().has(id,edgeId).hasNext()):
                 logger.info(f'Insert_Edge: {target_id} --> {node_id}.')
-                g.V().has(id,target_id).addE('CATEGORY').to(to_node).property(id,target_id+'-'+node_id).iterate() 
+                g.V().has(id,target_id).addE('CATEGORY').to(to_node).property(id,edgeId).iterate() 
+            else:
+                logger.debug(f'Ignore inserting existing edge with id {edgeId}')                
         
         conn = self.gremlin_utils.remote_connection()
         g = self.gremlin_utils.traversal_source(connection=conn) 
@@ -125,19 +134,18 @@ class GraphModelClient:
             g.inject(tr_dict).unfold().as_(vertex_type).\
             addV(vertex_type).as_('v').property(id,target_id).\
             sideEffect(__.select(vertex_type).unfold().as_('kv').select('v').\
-                property(__.select('kv').by(Column.keys),
+                property(Cardinality.single, __.select('kv').by(Column.keys),
                             __.select('kv').by(Column.values)
                             )
                 ).iterate()         
                 
-        attr_cols = [f'val{x}' for x in range(1,391)]
-        empty_node_dict ={}
-        for attr in attr_cols:
-            empty_node_dict[attr] = 0.0
-            
+        cols = {'val' + str(i + 1): '0.0' for i in range(390)}
         for node_k, node_v in connectted_node_dict[0].items():
             node_id = node_k + '-' + str(node_v)
-            insert_attr(g, [empty_node_dict], target_id, node_id, vertex_type = node_k)   
+            empty_node_dict = {}
+            empty_node_dict[attr_version_key] = json.dumps(cols)
+            empty_node_dict = [empty_node_dict]
+            insert_attr(g, empty_node_dict, target_id, node_id, vertex_type = node_k)   
 
         conn.close()                    
                     
@@ -176,13 +184,9 @@ class GraphModelClient:
         
         e_t = dt.now()
         logger.info(f'INSIDE query_target_subgraph: subgraph_dict used {(e_t - s_t).total_seconds()} seconds')
-        logger.info(f'subgraph_dict len: {len(subgraph_dict.keys())}  key: {subgraph_dict.keys()}')
-        logger.info(f'subgraph_dict: {subgraph_dict}')
         new_s_t = e_t
 
         union_li = [__.V().has(id,target_id).both().hasLabel(label).both().limit(MAX_FEATURE_NODE) for label in union_id_cols]
-        logger.info(f'union_id_cols len: {len(union_id_cols)}  key: {union_id_cols}')
-        logger.info(f'union_li len: {len(union_li)}  key: {union_li}')
 
         if len(union_id_cols) == 51:
             node_dict = g.V().has(id,target_id).union(__.both().hasLabel('card1').both().limit(MAX_FEATURE_NODE),\
@@ -205,29 +209,55 @@ class GraphModelClient:
         logger.info(f'INSIDE query_target_subgraph: node_dict used {(e_t - new_s_t).total_seconds()} seconds.')
         new_s_t = e_t
 
-        logger.info(f'node_dict len: {len(node_dict)}  key: {node_dict}')
-
+        logger.debug(f'Found {len(node_dict)} nodes from graph dbs...')
+        
+        class Item():
+            def __init__(self, item):
+                self.item = item
+        
+            def __hash__(self):
+                return hash(self.item.get(list(self.item)[0]))
+        
+            def __eq__(self,other):
+                if isinstance(other, self.__class__):
+                    return self.__hash__() == other.__hash__()
+                else:
+                    return NotImplemented
+        
+            def __repr__(self):
+                return "Item(%s)" % (self.item)
+                
+        node_dict = list(set([Item(node) for node in node_dict]))
+        logger.debug(f'Found {len(node_dict)} nodes without duplication')
         for item in node_dict:
+            item = item.item
             node = item.get(list(item)[0])
             node_value = node[(node.find('-')+1):]
-            neighbor_dict[node_value] = [item.get(key) for key in transaction_value_cols]
+            try:
+                logger.debug(f'the props of node {node} is {item.get(attr_version_key)}')
+                jsonVal = json.loads(item.get(attr_version_key))
+                neighbor_dict[node_value] = [jsonVal[key] for key in transaction_value_cols]
+                logger.debug(f'neighbor pair is {node_value}, {neighbor_dict[node_value]}')
+            except json.JSONDecodeError:
+                logger.warn(f'Malform node value {node} is {item.get(attr_version_key)}, run below cmd to remove it')
+                logger.info(f'g.V(\'{node}\').drop()')
 
         target_value = target_id[(target_id.find('-')+1):]
-        neighbor_dict[target_value] = [tr_dict[0].get(key) for key in transaction_value_cols]
+        jsonVal = json.loads(tr_dict[0].get(attr_version_key))
+        neighbor_dict[target_value] = [jsonVal[key] for key in transaction_value_cols]
         
-        logger.info(f'INSIDE query_target_subgraph: node_dict used {(e_t - new_s_t).total_seconds()} seconds.')
-        logger.info(f'neighbor_dict len: {len(neighbor_dict.keys())}  key: {neighbor_dict.keys()}')
-        logger.info(f'neighbor_dict: {neighbor_dict}')
-        
-        
+        logger.info(f'INSIDE query_target_subgraph: neighbor_dict used {(e_t - new_s_t).total_seconds()} seconds.')
+
         attr_cols = ['val'+str(x) for x in range(1,391)]
         for attr in feature_list:
             attr_name = attr[:attr.find('-')]
             attr_value = attr[(attr.find('-')+1):]
             attr_dict = g.V().has(id,attr).valueMap().toList()[0]
-            attr_dict = [attr_dict.get(key)[-1] for key in attr_cols]
+            logger.debug(f'attr is {attr}, dict is {attr_dict}')
+            jsonVal = json.loads(attr_dict.get(attr_version_key)[0])
+            attr_dict = [float(jsonVal[key]) for key in attr_cols]
             attr_input_dict = {}
-            attr_input_dict[attr_value] =  attr_dict
+            attr_input_dict[attr_value] = attr_dict
             transaction_embed_value_dict[attr_name] = attr_input_dict
         
         e_t = dt.now()
@@ -238,11 +268,7 @@ class GraphModelClient:
 
         conn.close()   
 
-        logger.info(f'transaction_embed_value_dict len: {len(transaction_embed_value_dict.keys())} key: {transaction_embed_value_dict.keys()}')
-        logger.info(f'transaction_embed_value_dict: {transaction_embed_value_dict}')
-
         return subgraph_dict, transaction_embed_value_dict    
-
 
 def invoke_endpoint_with_idx(endpointname, target_id, subgraph_dict, n_feats):
     """
@@ -265,21 +291,26 @@ def invoke_endpoint_with_idx(endpointname, target_id, subgraph_dict, n_feats):
         'n_feats': n_feats,
         'target_id': target_id
     }
-
+    
+    logger.debug(f'Invoke endpoint with data {payload}')
+    
     response = runtime.invoke_endpoint(EndpointName=endpointname,
                                             ContentType='application/json',
                                             Body=json.dumps(payload))
 
     res_body = response['Body'].read()
+    
+    logger.debug(f'Invoke endpoint with response {res_body}')
+    
     results = json.loads(res_body)
-
+    
     pred_prob = results
 
     return pred_prob
 
 
 def handler(event, context):
-
+    
     logger.info('Endpoint name: {}'.format(ENDPOINT_NAME))
     
     logger.info(f'Receive event: {event}')
@@ -316,7 +347,7 @@ def handler(event, context):
     data_output = {
                     'timestamp': int(time.time()),
                     'isFraud': pred_prob > MODEL_BTW,
-                    'id': event['transaction_data'][0]['TransactionID'],
+                    'id': transaction_id, #event['transaction_data'][0]['TransactionID'],
                     'amount': event['transaction_data'][0]['TransactionAmt'],
                     'productCD': event['transaction_data'][0]['ProductCD'],
                     'card1': event['transaction_data'][0]['card1'],
@@ -333,7 +364,7 @@ def handler(event, context):
                     'rEmaildomain': event['transaction_data'][0]['R_emaildomain'],
                 }
 
-    logger.info(f'Send transaction {data_output} to queue.')
+    logger.debug(f'Send transaction {data_output} to queue.')
     response = sqs.send_message(
         QueueUrl=QUEUE_URL,
         DelaySeconds=0,
@@ -347,5 +378,7 @@ def handler(event, context):
                     'pred_prob': pred_prob,
                     'time': (G_e_t - G_s_t).total_seconds()
                     }
-
+    
+    logger.info(f'Return function_res {function_res}.')
+    
     return function_res

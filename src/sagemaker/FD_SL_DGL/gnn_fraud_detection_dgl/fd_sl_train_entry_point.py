@@ -1,5 +1,7 @@
 import os
 import sys
+import json
+
 curPath = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(curPath)
 
@@ -149,15 +151,16 @@ def save_model(g, model, model_dir, id_to_node, mean, stdev):
         # create id dataframe
         node_ids_df = pd.DataFrame({'~label': [ntype] * num_nodes})
         node_ids_df['~id_tmp'] = old_id_list
-        node_ids_df['~id'] = node_ids_df['~label'] + '-' + node_ids_df['~id_tmp']
+        node_ids_df['~id'] = node_ids_df['~id_tmp'].apply(lambda col: f'{ntype}-{col}')
         node_ids_df['node_id'] = node_id_list
 
         # create feature dataframe columns
-        cols = {'val' + str(i + 1) + ':Double': node_feats[:, i] for i in range(num_feats)}
+        cols = {'val' + str(i + 1): node_feats[:, i] for i in range(num_feats)}
         node_feats_df = pd.DataFrame(cols)
+        json_props_df = node_feats_df.apply(lambda row: json.dumps(dict(row), default=str), axis=1).to_frame('props_values:String') 
 
         # merge id with feature, where feature_df use index
-        node_id_feats_df = node_ids_df.merge(node_feats_df, left_on='node_id', right_on=node_feats_df.index)
+        node_id_feats_df = node_ids_df.merge(json_props_df, left_on='node_id', right_on=json_props_df.index)
         # drop the id_tmp and node_id columns to follow the Grelim format requirements
         node_id_feats_df = node_id_feats_df.drop(['~id_tmp', 'node_id'], axis=1)
 

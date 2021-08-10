@@ -526,34 +526,6 @@ describe('training stack test suite', () => {
       PolicyDocument: {
         Statement: [
           {
-            Action: 'neptune-db:*',
-            Effect: 'Allow',
-            Resource: {
-              'Fn::Join': [
-                '',
-                [
-                  'arn:',
-                  {
-                    Ref: 'AWS::Partition',
-                  },
-                  ':neptune-db:',
-                  {
-                    Ref: 'AWS::Region',
-                  },
-                  ':',
-                  {
-                    Ref: 'AWS::AccountId',
-                  },
-                  ':',
-                  {
-                    Ref: 'referencetoTestStackDatabase1EBED910ClusterResourceId',
-                  },
-                  '/*',
-                ],
-              ],
-            },
-          },
-          {
             Action: [
               'glue:BatchDeletePartition',
               'glue:BatchGetPartition',
@@ -897,12 +869,6 @@ describe('training stack test suite', () => {
           ],
         },
         '--additional-python-modules': 'koalas==1.8.1',
-        '--neptune_endpoint': {
-          Ref: 'referencetoTestStackDatabase1EBED910Endpoint',
-        },
-        '--neptune_port': {
-          Ref: 'referencetoTestStackDatabase1EBED910Port',
-        },
       },
       GlueVersion: '2.0',
       MaxCapacity: 8,
@@ -1005,7 +971,7 @@ describe('training stack test suite', () => {
             {
               Ref: 'ETLCompDataCrawlerE8BE0214',
             },
-	          '"}}},"Data Process":{"Next":"Build hyperparameters","Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","ResultPath":"$.dataProcessOutput","Resource":"arn:',
+            '"}}},"Data Process":{"Next":"Build hyperparameters","Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","ResultPath":"$.dataProcessOutput","Resource":"arn:',
             {
               Ref: 'AWS::Partition',
             },
@@ -1024,7 +990,7 @@ describe('training stack test suite', () => {
                 'Arn',
               ],
             },
-            '","Payload.$":"$"},"ResultSelector":{"hyperParameters.$":"$.Payload.hyperParameters","inputDataUri.$":"$.Payload.inputDataUri"}},"Train model":{"Next":"Load the props to graph","Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","ResultPath":"$.trainingJobOutput","Resource":"arn:',
+            '","Payload.$":"$"},"ResultSelector":{"hyperParameters.$":"$.Payload.hyperParameters","inputDataUri.$":"$.Payload.inputDataUri"}},"Train model":{"Next":"Load the graph data to Graph database","Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","ResultPath":"$.trainingJobOutput","Resource":"arn:',
             {
               Ref: 'AWS::Partition',
             },
@@ -1059,7 +1025,7 @@ describe('training stack test suite', () => {
             {
               Ref: 'referencetoTestStackBucket80A092C2Ref',
             },
-            '/fraud-detection/model_output"},"ResourceConfig":{"VolumeSizeInGB":50,"InstanceCount.$":"$.parameters.trainingJob.instanceCount","InstanceType.$":"$.parameters.trainingJob.instanceType"},"StoppingCondition":{"MaxRuntimeInSeconds.$":"$.parameters.trainingJob.timeoutInSeconds"},"HyperParameters.$":"$.trainingParametersOutput.hyperParameters"},"ResultSelector":{"TrainingJobName.$":"$.TrainingJobName","ModelArtifacts.$":"$.ModelArtifacts"}},"Load the props to graph":{"Next":"Package model with code","Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","TimeoutSeconds":7200,"ResultPath":null,"Resource":"arn:',
+            '/fraud-detection/model_output"},"ResourceConfig":{"VolumeSizeInGB":50,"InstanceCount.$":"$.parameters.trainingJob.instanceCount","InstanceType.$":"$.parameters.trainingJob.instanceType"},"StoppingCondition":{"MaxRuntimeInSeconds.$":"$.parameters.trainingJob.timeoutInSeconds"},"HyperParameters.$":"$.trainingParametersOutput.hyperParameters"},"ResultSelector":{"TrainingJobName.$":"$.TrainingJobName","ModelArtifacts.$":"$.ModelArtifacts"}},"Load the graph data to Graph database":{"Next":"Package model with code","Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","TimeoutSeconds":7200,"ResultPath":null,"Resource":"arn:',
             {
               Ref: 'AWS::Partition',
             },
@@ -1070,7 +1036,7 @@ describe('training stack test suite', () => {
                 'Arn',
               ],
             },
-            '","TaskDefinition":"training-pipeline-load-props","NetworkConfiguration":{"AwsvpcConfiguration":{"Subnets":["',
+            '","TaskDefinition":"training-pipeline-load-graph-data","NetworkConfiguration":{"AwsvpcConfiguration":{"Subnets":["',
             {
               Ref: 'referencetoTestStackVpcPrivateSubnet1Subnet707BB947Ref',
             },
@@ -1081,7 +1047,7 @@ describe('training stack test suite', () => {
             '"],"SecurityGroups":["',
             {
               'Fn::GetAtt': [
-                'LoadPropsSGED21E180',
+                'LoadGraphDataSG283ACCD0',
                 'GroupId',
               ],
             },
@@ -1101,7 +1067,7 @@ describe('training stack test suite', () => {
             {
               Ref: 'AWS::Region',
             },
-            '","--neptune_iam_role_arn","arn:aws::123456789012:role/neptune-role"],"Environment":[{"Name":"MODEL_PACKAGE","Value.$":"$.trainingJobOutput.ModelArtifacts.S3ModelArtifacts"},{"Name":"JOB_NAME","Value.$":"$.trainingJobOutput.TrainingJobName"}]}]},"LaunchType":"FARGATE","PlatformVersion":"1.4.0"}},"Package model with code":{"Next":"Create model","Retry":[{"ErrorEquals":["Lambda.ServiceException","Lambda.AWSLambdaException","Lambda.SdkClientException"],"IntervalSeconds":2,"MaxAttempts":6,"BackoffRate":2}],"Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","TimeoutSeconds":900,"ResultPath":"$.modelPackagingOutput","Resource":"arn:',
+            '","--neptune_iam_role_arn","arn:aws::123456789012:role/neptune-role"],"Environment":[{"Name":"MODEL_PACKAGE","Value.$":"$.trainingJobOutput.ModelArtifacts.S3ModelArtifacts"},{"Name":"JOB_NAME","Value.$":"$.trainingJobOutput.TrainingJobName"},{"Name":"GRAPH_DATA_PATH","Value.$":"$.trainingParametersOutput.inputDataUri"}]}]},"LaunchType":"FARGATE","PlatformVersion":"1.4.0"}},"Package model with code":{"Next":"Create model","Retry":[{"ErrorEquals":["Lambda.ServiceException","Lambda.AWSLambdaException","Lambda.SdkClientException"],"IntervalSeconds":2,"MaxAttempts":6,"BackoffRate":2}],"Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","TimeoutSeconds":900,"ResultPath":"$.modelPackagingOutput","Resource":"arn:',
             {
               Ref: 'AWS::Partition',
             },
@@ -1141,7 +1107,7 @@ describe('training stack test suite', () => {
             {
               Ref: 'AWS::URLSuffix',
             },
-            '/pytorch-inference:1.6.0-cpu-py36-ubuntu16.04","Mode":"SingleModel","ModelDataUrl.$":"$.modelPackagingOutput.RepackagedArtifact","Environment":{"SAGEMAKER_PROGRAM":"fd_sl_deployment_entry_point.py","HIDDEN_SIZE.$":"$.parameters.trainingJob.hyperparameters[\'n-hidden\']"}}},"ResultSelector":{"ModelArn.$":"$.ModelArn"}},"Create endpoint config":{"Next":"Check the existence of endpoint","Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","ResultPath":"$.endpointConfigOutput","Resource":"arn:',
+            "/pytorch-inference:1.6.0-cpu-py36-ubuntu16.04\",\"Mode\":\"SingleModel\",\"ModelDataUrl.$\":\"$.modelPackagingOutput.RepackagedArtifact\",\"Environment\":{\"SAGEMAKER_PROGRAM\":\"fd_sl_deployment_entry_point.py\",\"HIDDEN_SIZE.$\":\"$.parameters.trainingJob.hyperparameters['n-hidden']\"}}},\"ResultSelector\":{\"ModelArn.$\":\"$.ModelArn\"}},\"Create endpoint config\":{\"Next\":\"Check the existence of endpoint\",\"Catch\":[{\"ErrorEquals\":[\"States.ALL\"],\"ResultPath\":\"$.error\",\"Next\":\"Fail\"}],\"Type\":\"Task\",\"ResultPath\":\"$.endpointConfigOutput\",\"Resource\":\"arn:",
             {
               Ref: 'AWS::Partition',
             },

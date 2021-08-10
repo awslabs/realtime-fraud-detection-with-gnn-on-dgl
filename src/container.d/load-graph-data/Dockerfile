@@ -14,7 +14,7 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2
     && rm -rf awscliv2.zip aws/
 RUN python -m pip install --user boto3
     
-COPY container.d/load-properties/bulk-load.py container.d/load-properties/prepare-data.sh /app/
+COPY container.d/load-graph-data/bulk-load.py container.d/load-graph-data/prepare-data.sh /app/
 COPY --from=builder /data/site-packages/ /var/lang/lib/python3.8/site-packages/
 
 ENTRYPOINT ["python", "/app/bulk-load.py"]

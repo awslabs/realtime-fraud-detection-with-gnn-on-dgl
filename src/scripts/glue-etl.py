@@ -1,6 +1,9 @@
 import sys
+
+from pandas.core.frame import DataFrame
 from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
+from pyspark.sql.functions import concat_ws, to_json, struct
 from awsglue.context import GlueContext
 from awsglue.dynamicframe import DynamicFrame
 from awsglue.transforms import DropFields, SelectFields
@@ -8,9 +11,6 @@ import pyspark.sql.functions as fc
 from io import BytesIO, StringIO
 import boto3
 from urllib.parse import urlparse
-from neptune_python_utils.gremlin_utils import GremlinUtils
-from neptune_python_utils.endpoints import Endpoints
-from neptune_python_utils.glue_gremlin_client import GlueGremlinClient
 from neptune_python_utils.glue_gremlin_csv_transforms import GlueGremlinCsvTransforms
 import databricks.koalas as ks
 
@@ -60,9 +60,13 @@ def get_relations_and_edgelist(transactions_df, identity_df, transactions_id_col
         edges[etype] = edgelist
     return edges
 
-def dump_df_to_s3(df, objectName, header = True):
-    objectKey = f"{args['output_prefix']}{args['JOB_RUN_ID']}/{objectName}"
-    logger.info(f'Dumping df to s3 object {objectKey}')
+def dump_df_to_s3(df, objectName, header = True, graph = False):
+    if graph == False:
+        objectKey = f"{args['output_prefix']}{args['JOB_RUN_ID']}/{objectName}"
+        logger.info(f'Dumping edge "{objectName}"" to bucekt prefix {objectKey}')
+    else:
+        objectKey = f"{args['output_prefix']}{args['JOB_RUN_ID']}/graph/{objectName}"
+        logger.info(f'Dumping edge "{objectName}" as graph to bucket prefix {objectKey}')
     glueContext.write_dynamic_frame.from_options(
         frame=DynamicFrame.fromDF(df, glueContext, f"{objectName}DF"),
         connection_type="s3",
@@ -70,14 +74,7 @@ def dump_df_to_s3(df, objectName, header = True):
         format_options={"writeHeader": header},
         format="csv")
 
-def create_catagory_and_relation(name, dataframe, gremlin_client):
-    # upsert category vertices
-    cateDF = dataframe.select(name).distinct()
-    dynamic_df = DynamicFrame.fromDF(cateDF, glueContext, f'{name}DF')
-    category_df = GlueGremlinCsvTransforms.create_prefixed_columns(dynamic_df, [('~id', name, name)])
-    logger.info(f'Upserting category \'{name}\' as vertices of graph...')
-    category_df.toDF().foreachPartition(gremlin_client.upsert_vertices(name, batch_size=100))
-
+def dump_edge_as_graph(name, dataframe):
     # upsert edge
     logger.info(f'Creating glue dynamic frame from spark dataframe for the relation between transaction and {name}...')
     dynamic_df = DynamicFrame.fromDF(dataframe, glueContext, f'{name}EdgeDF')
@@ -85,7 +82,7 @@ def create_catagory_and_relation(name, dataframe, gremlin_client):
     relation = GlueGremlinCsvTransforms.create_edge_id_column(relation, '~from', '~to')
     relation = SelectFields.apply(frame = relation, paths = ["~id", '~from', '~to'], transformation_ctx = f'selection_{name}')
     logger.info(f'Upserting edges between \'{name}\' and transaction...')
-    relation.toDF().foreachPartition(gremlin_client.upsert_edges('CATEGORY', batch_size=100))
+    dump_df_to_s3(relation.toDF(), f'relation_{name}_edgelist', graph = True)
 
 def sum_col(df, col):
     return df.select(fc.sum(col)).collect()[0][0]
@@ -104,16 +101,9 @@ args = getResolvedOptions(sys.argv,
                            'id_cols',
                            'cat_cols',
                            'output_prefix',
-                           'region',
-                           'neptune_endpoint',
-                           'neptune_port'])
+                           'region'])
 
 logger.info(f'Resolved options are: {args}')
-
-GremlinUtils.init_statics(globals())
-endpoints = Endpoints(neptune_endpoint=args['neptune_endpoint'], neptune_port=args['neptune_port'], region_name=args['region'])
-logger.info(f'Initializing gremlin client to Neptune ${endpoints.gremlin_endpoint()}.')
-gremlin_client = GlueGremlinClient(endpoints)
 
 TRANSACTION_ID = 'TransactionID'
 
@@ -135,21 +125,25 @@ id_cols = args['id_cols']
 cat_cols = args['cat_cols']
 features_df, labels_df = get_features_and_labels(transactions.toDF(), id_cols, cat_cols)
 
-# Creating glue dynamic frame from spark dataframe
-features_dynamic_df = DynamicFrame.fromDF(features_df, glueContext, 'FeaturesDF')
-features_dynamic_df = GlueGremlinCsvTransforms.create_prefixed_columns(features_dynamic_df, [('~id', TRANSACTION_ID, 't')])
-logger.info(f'Upserting transactions as vertices of graph...')
-features_dynamic_df.toDF().foreachPartition(gremlin_client.upsert_vertices('Transaction', batch_size=50))
-logger.info(f'Creating glue DF from labels dataframe')
-labels_dynamic_df = DynamicFrame.fromDF(labels_df, glueContext, 'LabelsDF')
-labels_dynamic_df = GlueGremlinCsvTransforms.create_prefixed_columns(labels_dynamic_df, [('~id', TRANSACTION_ID, 't')])
-logger.info(f'Upserting transactions with isFraud property...')
-labels_dynamic_df.toDF().foreachPartition(gremlin_client.upsert_vertices('Transaction', batch_size=100))
-
+logger.info(f'Dumping features and labels for training...')
 dump_df_to_s3(features_df, 'features')
 dump_df_to_s3(labels_df, 'tags')
+
+featurs_graph_df = features_df.withColumn('props_values:String', to_json(struct(list(filter(lambda x: (x != TRANSACTION_ID), features_df.schema.names)))))
+featurs_graph_df = featurs_graph_df.select('TransactionID','props_values:String')
+
+logger.info(f'Creating glue dynamic frame from spark dataframe...')
+features_graph_dynamic_df = DynamicFrame.fromDF(featurs_graph_df, glueContext, 'FeaturesDF')
+features_graph_dynamic_df = GlueGremlinCsvTransforms.create_prefixed_columns(features_graph_dynamic_df, [('~id', TRANSACTION_ID, 't')])
+features_graph_dynamic_df = GlueGremlinCsvTransforms.addLabel(features_graph_dynamic_df,'Transaction')
+features_graph_dynamic_df = SelectFields.apply(frame = features_graph_dynamic_df, paths = ["~id",'~label', 'props_values:String'])
+logger.info(f'Dumping transaction data as graph data...')
+dump_df_to_s3(features_graph_dynamic_df.toDF(), f'transaction', graph = True)
+
 relational_edges = get_relations_and_edgelist(transactions.toDF(), identities.toDF(), id_cols)
 for name, df in relational_edges.items():
     if name != TRANSACTION_ID:
+        logger.info(f'Dumping edge {name} for training...')
         dump_df_to_s3(df, f'relation_{name}_edgelist')
-        create_catagory_and_relation(name, df, gremlin_client)
+        logger.info(f'Dumping edge {name} as graph data...')
+        dump_edge_as_graph(name, df)

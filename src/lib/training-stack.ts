@@ -106,7 +106,6 @@ export class TrainingStack extends NestedStack {
       identityPrefix,
       bucket: props.bucket,
       vpc: props.vpc,
-      neptune: props.neptune.cluster,
       dataColumnsArg: props.dataColumnsArg,
     });
     this.glueJobSG = etlConstruct.glueJobSG;
@@ -346,17 +345,18 @@ export class TrainingStack extends NestedStack {
       containerInsights: true,
     });
 
-    const loadPropTaskRole = new Role(this, 'LoadPropertiesECSTaskRole', {
+    const loadGraphDataTaskRole = new Role(this, 'LoadGraphDataECSTaskRole', {
       assumedBy: new ServicePrincipal('ecs-tasks.amazonaws.com'),
     });
-    props.neptune.cluster.grantConnect(loadPropTaskRole);
-    props.bucket.grantRead(loadPropTaskRole, `${modelOutputPrefix}/*`);
-    props.bucket.grantWrite(loadPropTaskRole, `${props.neptune.loadObjectPrefix}/*`);
+    props.neptune.cluster.grantConnect(loadGraphDataTaskRole);
+    props.bucket.grantRead(loadGraphDataTaskRole, `${modelOutputPrefix}/*`);
+    props.bucket.grantRead(loadGraphDataTaskRole, `${etlConstruct.processedOutputPrefix}*`);
+    props.bucket.grantWrite(loadGraphDataTaskRole, `${props.neptune.loadObjectPrefix}/*`);
 
     const taskVolumeName = 'efs-volume';
-    const loadPropTaskDefinition = new FargateTaskDefinition(this, 'LoadPropertiesToGraphTask', {
-      family: 'training-pipeline-load-props',
-      taskRole: loadPropTaskRole,
+    const loadGraphDataTaskDefinition = new FargateTaskDefinition(this, 'LoadGraphDataToGraphDBsTask', {
+      family: 'training-pipeline-load-graph-data',
+      taskRole: loadGraphDataTaskRole,
       memoryLimitMiB: 1024,
       cpu: 256,
       volumes: [
@@ -373,11 +373,11 @@ export class TrainingStack extends NestedStack {
       ],
     });
 
-    const loadPropertiesImage = new DockerImageAsset(this, 'LoadPropertiesImage', {
+    const loadGraphDataImage = new DockerImageAsset(this, 'BulkLoadGraphDataImage', {
       directory: path.join(__dirname, '../'),
-      file: 'container.d/load-properties/Dockerfile',
+      file: 'container.d/load-graph-data/Dockerfile',
       exclude: [
-        'container.d/(!load-properties)',
+        'container.d/(!load-graph-data)',
         'lambda.d/**',
         'lib/**',
         'sagemaker/**',
@@ -387,36 +387,36 @@ export class TrainingStack extends NestedStack {
       ],
       ignoreMode: IgnoreMode.GLOB,
     });
-    const loadPropTaskContainer = loadPropTaskDefinition.addContainer('container', {
-      image: ContainerImage.fromDockerImageAsset(loadPropertiesImage),
+    const loadGraphDataTaskContainer = loadGraphDataTaskDefinition.addContainer('container', {
+      image: ContainerImage.fromDockerImageAsset(loadGraphDataImage),
       memoryLimitMiB: 512,
       logging: LogDrivers.awsLogs({
-        streamPrefix: 'fraud-detection-training-pipeline-load-prop-to-graph-dbs',
+        streamPrefix: 'fraud-detection-training-pipeline-load-graph-data-to-graph-dbs',
       }),
     });
-    loadPropTaskContainer.addMountPoints({
+    loadGraphDataTaskContainer.addMountPoints({
       containerPath: mountPoint,
       readOnly: false,
       sourceVolume: taskVolumeName,
     });
 
-    this.loadPropsSG = new SecurityGroup(this, 'LoadPropsSG', {
+    this.loadPropsSG = new SecurityGroup(this, 'LoadGraphDataSG', {
       allowAllOutbound: true,
-      description: 'SG for Loading props to graph dbs in training pipeline',
+      description: 'SG for Loading graph data to graph dbs in training pipeline',
       vpc: props.vpc,
     });
-    fileSystem.connections.allowDefaultPortFrom(this.loadPropsSG, 'allow requests from Load Props Fargate');
-    const runLoadPropsTask = new EcsRunTask(this, 'Load the props to graph', {
+    fileSystem.connections.allowDefaultPortFrom(this.loadPropsSG, 'allow requests from loading graph data Fargate');
+    const runLoadGraphDataTask = new EcsRunTask(this, 'Load the graph data to Graph database', {
       integrationPattern: IntegrationPattern.RUN_JOB,
       cluster: ecsCluster,
-      taskDefinition: loadPropTaskDefinition,
+      taskDefinition: loadGraphDataTaskDefinition,
       assignPublicIp: false,
       subnets: {
         subnetType: SubnetType.PRIVATE,
       },
       securityGroups: [this.loadPropsSG],
       containerOverrides: [{
-        containerDefinition: loadPropTaskContainer,
+        containerDefinition: loadGraphDataTaskContainer,
         command: [
           '--data_prefix',
           props.bucket.s3UrlForObject(props.neptune.loadObjectPrefix),
@@ -439,6 +439,10 @@ export class TrainingStack extends NestedStack {
           {
             name: 'JOB_NAME',
             value: TaskInput.fromJsonPathAt('$.trainingJobOutput.TrainingJobName').value,
+          },
+          {
+            name: 'GRAPH_DATA_PATH',
+            value: TaskInput.fromJsonPathAt('$.trainingParametersOutput.inputDataUri').value,
           },
         ],
       }],
@@ -642,7 +646,7 @@ export class TrainingStack extends NestedStack {
       .next(dataProcessTask)
       .next(hyperParaTask)
       .next(trainingJobTask)
-      .next(runLoadPropsTask)
+      .next(runLoadGraphDataTask)
       .next(modelRepackagingTask)
       .next(createModelTask)
       .next(createEndpointConfigTask)

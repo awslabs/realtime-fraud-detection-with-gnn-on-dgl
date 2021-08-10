@@ -133,7 +133,7 @@ def parse_edgelist(edges, id_to_node, header=False, source_type='user', sink_typ
     source_pointer, sink_pointer = 0, 0
     with open(edges, "r") as fh:
         for i, line in enumerate(fh):
-            source, sink = line.strip().split(",")
+            source, sink = [col.strip('"') for col in line.strip().split(",")]
             if i == 0:
                 if header:
                     source_type, sink_type = source, sink
