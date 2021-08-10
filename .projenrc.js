@@ -8,7 +8,7 @@ const tsExcludeConfig = {
 };
 
 const project = new AwsCdkTypeScriptApp({
-  cdkVersion: '1.109.0',
+  cdkVersion: '1.117.0',
   name: 'realtime-fraud-detection-with-gnn-on-dgl',
   /* AwsCdkTypeScriptAppOptions */
   // appEntrypoint: 'main.ts',                                                 /* The CDK app's entrypoint (relative to the source directory, which is "src" by default). */
@@ -60,12 +60,12 @@ const project = new AwsCdkTypeScriptApp({
   // bundledDeps: undefined,                                                   /* List of dependencies to bundle into this module. */
   deps: [
     'object-hash',
-    '@aws-sdk/client-glue@^3.16.0',
-    '@aws-sdk/client-secrets-manager@^3.16.0',
-    '@aws-sdk/client-sts@^3.16.0',
-    '@aws-sdk/client-serverlessapplicationrepository@^3.16.0',
-    '@aws-sdk/client-lambda@^3.16.0',
-    '@aws-sdk/client-cloudformation@^3.16.0',
+    '@aws-sdk/client-glue@^3.25.0',
+    '@aws-sdk/client-secrets-manager@^3.25.0',
+    '@aws-sdk/client-sts@^3.25.0',
+    '@aws-sdk/client-serverlessapplicationrepository@^3.25.0',
+    '@aws-sdk/client-lambda@^3.25.0',
+    '@aws-sdk/client-cloudformation@^3.25.0',
     'cfn-custom-resource@^5.0.12',
     'sync-fetch@^0.3.0',
     'mongodb@^3.6.6',
