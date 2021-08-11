@@ -1,9 +1,9 @@
-import { GatewayVpcEndpointAwsService, Vpc, FlowLogDestination, SubnetType, IVpc } from '@aws-cdk/aws-ec2';
-import { Role, ServicePrincipal, PolicyDocument, PolicyStatement } from '@aws-cdk/aws-iam';
+import { GatewayVpcEndpointAwsService, Vpc, FlowLogDestination, SubnetType, IVpc, SecurityGroup } from '@aws-cdk/aws-ec2';
+import { Role, ServicePrincipal } from '@aws-cdk/aws-iam';
 import { ClusterParameterGroup, ParameterGroup, DatabaseCluster, InstanceType, IDatabaseCluster, CfnDBInstance } from '@aws-cdk/aws-neptune';
 import { Bucket, BucketEncryption, IBucket } from '@aws-cdk/aws-s3';
 import { Queue, QueueEncryption } from '@aws-cdk/aws-sqs';
-import { Construct, RemovalPolicy, Stack, StackProps, Duration, CfnParameter, CfnOutput } from '@aws-cdk/core';
+import { Construct, RemovalPolicy, Stack, StackProps, Duration, CfnParameter, CfnOutput, CfnResource } from '@aws-cdk/core';
 import * as pjson from '../../package.json';
 import { TransactionDashboardStack } from './dashboard-stack';
 import { InferenceStack } from './inference-stack';
@@ -12,6 +12,12 @@ import { TrainingStack } from './training-stack';
 export class FraudDetectionStack extends Stack {
   constructor(scope: Construct, id: string, props: StackProps = {}) {
     super(scope, id, props);
+
+    const accessLogBucket = new Bucket(this, 'BucketAccessLog', {
+      encryption: BucketEncryption.S3_MANAGED,
+      removalPolicy: RemovalPolicy.RETAIN,
+      serverAccessLogsPrefix: 'accessLogBucketAccessLog',
+    });
 
     const vpcId = this.node.tryGetContext('vpcId');
     const vpc = vpcId ? Vpc.fromLookup(this, 'FraudDetectionVpc', {
@@ -30,19 +36,13 @@ export class FraudDetectionStack extends Stack {
         },
       });
       newVpc.addFlowLog('VpcFlowlogs', {
-        destination: FlowLogDestination.toS3(),
+        destination: FlowLogDestination.toS3(accessLogBucket, 'vpcFlowLogs'),
       });
       return newVpc;
     })();
     if (vpc.privateSubnets.length < 1) {
       throw new Error('The VPC must have PRIVATE subnet.');
     }
-
-    const accessLogBucket = new Bucket(this, 'BucketAccessLog', {
-      encryption: BucketEncryption.S3_MANAGED,
-      removalPolicy: RemovalPolicy.RETAIN,
-      serverAccessLogsPrefix: 'accessLogBucketAccessLog',
-    });
 
     const bucket = new Bucket(this, 'FraudDetectionDataBucket', {
       encryption: BucketEncryption.S3_MANAGED,
@@ -86,9 +86,6 @@ export class FraudDetectionStack extends Stack {
       dataColumnsArg: dataColumnsArg,
     });
 
-    neptuneInfo.cluster.connections.allowDefaultPortFrom(trainingStack.glueJobSG, 'access from glue job.');
-    neptuneInfo.cluster.connections.allowDefaultPortFrom(trainingStack.loadPropsSG, 'access from load props fargate task.');
-
     const tranQueue = new Queue(this, 'TransQueue', {
       contentBasedDeduplication: true,
       encryption: QueueEncryption.KMS_MANAGED,
@@ -114,8 +111,6 @@ export class FraudDetectionStack extends Stack {
       sagemakerEndpointName: trainingStack.endpointName,
       dataColumnsArg: dataColumnsArg,
     });
-
-    neptuneInfo.cluster.connections.allowDefaultPortFrom(inferenceStack.inferenceSG, 'access from inference job.');
 
     const inferenceFnArn = inferenceStack.inferenceFn.functionArn;
     const interParameterGroups = [
@@ -191,22 +186,26 @@ export class FraudDetectionStack extends Stack {
 
     const neptuneRole = new Role(this, 'NeptuneBulkLoadRole', {
       assumedBy: new ServicePrincipal('rds.amazonaws.com'),
-      inlinePolicies: {
-        kms: new PolicyDocument({
-          statements: [
-            new PolicyStatement({
-              actions: [
-                'kms:Decrypt',
-              ],
-              resources: ['*'],
-            }),
-          ],
-        }),
-      },
     });
     const neptuneLoadObjectPrefix = `${dataPrefix}neptune/bulk-load`;
     bucket.grantRead(neptuneRole, `${neptuneLoadObjectPrefix}/*`);
 
+    const graphDBSG = new SecurityGroup(this, 'NeptuneSG', {
+      vpc,
+      allowAllOutbound: true,
+    });
+    (graphDBSG.node.defaultChild as CfnResource).addMetadata('cfn_nag', {
+      rules_to_suppress: [
+        {
+          id: 'W40',
+          reason: 'Neptune bulk load need internet access to query S3 endpoint',
+        },
+        {
+          id: 'W5',
+          reason: 'Neptune bulk load need internet access to query S3 endpoint',
+        },
+      ],
+    });
     const graphDBCluster = new DatabaseCluster(this, 'TransactionGraphCluster', {
       vpc,
       instanceType: InstanceType.of(instanceType),
@@ -222,6 +221,7 @@ export class FraudDetectionStack extends Stack {
       instances: 1 + replicaCount,
       removalPolicy: RemovalPolicy.DESTROY,
       backupRetention: Duration.days(7),
+      securityGroups: [graphDBSG],
     });
     graphDBCluster.node.findAll().filter(c => (c as CfnDBInstance).cfnOptions)
       .forEach(c => (c as CfnDBInstance).autoMinorVersionUpgrade = true);

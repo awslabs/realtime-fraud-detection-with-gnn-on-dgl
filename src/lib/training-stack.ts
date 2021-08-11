@@ -1,10 +1,11 @@
 import * as path from 'path';
-import { IVpc, ISecurityGroup, InstanceType, InstanceClass, InstanceSize, SecurityGroup, SubnetType } from '@aws-cdk/aws-ec2';
+import { IVpc, InstanceType, InstanceClass, InstanceSize, SecurityGroup, SubnetType } from '@aws-cdk/aws-ec2';
 import { Repository } from '@aws-cdk/aws-ecr';
 import { DockerImageAsset, DockerImageAssetProps } from '@aws-cdk/aws-ecr-assets';
 import { Cluster, FargateTaskDefinition, ContainerImage, LogDrivers, FargatePlatformVersion } from '@aws-cdk/aws-ecs';
 import { FileSystem, LifecyclePolicy } from '@aws-cdk/aws-efs';
 import { PolicyStatement, Effect, Role, ServicePrincipal } from '@aws-cdk/aws-iam';
+import { Key } from '@aws-cdk/aws-kms';
 import { Runtime, LayerVersion, Code, Tracing, FileSystem as LambdaFileSystem } from '@aws-cdk/aws-lambda';
 import { NodejsFunction } from '@aws-cdk/aws-lambda-nodejs';
 import { PythonFunction } from '@aws-cdk/aws-lambda-python';
@@ -14,12 +15,12 @@ import { IBucket } from '@aws-cdk/aws-s3';
 import { BucketDeployment, Source } from '@aws-cdk/aws-s3-deployment';
 import { IntegrationPattern, StateMachine, Fail, Errors, TaskInput, LogLevel, JsonPath, Choice, Condition } from '@aws-cdk/aws-stepfunctions';
 import { LambdaInvoke, S3DataType, GlueStartJobRun, SageMakerCreateModel, S3Location, ContainerDefinition, Mode, DockerImage, SageMakerCreateEndpointConfig, SageMakerCreateEndpoint, SageMakerUpdateEndpoint, EcsRunTask, EcsFargateLaunchTarget, SageMakerCreateTrainingJob, InputMode } from '@aws-cdk/aws-stepfunctions-tasks';
-import { Construct, Duration, NestedStack, NestedStackProps, Arn, Stack, CfnMapping, Aws, RemovalPolicy, IgnoreMode, Size, Token } from '@aws-cdk/core';
+import { Construct, Duration, NestedStack, NestedStackProps, Arn, Stack, CfnMapping, Aws, RemovalPolicy, IgnoreMode, Size, Token, CfnResource, Aspects } from '@aws-cdk/core';
 import { AwsCliLayer } from '@aws-cdk/lambda-layer-awscli';
 import { getDatasetMapping, IEEE } from './dataset';
 import { ETLByGlue } from './etl-glue';
 import { WranglerLayer } from './layer';
-import { dirArtifactHash } from './utils';
+import { dirArtifactHash, CfnNagWhitelist, grantKmsKeyPerm } from './utils';
 
 export interface TrainingStackProps extends NestedStackProps {
   readonly bucket: IBucket;
@@ -38,12 +39,17 @@ export interface TrainingStackProps extends NestedStackProps {
 }
 
 export class TrainingStack extends NestedStack {
-  readonly glueJobSG: ISecurityGroup;
-  readonly loadPropsSG: ISecurityGroup;
   readonly endpointName = 'FraudDetection'.toLowerCase();
 
   constructor(scope: Construct, id: string, props: TrainingStackProps) {
     super(scope, id, props);
+
+    const kmsKey = new Key(this, 'realtime-fraud-detection-with-gnn-on-dgl-training', {
+      alias: 'realtime-fraud-detection-with-gnn-on-dgl/training',
+      enableKeyRotation: true,
+      trustAccountIdentities: true,
+      removalPolicy: RemovalPolicy.DESTROY,
+    });
 
     const dataPrefix = props.dataPrefix;
     const transactionPrefix = `${dataPrefix}transactions`;
@@ -106,9 +112,9 @@ export class TrainingStack extends NestedStack {
       identityPrefix,
       bucket: props.bucket,
       vpc: props.vpc,
+      key: kmsKey,
       dataColumnsArg: props.dataColumnsArg,
     });
-    this.glueJobSG = etlConstruct.glueJobSG;
 
     const dataCatalogCrawlerFn = new NodejsFunction(this, 'DataCatalogCrawler', {
       entry: path.join(__dirname, '../lambda.d/crawl-data-catalog/index.ts'),
@@ -254,9 +260,23 @@ export class TrainingStack extends NestedStack {
       errors: [Errors.ALL],
       resultPath: '$.error',
     });
+    (trainingJobTask.node.findChild('SagemakerRole').node.defaultChild as CfnResource)
+      .addMetadata('cfn_nag', {
+        rules_to_suppress: [
+          {
+            id: 'W11',
+            reason: 'wildcard in IAM policy is used for creating training job of SageMaker by CDK',
+          },
+        ],
+      });
 
+    const efsSG = new SecurityGroup(this, 'TrainingEFSSG', {
+      vpc: props.vpc,
+      allowAllOutbound: false,
+    });
     const fileSystem = new FileSystem(this, 'TempFilesystem', {
       vpc: props.vpc,
+      securityGroup: efsSG,
       encrypted: true,
       removalPolicy: RemovalPolicy.DESTROY,
       lifecyclePolicy: LifecyclePolicy.AFTER_14_DAYS,
@@ -284,10 +304,22 @@ export class TrainingStack extends NestedStack {
       retainOnDelete: false,
     });
 
-    const sg = new SecurityGroup(this, 'ModelRepackageSG', {
+    const modelRepackageSG = new SecurityGroup(this, 'ModelRepackageSG', {
       allowAllOutbound: true,
       description: 'SG for Model Repackage SG',
       vpc: props.vpc,
+    });
+    (modelRepackageSG.node.defaultChild as CfnResource).addMetadata('cfn_nag', {
+      rules_to_suppress: [
+        {
+          id: 'W40',
+          reason: 'Model repackage func need internet access to query S3 endpoint',
+        },
+        {
+          id: 'W5',
+          reason: 'Model repackage func need internet access to query S3 endpoint',
+        },
+      ],
     });
     const mountPoint = '/mnt/efs';
     const modelRepackageFunc = new PythonFunction(this, 'ModelRepackageFunc', {
@@ -310,11 +342,11 @@ export class TrainingStack extends NestedStack {
       vpcSubnets: props.vpc.selectSubnets({
         subnetType: SubnetType.PRIVATE,
       }),
-      securityGroup: sg,
+      securityGroup: modelRepackageSG,
       tracing: Tracing.ACTIVE,
     });
 
-    fileSystem.connections.allowDefaultPortFrom(sg, 'allow requests from Model Repackage Func');
+    fileSystem.connections.allowDefaultPortFrom(modelRepackageSG, 'allow requests from Model Repackage Func');
     props.bucket.grantRead(modelRepackageFunc, `${codePrefix}/*`);
     props.bucket.grantReadWrite(modelRepackageFunc, `${modelOutputPrefix}/*`);
 
@@ -352,6 +384,15 @@ export class TrainingStack extends NestedStack {
     props.bucket.grantRead(loadGraphDataTaskRole, `${modelOutputPrefix}/*`);
     props.bucket.grantRead(loadGraphDataTaskRole, `${etlConstruct.processedOutputPrefix}*`);
     props.bucket.grantWrite(loadGraphDataTaskRole, `${props.neptune.loadObjectPrefix}/*`);
+    (loadGraphDataTaskRole.node.findChild('DefaultPolicy').node.defaultChild as CfnResource)
+      .addMetadata('cfn_nag', {
+        rules_to_suppress: [
+          {
+            id: 'F4',
+            reason: 'neptune only has connect action',
+          },
+        ],
+      });
 
     const taskVolumeName = 'efs-volume';
     const loadGraphDataTaskDefinition = new FargateTaskDefinition(this, 'LoadGraphDataToGraphDBsTask', {
@@ -387,11 +428,19 @@ export class TrainingStack extends NestedStack {
       ],
       ignoreMode: IgnoreMode.GLOB,
     });
+    const bulkLoadGraphLogGroupName = `/realtime-fraud-detection-with-gnn-on-dgl/training/BulkLoadGraphData-${this.stackName}`;
+    grantKmsKeyPerm(kmsKey, bulkLoadGraphLogGroupName);
     const loadGraphDataTaskContainer = loadGraphDataTaskDefinition.addContainer('container', {
       image: ContainerImage.fromDockerImageAsset(loadGraphDataImage),
       memoryLimitMiB: 512,
       logging: LogDrivers.awsLogs({
         streamPrefix: 'fraud-detection-training-pipeline-load-graph-data-to-graph-dbs',
+        logGroup: new LogGroup(this, 'TrainingBulkLoadGraph', {
+          logGroupName: bulkLoadGraphLogGroupName,
+          encryptionKey: kmsKey,
+          retention: RetentionDays.SIX_MONTHS,
+          removalPolicy: RemovalPolicy.DESTROY,
+        }),
       }),
     });
     loadGraphDataTaskContainer.addMountPoints({
@@ -400,12 +449,25 @@ export class TrainingStack extends NestedStack {
       sourceVolume: taskVolumeName,
     });
 
-    this.loadPropsSG = new SecurityGroup(this, 'LoadGraphDataSG', {
+    const loadPropsSG = new SecurityGroup(this, 'LoadGraphDataSG', {
       allowAllOutbound: true,
       description: 'SG for Loading graph data to graph dbs in training pipeline',
       vpc: props.vpc,
     });
-    fileSystem.connections.allowDefaultPortFrom(this.loadPropsSG, 'allow requests from loading graph data Fargate');
+    props.neptune.cluster.connections.allowDefaultPortFrom(loadPropsSG, 'access from load props fargate task.');
+    (loadPropsSG.node.defaultChild as CfnResource).addMetadata('cfn_nag', {
+      rules_to_suppress: [
+        {
+          id: 'W40',
+          reason: 'bulk load task need internet access to connect Neptune endpoint',
+        },
+        {
+          id: 'W5',
+          reason: 'bulk load task need internet access to connect Neptune endpoint',
+        },
+      ],
+    });
+    fileSystem.connections.allowDefaultPortFrom(loadPropsSG, 'allow requests from loading graph data Fargate');
     const runLoadGraphDataTask = new EcsRunTask(this, 'Load the graph data to Graph database', {
       integrationPattern: IntegrationPattern.RUN_JOB,
       cluster: ecsCluster,
@@ -414,7 +476,7 @@ export class TrainingStack extends NestedStack {
       subnets: {
         subnetType: SubnetType.PRIVATE,
       },
-      securityGroups: [this.loadPropsSG],
+      securityGroups: [loadPropsSG],
       containerOverrides: [{
         containerDefinition: loadGraphDataTaskContainer,
         command: [
@@ -554,6 +616,15 @@ export class TrainingStack extends NestedStack {
       }),
       resultPath: '$.modelOutput',
     });
+    (createModelTask.node.findChild('SagemakerRole').node.defaultChild as CfnResource)
+      .addMetadata('cfn_nag', {
+        rules_to_suppress: [
+          {
+            id: 'W11',
+            reason: 'wildcard in IAM policy is used for creating model of SageMaker by CDK',
+          },
+        ],
+      });
 
     const createEndpointConfigTask = new class extends SageMakerCreateEndpointConfig {
       public toStateJson(): object {
@@ -653,18 +724,62 @@ export class TrainingStack extends NestedStack {
       .next(checkEndpointTask)
       .next(endpointChoice);
 
-    new StateMachine(this, 'ModelTrainingPipeline', {
+    const pipelineLogGroupName = `/aws/vendedlogs/realtime-fraud-detection-with-gnn-on-dgl/training/pipeline/${this.stackName}`;
+    grantKmsKeyPerm(kmsKey, pipelineLogGroupName);
+    const pipeline = new StateMachine(this, 'ModelTrainingPipeline', {
       definition,
       logs: {
         destination: new LogGroup(this, 'FraudDetectionLogGroup', {
           retention: RetentionDays.SIX_MONTHS,
-          logGroupName: `/aws/vendedlogs/states/fraud-detetion/training-pipeline/${this.stackName}`,
+          logGroupName: pipelineLogGroupName,
+          encryptionKey: kmsKey,
+          removalPolicy: RemovalPolicy.DESTROY,
         }),
         includeExecutionData: true,
         level: LogLevel.ALL,
       },
       tracingEnabled: true,
     });
+
+    (pipeline.role.node.findChild('DefaultPolicy').node.defaultChild as CfnResource)
+      .addMetadata('cfn_nag', {
+        rules_to_suppress: [
+          {
+            id: 'W12',
+            reason: 'wildcard resource in IAM policy(x-ray/logs) is used for step functions state machine',
+          },
+        ],
+      });
+    (createModelTask.node.findChild('SagemakerRole').node.findChild('DefaultPolicy').node.defaultChild as CfnResource)
+      .addMetadata('cfn_nag', {
+        rules_to_suppress: [
+          {
+            id: 'W12',
+            reason: 'wildcard resource in IAM policy(ECR auth) is used for creating training job of SageMaker by CDK',
+          },
+        ],
+      });
+    (trainingJobTask.node.findChild('SagemakerRole').node.findChild('DefaultPolicy').node.defaultChild as CfnResource)
+      .addMetadata('cfn_nag', {
+        rules_to_suppress: [
+          {
+            id: 'W12',
+            reason: 'wildcard resource in IAM policy(ECR auth) is used for creating training job of SageMaker by CDK',
+          },
+        ],
+      });
+    (loadGraphDataTaskDefinition.node.findChild('ExecutionRole').node
+      .findChild('DefaultPolicy').node.defaultChild as CfnResource)
+      .addMetadata('cfn_nag', {
+        rules_to_suppress: [
+          {
+            id: 'W12',
+            reason: 'wildcard in IAM policy(ECR auth) is used for bulk loading graph',
+          },
+        ],
+      });
+
+    Aspects.of(this).add(new CfnNagWhitelist());
 
     this.templateOptions.description = '(SO8013) - Real-time Fraud Detection with Graph Neural Network on DGL -- model training and deployment stack.';
   }

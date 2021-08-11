@@ -154,7 +154,7 @@ describe('training stack test suite', () => {
           CloudWatchEncryptionMode: 'SSE-KMS',
           KmsKeyArn: {
             'Fn::GetAtt': [
-              'ETLCompFraudDetectionSecConfKey781FDC27',
+              'realtimefrauddetectionwithgnnondgltrainingBD8E89BF',
               'Arn',
             ],
           },
@@ -163,7 +163,7 @@ describe('training stack test suite', () => {
           JobBookmarksEncryptionMode: 'CSE-KMS',
           KmsKeyArn: {
             'Fn::GetAtt': [
-              'ETLCompFraudDetectionSecConfKey781FDC27',
+              'realtimefrauddetectionwithgnnondgltrainingBD8E89BF',
               'Arn',
             ],
           },
@@ -186,29 +186,15 @@ describe('training stack test suite', () => {
         ],
       },
     });
+  });
 
+  test('key policy of custom kms key', () => {
     // check custom KMS key grant logs to encrypt
     expect(stack).toHaveResourceLike('AWS::KMS::Key', {
       KeyPolicy: {
         Statement: [
           {
-            Action: [
-              'kms:Create*',
-              'kms:Describe*',
-              'kms:Enable*',
-              'kms:List*',
-              'kms:Put*',
-              'kms:Update*',
-              'kms:Revoke*',
-              'kms:Disable*',
-              'kms:Get*',
-              'kms:Delete*',
-              'kms:ScheduleKeyDeletion',
-              'kms:CancelKeyDeletion',
-              'kms:GenerateDataKey',
-              'kms:TagResource',
-              'kms:UntagResource',
-            ],
+            Action: 'kms:*',
             Effect: 'Allow',
             Principal: {
               AWS: {
@@ -286,8 +272,120 @@ describe('training stack test suite', () => {
             },
             Resource: '*',
           },
+          {
+            Action: [
+              'kms:Encrypt*',
+              'kms:ReEncrypt*',
+              'kms:Decrypt*',
+              'kms:GenerateDataKey*',
+              'kms:Describe*',
+            ],
+            Condition: {
+              ArnLike: {
+                'kms:EncryptionContext:aws:logs:arn': {
+                  'Fn::Join': [
+                    '',
+                    [
+                      'arn:',
+                      {
+                        Ref: 'AWS::Partition',
+                      },
+                      ':logs:',
+                      {
+                        Ref: 'AWS::Region',
+                      },
+                      ':',
+                      {
+                        Ref: 'AWS::AccountId',
+                      },
+                      ':log-group:/realtime-fraud-detection-with-gnn-on-dgl/training/BulkLoadGraphData-',
+                      {
+                        Ref: 'AWS::StackName',
+                      },
+                    ],
+                  ],
+                },
+              },
+            },
+            Effect: 'Allow',
+            Principal: {
+              Service: {
+                'Fn::Join': [
+                  '',
+                  [
+                    'logs.',
+                    {
+                      Ref: 'AWS::Region',
+                    },
+                    '.',
+                    {
+                      Ref: 'AWS::URLSuffix',
+                    },
+                  ],
+                ],
+              },
+            },
+            Resource: '*',
+          },
+          {
+            Action: [
+              'kms:Encrypt*',
+              'kms:ReEncrypt*',
+              'kms:Decrypt*',
+              'kms:GenerateDataKey*',
+              'kms:Describe*',
+            ],
+            Condition: {
+              ArnLike: {
+                'kms:EncryptionContext:aws:logs:arn': {
+                  'Fn::Join': [
+                    '',
+                    [
+                      'arn:',
+                      {
+                        Ref: 'AWS::Partition',
+                      },
+                      ':logs:',
+                      {
+                        Ref: 'AWS::Region',
+                      },
+                      ':',
+                      {
+                        Ref: 'AWS::AccountId',
+                      },
+                      ':log-group:/aws/vendedlogs/realtime-fraud-detection-with-gnn-on-dgl/training/pipeline/',
+                      {
+                        Ref: 'AWS::StackName',
+                      },
+                    ],
+                  ],
+                },
+              },
+            },
+            Effect: 'Allow',
+            Principal: {
+              Service: {
+                'Fn::Join': [
+                  '',
+                  [
+                    'logs.',
+                    {
+                      Ref: 'AWS::Region',
+                    },
+                    '.',
+                    {
+                      Ref: 'AWS::URLSuffix',
+                    },
+                  ],
+                ],
+              },
+            },
+            Resource: '*',
+          },
         ],
+        Version: '2012-10-17',
       },
+      EnableKeyRotation: true,
     });
   });
 
@@ -1148,7 +1246,7 @@ describe('training stack test suite', () => {
           'Fn::Join': [
             '',
             [
-              '/aws/vendedlogs/states/fraud-detetion/training-pipeline/',
+              '/aws/vendedlogs/realtime-fraud-detection-with-gnn-on-dgl/training/pipeline/',
               {
                 Ref: 'AWS::StackName',
               },
@@ -1157,8 +1255,8 @@ describe('training stack test suite', () => {
         },
         RetentionInDays: 180,
       },
-      UpdateReplacePolicy: 'Retain',
-      DeletionPolicy: 'Retain',
+      UpdateReplacePolicy: 'Delete',
+      DeletionPolicy: 'Delete',
     }, ResourcePart.CompleteDefinition);
     expect(stack).toHaveResourceLike('AWS::StepFunctions::StateMachine', {
       LoggingConfiguration: {

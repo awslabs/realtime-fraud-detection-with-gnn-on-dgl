@@ -1,0 +1,20 @@
+RulesToSuppress:
+  - id: W33
+    reason: allow assign public IPs in public subnet for solution
+  - id: W58
+    reason: >-
+      use managed policy AWSLambdaBasicExecutionRole to grant logs permission in
+      solution
+  - id: W89
+    reason: allow non VPC Lambda in solution
+  - id: W92
+    reason: >-
+      allow no ReservedConcurrentExecutions configuration of solution Lambda
+  - id: W51
+    reason: use bucket default policy for the account itself
+  - id: W29
+    reason: >-
+      the default egress rule with port range created by CDK and deny all
+      traffic
+  - id: W76
+    reason: all IAM Policy documents are necessary and required

@@ -68,9 +68,17 @@ describe('fraud detection stack test suite', () => {
       ResourceType: 'VPC',
       TrafficType: 'ALL',
       LogDestination: {
-        'Fn::GetAtt': [
-          'FraudDetectionVpcVpcFlowlogsBucket43753A7B',
-          'Arn',
+        'Fn::Join': [
+          '',
+          [
+            {
+              'Fn::GetAtt': [
+                'BucketAccessLog9C13C446',
+                'Arn',
+              ],
+            },
+            '/vpcFlowLogs',
+          ],
         ],
       },
       LogDestinationType: 's3',
@@ -111,7 +119,7 @@ describe('fraud detection stack test suite', () => {
         VpcSecurityGroupIds: [
           {
             'Fn::GetAtt': [
-              'TransactionGraphClusterSecurityGroupDB59E630',
+              'NeptuneSG31D2E08E',
               'GroupId',
             ],
           },
@@ -170,14 +178,42 @@ describe('fraud detection stack test suite', () => {
       },
       GroupId: {
         'Fn::GetAtt': [
-          'TransactionGraphClusterSecurityGroupDB59E630',
+          'NeptuneSG31D2E08E',
           'GroupId',
         ],
       },
       SourceSecurityGroupId: {
         'Fn::GetAtt': [
           'trainingNestedStacktrainingNestedStackResourceAA446BCB',
-          'Outputs.TestStacktrainingETLCompGlueJobSG3879196AGroupId',
+          'Outputs.TestStacktrainingLoadGraphDataSG75C7D514GroupId',
+        ],
+      },
+      ToPort: {
+        'Fn::GetAtt': [
+          'TransactionGraphClusterA4FB4FE0',
+          'Port',
+        ],
+      },
+    });
+
+    expect(stack).toHaveResourceLike('AWS::EC2::SecurityGroupIngress', {
+      IpProtocol: 'tcp',
+      FromPort: {
+        'Fn::GetAtt': [
+          'TransactionGraphClusterA4FB4FE0',
+          'Port',
+        ],
+      },
+      GroupId: {
+        'Fn::GetAtt': [
+          'NeptuneSG31D2E08E',
+          'GroupId',
+        ],
+      },
+      SourceSecurityGroupId: {
+        'Fn::GetAtt': [
+          'inferenceNestedStackinferenceNestedStackResourceB0DA9D8F',
+          'Outputs.TestStackinferenceinferenceSGF28A5C19GroupId',
         ],
       },
       ToPort: {

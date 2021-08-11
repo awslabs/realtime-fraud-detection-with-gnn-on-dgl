@@ -2,7 +2,7 @@ import * as path from 'path';
 import { PolicyStatement } from '@aws-cdk/aws-iam';
 import { Runtime, IFunction, Tracing } from '@aws-cdk/aws-lambda';
 import { NodejsFunction } from '@aws-cdk/aws-lambda-nodejs';
-import { Aws, Duration, Construct, Arn, Stack, CustomResource } from '@aws-cdk/core';
+import { Aws, Duration, Construct, Arn, Stack, CustomResource, CfnResource } from '@aws-cdk/core';
 
 export interface SARDeploymentProps {
   application: string;
@@ -111,10 +111,28 @@ export class SARDeployment extends Construct {
         'iam:CreateRole',
         'iam:AttachRolePolicy',
         'iam:TagRole',
+      ],
+      resources: ['*'],
+    }));
+    this.deployFunc.addToRolePolicy(new PolicyStatement({
+      actions: [
         'iam:PassRole',
       ],
       resources: ['*'],
     }));
+    (this.deployFunc.node.findChild('ServiceRole').node.findChild('DefaultPolicy').node.defaultChild as CfnResource)
+      .addMetadata('cfn_nag', {
+        rules_to_suppress: [
+          {
+            id: 'W12',
+            reason: 'wildcard resource in IAM policy for create role for sar function',
+          },
+          {
+            id: 'F39',
+            reason: 'PassRole action to all resources due to no way to know the role of third party SAR function',
+          },
+        ],
+      });
 
     const sarAppDeployment = new CustomResource(this, `SarDeploymentResource-${id}`, {
       serviceToken: this.deployFunc.functionArn,
