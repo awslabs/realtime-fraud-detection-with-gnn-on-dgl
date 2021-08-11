@@ -74,13 +74,41 @@ describe('dashboard stack test suite', () => {
       },
       GroupId: {
         'Fn::GetAtt': [
-          'DashboardDatabaseSecurityGroupECDE0B4B',
+          'DashboardDatabaseSGAB493439',
           'GroupId',
         ],
       },
       SourceSecurityGroupId: {
         'Fn::GetAtt': [
           'DashboardToDocDBSGD91501D9',
+          'GroupId',
+        ],
+      },
+      ToPort: {
+        'Fn::GetAtt': [
+          'DashboardDatabaseF93C7646',
+          'Port',
+        ],
+      },
+    });
+
+    expect(stack).toHaveResourceLike('AWS::EC2::SecurityGroupIngress', {
+      IpProtocol: 'tcp',
+      FromPort: {
+        'Fn::GetAtt': [
+          'DashboardDatabaseF93C7646',
+          'Port',
+        ],
+      },
+      GroupId: {
+        'Fn::GetAtt': [
+          'DashboardDatabaseSGAB493439',
+          'GroupId',
+        ],
+      },
+      SourceSecurityGroupId: {
+        'Fn::GetAtt': [
+          'CreateIndexOfDocDBSG8E379620',
           'GroupId',
         ],
       },
@@ -228,9 +256,6 @@ describe('dashboard stack test suite', () => {
         'DashboardDatabaseSecretAttachmentB749CF34',
         'DashboardDatabaseSecretAttachmentRotationScheduleD0CB8A1A',
         'DashboardDatabaseSecretCF9F4299',
-        'DashboardDatabaseSecurityGroupfromTestStackDashboardStackDashboardDatabaseRotationSingleUserSecurityGroupF16A65A2IndirectPortFE2473FE',
-        'DashboardDatabaseSecurityGroupfromTestStackDashboardStackDashboardToDocDBSG004411E5IndirectPortF0F1D237',
-        'DashboardDatabaseSecurityGroupECDE0B4B',
         'DashboardDatabaseSubnetsD80E6AA1',
       ],
     }, ResourcePart.CompleteDefinition);
@@ -428,7 +453,7 @@ describe('dashboard stack test suite', () => {
           'Fn::Join': [
             '',
             [
-              '/aws/vendedlogs/states/fraud-detetion/dashboard-simulator/',
+              '/aws/vendedlogs/realtime-fraud-detection-with-gnn-on-dgl/dashboard/simulator/',
               {
                 Ref: 'AWS::StackName',
               },
@@ -437,8 +462,8 @@ describe('dashboard stack test suite', () => {
         },
         RetentionInDays: 180,
       },
-      UpdateReplacePolicy: 'Retain',
-      DeletionPolicy: 'Retain',
+      UpdateReplacePolicy: 'Delete',
+      DeletionPolicy: 'Delete',
     }, ResourcePart.CompleteDefinition);
     expect(stack).toHaveResourceLike('AWS::StepFunctions::StateMachine', {
       LoggingConfiguration: {
@@ -875,11 +900,9 @@ describe('dashboard stack test suite', () => {
         PriceClass: 'PriceClass_All',
         Logging: {
           Bucket: {
-            'Fn::GetAtt': [
-              'DistributionLoggingBucketEC62F627',
-              'RegionalDomainName',
-            ],
+            Ref: 'referencetoTestStackAccessLogF5229892RegionalDomainName',
           },
+          Prefix: 'cfAccessLog',
         },
         CustomErrorResponses: [
           {

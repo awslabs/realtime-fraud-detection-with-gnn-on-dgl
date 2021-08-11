@@ -1,0 +1,25 @@
+name: Cfn-nag check
+'on':
+  pull_request: {}
+  workflow_dispatch: {}
+jobs:
+  cfn-nag:
+    runs-on: ubuntu-latest
+    env:
+      CI: 'true'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: '${{ github.event.pull_request.head.ref }}'
+          repository: '${{ github.event.pull_request.head.repo.full_name }}'
+      - name: Install dependencies
+        run: |
+          yarn install --check-files --frozen-lockfile
+          npx projen
+      - name: synth
+        run: npx cdk synth -c EnableDashboardCustomDomain=true
+      - uses: stelligent/cfn_nag@master
+        with:
+          input_path: cdk.out/
+          extra_args: '--template-pattern ..*.template.json --fail-on-warnings -b .cfn-nag-ignore-lists.yml --print-suppression'

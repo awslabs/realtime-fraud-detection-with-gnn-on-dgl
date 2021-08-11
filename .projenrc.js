@@ -27,6 +27,7 @@ const project = new AwsCdkTypeScriptApp({
     '@aws-cdk/aws-efs',
     '@aws-cdk/aws-glue',
     '@aws-cdk/aws-iam',
+    '@aws-cdk/aws-kms',
     '@aws-cdk/aws-lambda',
     '@aws-cdk/aws-lambda-event-sources',
     '@aws-cdk/aws-lambda-python',

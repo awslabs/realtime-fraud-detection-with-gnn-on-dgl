@@ -33,6 +33,7 @@ import {
   ViewerCertificate,
   LambdaEdgeEventType,
   CfnDistribution,
+  SecurityPolicyProtocol,
 } from '@aws-cdk/aws-cloudfront';
 import { S3Origin, HttpOrigin } from '@aws-cdk/aws-cloudfront-origins';
 import { ClusterParameterGroup, DatabaseCluster } from '@aws-cdk/aws-docdb';
@@ -53,6 +54,7 @@ import {
   ArnPrincipal,
   ManagedPolicy,
 } from '@aws-cdk/aws-iam';
+import { Key } from '@aws-cdk/aws-kms';
 import { LayerVersion, Code, Runtime, Tracing } from '@aws-cdk/aws-lambda';
 import { SqsEventSource } from '@aws-cdk/aws-lambda-event-sources';
 import { NodejsFunction } from '@aws-cdk/aws-lambda-nodejs';
@@ -93,6 +95,8 @@ import {
   Resource,
   Stack,
   Arn,
+  CfnResource,
+  Aspects,
 } from '@aws-cdk/core';
 import {
   Provider,
@@ -103,7 +107,7 @@ import {
 import { IEEE, getDatasetMapping } from './dataset';
 import { WranglerLayer } from './layer';
 import { SARDeployment } from './sar';
-import { artifactsHash } from './utils';
+import { artifactsHash, CfnNagWhitelist, grantKmsKeyPerm } from './utils';
 
 export interface TransactionDashboardStackStackProps extends NestedStackProps {
   readonly vpc: IVpc;
@@ -125,6 +129,13 @@ export class TransactionDashboardStack extends NestedStack {
   ) {
     super(scope, id, props);
 
+    const kmsKey = new Key(this, 'realtime-fraud-detection-with-gnn-on-dgl-dashboard', {
+      alias: 'realtime-fraud-detection-with-gnn-on-dgl/dashboard',
+      enableKeyRotation: true,
+      trustAccountIdentities: true,
+      removalPolicy: RemovalPolicy.DESTROY,
+    });
+
     const engine = '4.0.0';
     const docDBParameterGroup = new ClusterParameterGroup(this, 'DashboardDBParameterGroup', {
       family: 'docdb4.0', // peer to engine
@@ -134,6 +145,10 @@ export class TransactionDashboardStack extends NestedStack {
       },
     });
     const dbUser = 'dashboard';
+    const dashboardDBSG = new SecurityGroup(this, 'DashboardDatabaseSG', {
+      vpc: props.vpc,
+      allowAllOutbound: false,
+    });
     const docDBCluster = new DatabaseCluster(this, 'DashboardDatabase', {
       masterUser: {
         username: dbUser,
@@ -146,13 +161,34 @@ export class TransactionDashboardStack extends NestedStack {
         subnetType: SubnetType.PRIVATE,
       },
       vpc: props.vpc,
+      securityGroup: dashboardDBSG,
       backup: {
         retention: Duration.days(7),
       },
       parameterGroup: docDBParameterGroup,
       removalPolicy: RemovalPolicy.DESTROY,
+      kmsKey,
     });
-    docDBCluster.addRotationSingleUser();
+    (docDBCluster.node.findChild('Secret').node.defaultChild as CfnResource)
+      .addMetadata('cfn_nag', {
+        rules_to_suppress: [
+          {
+            id: 'W77',
+            reason: 'use default KMS key created by secretmanager',
+          },
+        ],
+      });
+    const secretRotation = docDBCluster.addRotationSingleUser();
+    (secretRotation.node.findChild('SecurityGroup').node.findChild('Resource') as CfnResource)
+      .addPropertyOverride('SecurityGroupEgress', [
+        {
+          CidrIp: '255.255.255.255/32',
+          Description: 'Disallow all traffic',
+          FromPort: 252,
+          IpProtocol: 'icmp',
+          ToPort: 86,
+        },
+      ]);
 
     const docDBCertLayer = new DocumentDBCertLayer(this, 'CertLayer');
     const caFileKey = 'CAFile';
@@ -174,6 +210,18 @@ export class TransactionDashboardStack extends NestedStack {
       allowAllOutbound: true,
       description: 'SG for Dashboard handlers connecting DocDB',
       vpc: props.vpc,
+    });
+    (dashboardSG.node.defaultChild as CfnResource).addMetadata('cfn_nag', {
+      rules_to_suppress: [
+        {
+          id: 'W40',
+          reason: 'dashboard func need internet access to connect secretsmanager endpoint',
+        },
+        {
+          id: 'W5',
+          reason: 'dashboard func need internet access to connect secretsmanager endpoint',
+        },
+      ],
     });
     docDBCluster.connections.allowDefaultPortFrom(
       dashboardSG,
@@ -207,6 +255,28 @@ export class TransactionDashboardStack extends NestedStack {
     });
     docDBCluster.secret!.grantRead(transacationFn);
 
+    const createIndexSG = new SecurityGroup(this, 'CreateIndexOfDocDBSG', {
+      allowAllOutbound: true,
+      description: 'SG for creating index CR connecting DocDB',
+      vpc: props.vpc,
+    });
+    createIndexSG.connections.allowTo(
+      docDBCluster.connections,
+      Port.tcp(docDBCluster.clusterEndpoint.port),
+      'Allow Custom Resource creating index to access docDB.',
+    );
+    (createIndexSG.node.defaultChild as CfnResource).addMetadata('cfn_nag', {
+      rules_to_suppress: [
+        {
+          id: 'W40',
+          reason: 'creating index func need internet access to connect secretsmanager endpoint',
+        },
+        {
+          id: 'W5',
+          reason: 'creating index func need internet access to connect secretsmanager endpoint',
+        },
+      ],
+    });
     const createIndexesFn = new NodejsFunction(this, 'CreateIndexFunc', {
       entry: path.join(__dirname, '../lambda.d/create-indexes/handler.ts'),
       handler: 'createIndexes',
@@ -221,7 +291,7 @@ export class TransactionDashboardStack extends NestedStack {
       vpcSubnets: props.vpc.selectSubnets({
         subnetType: SubnetType.PRIVATE,
       }),
-      securityGroup: dashboardSG,
+      securityGroup: createIndexSG,
       layers: [docDBCertLayer],
       tracing: Tracing.ACTIVE,
     });
@@ -273,6 +343,14 @@ export class TransactionDashboardStack extends NestedStack {
           ],
         }),
       },
+    });
+    (logRole.node.defaultChild as CfnResource).addMetadata('cfn_nag', {
+      rules_to_suppress: [
+        {
+          id: 'W11',
+          reason: 'wildcard is used for putting logs',
+        },
+      ],
     });
     const dashboardApi = new GraphqlApi(this, 'FraudDetectionDashboardAPI', {
       name: 'FraudDetectionDashboardAPI',
@@ -426,6 +504,8 @@ export class TransactionDashboardStack extends NestedStack {
     });
 
     const definition = parameterTask.next(map);
+    const genLogGroupName = `/aws/vendedlogs/realtime-fraud-detection-with-gnn-on-dgl/dashboard/simulator/${this.stackName}`;
+    grantKmsKeyPerm(kmsKey, genLogGroupName);
     const transactionGenerator = new StateMachine(
       this,
       'TransactionGenerator',
@@ -433,8 +513,10 @@ export class TransactionDashboardStack extends NestedStack {
         definition,
         logs: {
           destination: new LogGroup(this, 'FraudDetectionSimulatorLogGroup', {
+            encryptionKey: kmsKey,
             retention: RetentionDays.SIX_MONTHS,
-            logGroupName: `/aws/vendedlogs/states/fraud-detetion/dashboard-simulator/${this.stackName}`,
+            logGroupName: genLogGroupName,
+            removalPolicy: RemovalPolicy.DESTROY,
           }),
           includeExecutionData: true,
           level: LogLevel.ALL,
@@ -442,6 +524,15 @@ export class TransactionDashboardStack extends NestedStack {
         tracingEnabled: true,
       },
     );
+    (transactionGenerator.node.findChild('Role').node.findChild('DefaultPolicy')
+      .node.defaultChild as CfnResource).addMetadata('cfn_nag', {
+      rules_to_suppress: [
+        {
+          id: 'W12',
+          reason: 'wildcard in policy is used for x-ray and logs',
+        },
+      ],
+    });
 
     const httpApi = new HttpApi(this, 'FraudDetectionDashboardApi', {
       createDefaultStage: false,
@@ -502,6 +593,15 @@ export class TransactionDashboardStack extends NestedStack {
       runtime: Runtime.NODEJS_14_X,
       tracing: Tracing.ACTIVE,
     });
+    (tokenFnRole.node.findChild('DefaultPolicy').node.defaultChild as CfnResource)
+      .addMetadata('cfn_nag', {
+        rules_to_suppress: [
+          {
+            id: 'W12',
+            reason: 'wildcard in policy is built by CDK for x-ray',
+          },
+        ],
+      });
     const tokenFnIntegration = new LambdaProxyIntegration({
       handler: tokenFn,
       payloadFormatVersion: PayloadFormatVersion.VERSION_2_0,
@@ -519,7 +619,13 @@ export class TransactionDashboardStack extends NestedStack {
     });
     // TODO: update it when https://github.com/aws/aws-cdk/issues/11100 is resolved
     const apiCfnStage = apiStage.node.defaultChild as CfnStage;
-    const apiAccessLog = new LogGroup(this, `Stage${apiStageName}Log`);
+    const apiAccessLogGroupName = `/aws/vendedlogs/realtime-fraud-detection-with-gnn-on-dgl/dashboard/api/${httpApi.apiId}/stage/${apiStageName}/${this.stackName}`;
+    const apiAccessLog = new LogGroup(this, `Stage${apiStageName}Log`, {
+      encryptionKey: kmsKey,
+      logGroupName: apiAccessLogGroupName,
+      removalPolicy: RemovalPolicy.DESTROY,
+    });
+    grantKmsKeyPerm(kmsKey, apiAccessLogGroupName);
     apiCfnStage.accessLogSettings = {
       destinationArn: apiAccessLog.logGroupArn,
       format: JSON.stringify({
@@ -700,6 +806,7 @@ export class TransactionDashboardStack extends NestedStack {
 
       distribution = new Distribution(this, 'Distribution', {
         certificate: cert,
+        minimumProtocolVersion: SecurityPolicyProtocol.TLS_V1_2_2019,
         domainNames: customDomain ? [customDomain] : [],
         defaultBehavior: {
           origin: new S3Origin(websiteBucket),
@@ -728,6 +835,8 @@ export class TransactionDashboardStack extends NestedStack {
         enableIpv6: true,
         priceClass: PriceClass.PRICE_CLASS_ALL,
         enableLogging: true,
+        logBucket: accessLogBucket,
+        logFilePrefix: 'cfAccessLog',
         errorResponses: [
           {
             httpStatus: 500,
@@ -808,6 +917,8 @@ export class TransactionDashboardStack extends NestedStack {
     });
 
     websiteDeployment.node.addDependency(createAwsExportsJson);
+
+    Aspects.of(this).add(new CfnNagWhitelist());
 
     new CfnOutput(this, 'DashboardWebsiteUrl', {
       value: `${distribution.distributionDomainName}`,

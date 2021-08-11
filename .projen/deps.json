@@ -164,6 +164,11 @@
       "type": "runtime"
     },
     {
+      "name": "@aws-cdk/aws-kms",
+      "version": "1.117.0",
+      "type": "runtime"
+    },
+    {
       "name": "@aws-cdk/aws-lambda-event-sources",
       "version": "1.117.0",
       "type": "runtime"

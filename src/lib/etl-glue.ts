@@ -1,10 +1,11 @@
 import * as path from 'path';
-import { IVpc, Port, SecurityGroup, ISecurityGroup } from '@aws-cdk/aws-ec2';
-import { Database, DataFormat, Table, Schema, CfnJob, CfnConnection, CfnCrawler, SecurityConfiguration, S3EncryptionMode, CloudWatchEncryptionMode, JobBookmarksEncryptionMode } from '@aws-cdk/aws-glue';
+import { IVpc, SecurityGroup, Port } from '@aws-cdk/aws-ec2';
+import { Database, DataFormat, Table, Schema, CfnJob, CfnConnection, CfnCrawler, SecurityConfiguration, S3EncryptionMode, JobBookmarksEncryptionMode, CloudWatchEncryptionMode } from '@aws-cdk/aws-glue';
 import { CompositePrincipal, ManagedPolicy, PolicyDocument, PolicyStatement, ServicePrincipal, Role } from '@aws-cdk/aws-iam';
+import { IKey } from '@aws-cdk/aws-kms';
 import { IBucket, Bucket, BucketEncryption } from '@aws-cdk/aws-s3';
 import { BucketDeployment, Source } from '@aws-cdk/aws-s3-deployment';
-import { Aws, Construct, RemovalPolicy, Stack } from '@aws-cdk/core';
+import { Aws, Construct, RemovalPolicy, Stack, CfnResource } from '@aws-cdk/core';
 import { artifactHash } from './utils';
 
 export interface ETLProps {
@@ -12,6 +13,7 @@ export interface ETLProps {
   accessLogBucket: IBucket;
   s3Prefix?: string;
   vpc: IVpc;
+  key: IKey;
   transactionPrefix: string;
   identityPrefix: string;
   dataColumnsArg: {
@@ -24,7 +26,6 @@ export class ETLByGlue extends Construct {
   readonly crawlerName: string;
   readonly jobName: string;
   readonly processedOutputPrefix: string;
-  readonly glueJobSG: ISecurityGroup;
 
   constructor(scope: Construct, id: string, props: ETLProps) {
     super(scope, id);
@@ -94,11 +95,27 @@ export class ETLByGlue extends Construct {
     });
     this.crawlerName = crawler.ref;
 
-    this.glueJobSG = new SecurityGroup(this, 'GlueJobSG', {
+    const glueJobSG = new SecurityGroup(this, 'GlueJobSG', {
       vpc: props.vpc,
       allowAllOutbound: true,
     });
-    this.glueJobSG.addIngressRule(this.glueJobSG, Port.allTraffic());
+    glueJobSG.addIngressRule(glueJobSG, Port.allTcp(), 'allow all TCP from same SG');
+    (glueJobSG.node.defaultChild as CfnResource).addMetadata('cfn_nag', {
+      rules_to_suppress: [
+        {
+          id: 'W40',
+          reason: 'etl job need internet access to install pip packages',
+        },
+        {
+          id: 'W5',
+          reason: 'etl job need internet access to install pip packages',
+        },
+        {
+          id: 'W27',
+          reason: 'SG of glue job need open ingress required by Glue',
+        },
+      ],
+    });
 
     var connCount = 1;
     const networkConntions = props.vpc.privateSubnets.map(sub => new CfnConnection(this, `NetworkConnection-${connCount++}`, {
@@ -110,7 +127,7 @@ export class ETLByGlue extends Construct {
           availabilityZone: sub.availabilityZone,
           subnetId: sub.subnetId,
           securityGroupIdList: [
-            this.glueJobSG.securityGroupId,
+            glueJobSG.securityGroupId,
           ],
         },
       },
@@ -124,9 +141,11 @@ export class ETLByGlue extends Construct {
       },
       cloudWatchEncryption: {
         mode: CloudWatchEncryptionMode.KMS,
+        kmsKey: props.key,
       },
       jobBookmarksEncryption: {
         mode: JobBookmarksEncryptionMode.CLIENT_SIDE_KMS,
+        kmsKey: props.key,
       },
     });
     securityConf.cloudWatchEncryptionKey?.addToResourcePolicy(new PolicyStatement({
