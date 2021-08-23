@@ -7,8 +7,9 @@ const tsExcludeConfig = {
   exclude: ['src/frontend'],
 };
 
+const awsJSSDKV3 = '^3.27.0';
 const project = new AwsCdkTypeScriptApp({
-  cdkVersion: '1.117.0',
+  cdkVersion: '1.119.0',
   name: 'realtime-fraud-detection-with-gnn-on-dgl',
   /* AwsCdkTypeScriptAppOptions */
   // appEntrypoint: 'main.ts',                                                 /* The CDK app's entrypoint (relative to the source directory, which is "src" by default). */
@@ -61,16 +62,16 @@ const project = new AwsCdkTypeScriptApp({
   // bundledDeps: undefined,                                                   /* List of dependencies to bundle into this module. */
   deps: [
     'object-hash',
-    '@aws-sdk/client-glue@^3.25.0',
-    '@aws-sdk/client-secrets-manager@^3.25.0',
-    '@aws-sdk/client-sts@^3.25.0',
-    '@aws-sdk/client-serverlessapplicationrepository@^3.25.0',
-    '@aws-sdk/client-lambda@^3.25.0',
-    '@aws-sdk/client-cloudformation@^3.25.0',
+    '@aws-sdk/client-glue@' + awsJSSDKV3,
+    '@aws-sdk/client-secrets-manager@' + awsJSSDKV3,
+    '@aws-sdk/client-sts@' + awsJSSDKV3,
+    '@aws-sdk/client-serverlessapplicationrepository@' + awsJSSDKV3,
+    '@aws-sdk/client-lambda@' + awsJSSDKV3,
+    '@aws-sdk/client-cloudformation@' + awsJSSDKV3,
     'cfn-custom-resource@^5.0.12',
     'sync-fetch@^0.3.0',
-    'mongodb@^3.6.6',
-    'mongodb-client-encryption@^1.2.3',
+    'mongodb@^3.6.11',
+    'mongodb-client-encryption@^1.2.6',
   ] /* Runtime dependencies of this module. */,
   description:
     'Real-time Fraud Detection with Graph Neural Network on DGL' /* The description is just a string that helps people understand the purpose of the package. */,
@@ -191,6 +192,9 @@ project.addTask('postinstall', {
 });
 project.package.addField('resolutions', {
   'trim-newlines': '^3.0.1',
+});
+project.addFields({
+  version: '2.0.0-mainline',
 });
 
 const tsReactConfig = {
