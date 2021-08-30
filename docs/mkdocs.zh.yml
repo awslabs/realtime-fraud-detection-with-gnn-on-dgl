@@ -1,0 +1,14 @@
+INHERIT: ./mkdocs.base.yml
+site_name: 基于深度学习图神经网络的实时反欺诈解决方案
+site_description: 基于深度学习图神经网络（GNN）的实时反欺诈解决方案实现手册
+docs_dir: zh
+site_dir: ./site/zh
+theme:
+  language: zh
+nav:
+  - 方案介绍: index.md
+  - 区域支持: regions.md
+  - 架构概览: architecture.md
+  - 组件: components.md
+  - 自动化部署: deployment.md
+  - 清理解决方案部署: uninstall.md

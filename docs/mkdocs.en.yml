@@ -1,0 +1,13 @@
+INHERIT: ./mkdocs.base.yml
+docs_dir: en
+site_dir: ./site/en
+theme:
+  language: en
+nav:
+  - Welcome: index.md
+  - Supported regions: regions.md
+  - Architecture overview: architecture.md
+  - Components: components.md
+  - Deployment: deployment.md
+  - Data scientist: data-scientist.md
+  - Uninstall the solution: uninstall.md

@@ -23,6 +23,7 @@ build/Release
 cdk.context.json
 cdk.out/
 coverage
+docs/site/
 jspm_packages/
 junit.xml
 lerna-debug.log*
