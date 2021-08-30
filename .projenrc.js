@@ -120,6 +120,7 @@ const project = new AwsCdkTypeScriptApp({
     '.vscode/',
     'cdk.context.json',
     '.DS_Store',
+    'docs/site/',
   ] /* Additional entries to .gitignore. */,
   // jest: true,                                                               /* Setup jest unit tests. */
   // jestOptions: {

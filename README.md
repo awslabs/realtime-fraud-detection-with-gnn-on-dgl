@@ -14,12 +14,12 @@ This solution consists of below [stacks][cfn-stack],
 ### Model training and deployment stack
 
 The model training & deployment pipeline is orchestrated by [AWS Step Functions][step-functions] like below graph,
-![model training](./docs/images/model-training.png)
+![model training](./docs/en/images/model-training.png)
 
 ### Dashboard stack
 
 It creates a React based web portal that observes the recent fraud transactions detected by this solution. This web application also is orchestrated by [Amazon CloudFront][cloudfront], [AWS Amplify][amplify], [AWS AppSync][appsync], [Amazon API Gateway][api], [AWS Step Functions][step-functions] and [Amazon DocumentDB][docdb].
-![business system](./docs/images/system-arch.png)
+![business system](./docs/en/images/system-arch.png)
 
 #### How to train model and deploy inference endpoint
 
@@ -101,10 +101,10 @@ npx cdk deploy -c vpcId=<your vpc id>
 
 ### Deploy it with custom Neptune instance class and replica count
 
-The solution will deploy Neptune cluster with instance class `db.r5.8xlarge` and `1` read replica by default. You can override the instance class and replica count like below,
+The solution will deploy Neptune cluster with instance class `db.r5.xlarge` and `1` read replica by default. You can override the instance class and replica count like below,
 
 ```shell
-npx cdk deploy --parameters NeptuneInstaneType=db.r5.12xlarge -c NeptuneReplicaCount=2 
+npx cdk deploy --parameters NeptuneInstaneType=db.r5.4xlarge -c NeptuneReplicaCount=2 
 ```
 
 ### Deploy it with custom domain of dashboard
