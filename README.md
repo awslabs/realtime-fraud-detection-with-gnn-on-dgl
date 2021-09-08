@@ -74,7 +74,7 @@ The solution is using graph database [Amazon Neptune][neptune] for real-time fra
 - [Optional] [Public hosted zone in Amazon Route 53][create-public-hosted-zone]
 - Authenticate with below ECR repository in your AWS partition
 ```shell
-aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 763104351884.dkr.ecr.us-east-1.amazonaws.com
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 472162242644.dkr.ecr.us-east-1.amazonaws.com
 ```
 Run below command if you are deployed to China regions
 ```shell

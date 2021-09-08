@@ -1,5 +1,5 @@
 # SageMaker PyTorch image v1.4.0
-ARG IMAGE_REPO=763104351884.dkr.ecr.us-east-1.amazonaws.com
+ARG IMAGE_REPO=472162242644.dkr.ecr.us-east-1.amazonaws.com
 FROM $IMAGE_REPO/pytorch-training:1.6.0-cpu-py36-ubuntu16.04
 
 ENV PATH="/opt/ml/code:${PATH}"
