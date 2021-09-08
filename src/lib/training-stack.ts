@@ -521,16 +521,16 @@ export class TrainingStack extends NestedStack {
     const deepLearningImagesMapping = new CfnMapping(this, 'DeepLearningImagesMapping', {
       mapping: {
         'us-east-1': {
-          accountId: '472162242644',
+          accountId: '763104351884',
         },
         'us-east-2': {
-          accountId: '472162242644',
+          accountId: '763104351884',
         },
         'us-west-1': {
-          accountId: '472162242644',
+          accountId: '763104351884',
         },
         'us-west-2': {
-          accountId: '472162242644',
+          accountId: '763104351884',
         },
         'af-south-1': {
           accountId: '626614931356',
@@ -539,46 +539,46 @@ export class TrainingStack extends NestedStack {
           accountId: '871362719292',
         },
         'ap-south-1': {
-          accountId: '472162242644',
+          accountId: '763104351884',
         },
         'ap-northeast-2': {
-          accountId: '472162242644',
+          accountId: '763104351884',
         },
         'ap-southeast-1': {
-          accountId: '472162242644',
+          accountId: '763104351884',
         },
         'ap-southeast-2': {
-          accountId: '472162242644',
+          accountId: '763104351884',
         },
         'ap-northeast-1': {
-          accountId: '472162242644',
+          accountId: '763104351884',
         },
         'ca-central-1': {
-          accountId: '472162242644',
+          accountId: '763104351884',
         },
         'eu-central-1': {
-          accountId: '472162242644',
+          accountId: '763104351884',
         },
         'eu-west-1': {
-          accountId: '472162242644',
+          accountId: '763104351884',
         },
         'eu-west-2': {
-          accountId: '472162242644',
+          accountId: '763104351884',
         },
         'eu-south-1': {
           accountId: '692866216735',
         },
         'eu-west-3': {
-          accountId: '472162242644',
+          accountId: '763104351884',
         },
         'eu-north-1': {
-          accountId: '472162242644',
+          accountId: '763104351884',
         },
         'me-south-1': {
           accountId: '217643126080',
         },
         'sa-east-1': {
-          accountId: '472162242644',
+          accountId: '763104351884',
         },
         'cn-north-1': {
           accountId: '727897471807',
