@@ -1,6 +1,6 @@
 site_name: Real-time Fraud Detection with GNN on DGL
-site_url: https://awslabs.github.io/realtime-fraud-detection-with-gnn-on-dgl/
-repo_url: https://github.com/awslabs/realtime-fraud-detection-with-gnn-on-dgl
+site_url: 'https://awslabs.github.io/realtime-fraud-detection-with-gnn-on-dgl/'
+repo_url: 'https://github.com/awslabs/realtime-fraud-detection-with-gnn-on-dgl'
 theme:
   name: material
   features:
@@ -12,8 +12,8 @@ plugins:
 extra:
   alternate:
     - name: English
-      link: /site/en/
+      link: ./en/
       lang: en
     - name: 简体中文
-      link: /site/zh/
+      link: ./zh/
       lang: zh-CN
