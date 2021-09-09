@@ -12,8 +12,8 @@ plugins:
 extra:
   alternate:
     - name: English
-      link: ./en/
+      link: /en/
       lang: en
     - name: 简体中文
-      link: ./zh/
+      link: /zh/
       lang: zh-CN
