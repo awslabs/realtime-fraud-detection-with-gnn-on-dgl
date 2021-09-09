@@ -12,8 +12,8 @@ plugins:
 extra:
   alternate:
     - name: English
-      link: /en/
+      link: /realtime-fraud-detection-with-gnn-on-dgl/en/
       lang: en
     - name: 简体中文
-      link: /zh/
+      link: /realtime-fraud-detection-with-gnn-on-dgl/zh-CN/
       lang: zh-CN
