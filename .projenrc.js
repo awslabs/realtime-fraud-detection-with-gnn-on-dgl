@@ -232,7 +232,7 @@ const reactPrj = new web.ReactTypeScriptProject({
     'i18next@^20.3.1',
     'i18next-browser-languagedetector@^6.1.1',
     'i18next-http-backend@^1.2.6',
-    'axios@^0.21.1',
+    'axios@^0.21.4',
     'aws-amplify@^3.4.3',
     'best-queue@^2.0.1',
     'moment@^2.29.1',
