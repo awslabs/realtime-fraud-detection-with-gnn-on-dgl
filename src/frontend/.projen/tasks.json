@@ -2,7 +2,6 @@
   "tasks": {
     "clobber": {
       "name": "clobber",
-      "category": "30.maintain",
       "description": "hard resets to HEAD of origin and cleans the local repo",
       "env": {
         "BRANCH": "$(git branch --show-current)"
@@ -35,85 +34,100 @@
     },
     "compile": {
       "name": "compile",
-      "category": "00.build",
       "description": "Only compile"
     },
     "test:compile": {
       "name": "test:compile",
-      "category": "10.test",
       "description": "compiles the test code"
     },
     "test": {
       "name": "test",
-      "category": "10.test",
-      "description": "Runs tests",
+      "description": "Run tests",
       "steps": [
         {
-          "exec": "react-scripts test"
+          "spawn": "test:compile"
+        },
+        {
+          "exec": "react-scripts test --watchAll=false"
         }
       ]
     },
     "build": {
       "name": "build",
-      "category": "00.build",
-      "description": "Creates an optimized production build of your React application",
+      "description": "Full release build (test+compile)",
       "steps": [
+        {
+          "spawn": "test"
+        },
+        {
+          "spawn": "compile"
+        },
         {
           "exec": "react-scripts build"
         }
       ]
     },
-    "bump": {
-      "name": "bump",
-      "category": "20.release",
-      "description": "Commits a bump to the package version based on conventional commits",
+    "upgrade": {
+      "name": "upgrade",
+      "description": "upgrade dependencies",
+      "env": {
+        "CI": "0"
+      },
       "steps": [
         {
-          "exec": "standard-version"
-        }
-      ],
-      "condition": "! git log --oneline -1 | grep -q \"chore(release):\""
-    },
-    "release": {
-      "name": "release",
-      "category": "20.release",
-      "description": "Bumps version & push to main",
-      "steps": [
-        {
-          "spawn": "bump"
+          "exec": "npm-check-updates --upgrade --target=minor --reject='projen'"
         },
         {
-          "exec": "git push --follow-tags origin main"
-        }
-      ],
-      "condition": "! git log --oneline -1 | grep -q \"chore(release):\""
-    },
-    "projen:upgrade": {
-      "name": "projen:upgrade",
-      "category": "30.maintain",
-      "description": "upgrades projen to the latest version",
-      "steps": [
-        {
-          "exec": "yarn upgrade -L projen"
+          "exec": "yarn install --check-files"
         },
         {
-          "exec": "CI=\"\" yarn projen"
+          "exec": "yarn upgrade @testing-library/jest-dom @testing-library/react @testing-library/user-event @types/jest @types/node @types/react @types/react-dom @types/react-loader-spinner @types/react-router-dom npm-check-updates typescript @material-ui/core @material-ui/icons @material-ui/lab @testing-library/jest-dom @testing-library/react @testing-library/user-event @types/jest @types/node @types/react-dom @types/react apexcharts aws-amplify aws-appsync aws-sdk axios best-queue graphql-tag i18next-browser-languagedetector i18next-http-backend i18next moment node-sass react react-apexcharts react-dom react-i18next react-loader-spinner react-router-dom react-scripts sweetalert2 web-vitals"
+        },
+        {
+          "exec": "npx projen"
+        }
+      ]
+    },
+    "upgrade-projen": {
+      "name": "upgrade-projen",
+      "description": "upgrade projen",
+      "env": {
+        "CI": "0"
+      },
+      "steps": [
+        {
+          "exec": "npm-check-updates --upgrade --target=minor --filter='projen'"
+        },
+        {
+          "exec": "yarn install --check-files"
+        },
+        {
+          "exec": "yarn upgrade projen"
+        },
+        {
+          "exec": "npx projen"
+        }
+      ]
+    },
+    "default": {
+      "name": "default",
+      "steps": [
+        {
+          "exec": "node .projenrc.js"
         }
       ]
     },
     "watch": {
       "name": "watch",
-      "category": "00.build",
       "description": "Watch & compile in the background",
       "steps": [
         {
-          "exec": "tsc -w"
+          "exec": "tsc --build -w"
         }
       ]
     },
     "dev": {
       "name": "dev",
-      "category": "00.build",
       "description": "Starts the react application",
       "steps": [
         {
@@ -123,7 +137,6 @@
     },
     "eject": {
       "name": "eject",
-      "category": "99.misc",
       "description": "Ejects your React application from react-scripts",
       "steps": [
         {
