@@ -2,7 +2,7 @@
   "dependencies": [
     {
       "name": "@types/aws-lambda",
-      "version": "^8.10.76",
+      "version": "^8.10.83",
       "type": "build"
     },
     {
@@ -11,7 +11,7 @@
     },
     {
       "name": "@types/mongodb",
-      "version": "^3.6.8",
+      "version": "^3.6.20",
       "type": "build"
     },
     {
@@ -29,7 +29,7 @@
     },
     {
       "name": "aws-cdk",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "build"
     },
     {
@@ -62,13 +62,12 @@
       "type": "build"
     },
     {
-      "name": "projen",
-      "version": "^0.17.30",
+      "name": "npm-check-updates",
+      "version": "^11",
       "type": "build"
     },
     {
-      "name": "standard-version",
-      "version": "^9",
+      "name": "projen",
       "type": "build"
     },
     {
@@ -77,220 +76,216 @@
     },
     {
       "name": "ts-node",
+      "version": "^9",
       "type": "build"
     },
     {
       "name": "typescript",
-      "type": "build"
-    },
-    {
-      "name": "typescript",
-      "version": "^4.2.0",
       "type": "build"
     },
     {
       "name": "@aws-cdk/assert",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-apigatewayv2-integrations",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-apigatewayv2",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-appsync",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-certificatemanager",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-cloudfront-origins",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-cloudfront",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-docdb",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-ec2",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-ecr-assets",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-ecr",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-ecs",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-efs",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-glue",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-iam",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-kms",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-lambda-event-sources",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-lambda-nodejs",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-lambda-python",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-lambda",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-logs",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-neptune",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-route53-targets",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-route53",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-s3-deployment",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-s3",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-sqs",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-stepfunctions-tasks",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-stepfunctions",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/cloud-assembly-schema",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/core",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/custom-resources",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/cx-api",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/lambda-layer-awscli",
-      "version": "1.119.0",
+      "version": "1.122.0",
       "type": "runtime"
     },
     {
       "name": "@aws-sdk/client-cloudformation",
-      "version": "^3.27.0",
+      "version": "^3.30.0",
       "type": "runtime"
     },
     {
       "name": "@aws-sdk/client-glue",
-      "version": "^3.27.0",
+      "version": "^3.30.0",
       "type": "runtime"
     },
     {
       "name": "@aws-sdk/client-lambda",
-      "version": "^3.27.0",
+      "version": "^3.30.0",
       "type": "runtime"
     },
     {
       "name": "@aws-sdk/client-secrets-manager",
-      "version": "^3.27.0",
+      "version": "^3.30.0",
       "type": "runtime"
     },
     {
       "name": "@aws-sdk/client-serverlessapplicationrepository",
-      "version": "^3.27.0",
+      "version": "^3.30.0",
       "type": "runtime"
     },
     {
       "name": "@aws-sdk/client-sts",
-      "version": "^3.27.0",
+      "version": "^3.30.0",
       "type": "runtime"
     },
     {
       "name": "cfn-custom-resource",
-      "version": "^5.0.12",
+      "version": "^5.0.14",
       "type": "runtime"
     },
     {
@@ -300,7 +295,7 @@
     },
     {
       "name": "mongodb",
-      "version": "^3.6.11",
+      "version": "^3.7.0",
       "type": "runtime"
     },
     {

@@ -192,6 +192,7 @@ project.addTask('postinstall', {
 });
 project.package.addField('resolutions', {
   'trim-newlines': '^3.0.1',
+  'pac-resolver': '^5.0.0',
 });
 project.addFields({
   version: '2.0.0-mainline',
