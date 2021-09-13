@@ -270,8 +270,8 @@ reactPrj.package.addField('resolutions', {
   'normalize-url': '^4.5.1',
   'browserslist': '^4.16.5',
   'css-what': '^5.0.1',
-  'ansi-html': '^0.0.7',
   'immer': '^9.0.6',
+  'axios': '^0.21.4',
 });
 
 project.synth();
