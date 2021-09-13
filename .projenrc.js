@@ -1,4 +1,4 @@
-const { AwsCdkTypeScriptApp, web } = require('projen');
+const { AwsCdkTypeScriptApp, DependenciesUpgradeMechanism, web } = require('projen');
 
 const tsExcludeConfig = {
   compilerOptions: {
@@ -178,6 +178,12 @@ const project = new AwsCdkTypeScriptApp({
   // sampleCode: true,                                                         /* Generate one-time sample in `src/` and `test/` if there are no files there. */
   tsconfig: tsExcludeConfig /* Custom TSConfig. */,
   // typescriptVersion: '^3.9.5',                                              /* TypeScript version to use. */
+  depsUpgrade: DependenciesUpgradeMechanism.githubWorkflow({
+    workflowOptions: {
+      labels: ['auto-approve', 'auto-merge'],
+      secret: 'PROJEN_GITHUB_TOKEN',
+    },
+  }),
 });
 
 project.addTask('deploy-to-default-vpc', {
