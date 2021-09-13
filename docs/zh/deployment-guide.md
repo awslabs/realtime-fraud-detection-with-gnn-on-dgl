@@ -210,8 +210,8 @@ aws s3 rb s3://<bucket-name> --force
 [api-gateway]: https://aws.amazon.com/cn/api-gateway/
 [appsync]: https://aws.amazon.com/cn/appsync/
 [secrets-manager]: https://aws.amazon.com/cn/secrets-manager/
-[deploy-to-zhy]: https://cn-northwest-1.console.amazonaws.cn/cloudformation/home?region=cn-northwest-1#/stacks/create/template?stackName=fraud-detection-on-dgl&templateURL=https://aws-gcr-solutions.s3.cn-north-1.amazonaws.com.cn/fraud-detection-on-dgl/latest/realtime-fraud-detection-with-gnn-on-dgl-aws-cn.template.json
-[deploy-to-global]: https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=fraud-detection-on-dgl&templateURL=https://aws-gcr-solutions.s3.amazonaws.com/fraud-detection-on-dgl/latest/realtime-fraud-detection-with-gnn-on-dgl.template.json
+[deploy-to-zhy]: https://cn-northwest-1.console.amazonaws.cn/cloudformation/home?region=cn-northwest-1#/stacks/create/template?stackName=fraud-detection-on-dgl&templateURL=https://aws-gcr-solutions.s3.cn-north-1.amazonaws.com.cn/Realtime-fraud-detection-with-gnn-on-dgl-rel/latest/realtime-fraud-detection-with-gnn-on-dgl-aws-cn.template.json
+[deploy-to-global]: https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=fraud-detection-on-dgl&templateURL=https://aws-gcr-solutions.s3.amazonaws.com/Realtime-fraud-detection-with-gnn-on-dgl-rel/latest/realtime-fraud-detection-with-gnn-on-dgl.template.json
 [cloudformation-console]: https://cn-northwest-1.console.amazonaws.cn/cloudformation/home?region=cn-northwest-1
 [aws-cli]: https://docs.amazonaws.cn/cli/latest/userguide/cli-chap-welcome.html
 [s3-console]: https://console.amazonaws.cn/s3/home?region=cn-northwest-1#
