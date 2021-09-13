@@ -99,7 +99,7 @@ const List: React.FC = () => {
         count={100}
         rowsPerPage={10}
         page={1}
-        onChangePage={handleChangePage}
+        onPageChange={handleChangePage}
         onChangeRowsPerPage={handleChangeRowsPerPage}
       />
     </TableContainer>

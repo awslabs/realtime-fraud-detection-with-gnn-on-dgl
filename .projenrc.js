@@ -1,4 +1,4 @@
-const { AwsCdkTypeScriptApp, web } = require('projen');
+const { AwsCdkTypeScriptApp, DependenciesUpgradeMechanism, web } = require('projen');
 
 const tsExcludeConfig = {
   compilerOptions: {
@@ -7,9 +7,9 @@ const tsExcludeConfig = {
   exclude: ['src/frontend'],
 };
 
-const awsJSSDKV3 = '^3.27.0';
+const awsJSSDKV3 = '^3.30.0';
 const project = new AwsCdkTypeScriptApp({
-  cdkVersion: '1.119.0',
+  cdkVersion: '1.122.0',
   name: 'realtime-fraud-detection-with-gnn-on-dgl',
   /* AwsCdkTypeScriptAppOptions */
   // appEntrypoint: 'main.ts',                                                 /* The CDK app's entrypoint (relative to the source directory, which is "src" by default). */
@@ -68,17 +68,16 @@ const project = new AwsCdkTypeScriptApp({
     '@aws-sdk/client-serverlessapplicationrepository@' + awsJSSDKV3,
     '@aws-sdk/client-lambda@' + awsJSSDKV3,
     '@aws-sdk/client-cloudformation@' + awsJSSDKV3,
-    'cfn-custom-resource@^5.0.12',
+    'cfn-custom-resource@^5.0.14',
     'sync-fetch@^0.3.0',
-    'mongodb@^3.6.11',
+    'mongodb@^3.7.0',
     'mongodb-client-encryption@^1.2.6',
   ] /* Runtime dependencies of this module. */,
   description:
     'Real-time Fraud Detection with Graph Neural Network on DGL' /* The description is just a string that helps people understand the purpose of the package. */,
   devDeps: [
-    '@types/aws-lambda@^8.10.76',
-    '@types/mongodb@^3.6.8',
-    'typescript@^4.2.0',
+    '@types/aws-lambda@^8.10.83',
+    '@types/mongodb@^3.6.20',
   ] /* Build dependencies for this module. */,
   // entrypoint: 'lib/index.js',                                               /* Module entrypoint (`main` in `package.json`). */
   // homepage: undefined,                                                      /* Package's Homepage / Website. */
@@ -179,6 +178,12 @@ const project = new AwsCdkTypeScriptApp({
   // sampleCode: true,                                                         /* Generate one-time sample in `src/` and `test/` if there are no files there. */
   tsconfig: tsExcludeConfig /* Custom TSConfig. */,
   // typescriptVersion: '^3.9.5',                                              /* TypeScript version to use. */
+  depsUpgrade: DependenciesUpgradeMechanism.githubWorkflow({
+    workflowOptions: {
+      labels: ['auto-approve', 'auto-merge'],
+      secret: 'PROJEN_GITHUB_TOKEN',
+    },
+  }),
 });
 
 project.addTask('deploy-to-default-vpc', {
@@ -193,6 +198,7 @@ project.addTask('postinstall', {
 });
 project.package.addField('resolutions', {
   'trim-newlines': '^3.0.1',
+  'pac-resolver': '^5.0.0',
 });
 project.addFields({
   version: '2.0.0-mainline',
@@ -233,21 +239,16 @@ const reactPrj = new web.ReactTypeScriptProject({
     'i18next@^20.3.1',
     'i18next-browser-languagedetector@^6.1.1',
     'i18next-http-backend@^1.2.6',
-    'axios@^0.21.1',
+    'axios@^0.21.4',
     'aws-amplify@^3.4.3',
     'best-queue@^2.0.1',
     'moment@^2.29.1',
     'node-sass@^5.0.0',
-    'react@^17.0.2',
     'react-apexcharts@^1.3.9',
-    'react-dom@^17.0.2',
     'react-i18next@^11.11.0',
     'react-loader-spinner@^4.0.0',
     'react-router-dom@^5.2.0',
-    'react-scripts@4.0.3',
     'sweetalert2@^10.16.9',
-    'typescript@^4.3.2',
-    'web-vitals@^1.1.2',
   ],
   devDeps: [
     '@types/react-loader-spinner@^3.1.3',
@@ -275,6 +276,8 @@ reactPrj.package.addField('resolutions', {
   'normalize-url': '^4.5.1',
   'browserslist': '^4.16.5',
   'css-what': '^5.0.1',
+  'ansi-html': '^0.0.7',
+  'immer': '^9.0.6',
 });
 
 project.synth();
