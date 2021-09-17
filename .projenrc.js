@@ -200,6 +200,7 @@ project.addTask('postinstall', {
 project.package.addField('resolutions', {
   'trim-newlines': '^3.0.1',
   'pac-resolver': '^5.0.0',
+  'set-value': '^4.0.1',
 });
 project.addFields({
   version: '2.0.0-mainline',
@@ -279,6 +280,7 @@ reactPrj.package.addField('resolutions', {
   'css-what': '^5.0.1',
   'immer': '^9.0.6',
   'axios': '^0.21.4',
+  'set-value': '^4.0.1',
 });
 
 project.synth();
