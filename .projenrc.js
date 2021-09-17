@@ -78,6 +78,7 @@ const project = new AwsCdkTypeScriptApp({
   devDeps: [
     '@types/aws-lambda@^8.10.83',
     '@types/mongodb@^3.6.20',
+    '@types/bson@^4.2.0',
   ] /* Build dependencies for this module. */,
   // entrypoint: 'lib/index.js',                                               /* Module entrypoint (`main` in `package.json`). */
   // homepage: undefined,                                                      /* Package's Homepage / Website. */

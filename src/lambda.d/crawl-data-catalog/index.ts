@@ -38,8 +38,10 @@ export const crawler: CrawlDataCatalogEventHandler = async (event, _context, cal
 
     callback(null);
   } catch (err) {
-    console.error(err, err.stack);
-    callback(err);
+    if (err instanceof Error) {
+      console.error(err, err.stack);
+      callback(err);
+    }
   }
 };
 

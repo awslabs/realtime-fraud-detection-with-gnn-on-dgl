@@ -6,6 +6,11 @@
       "type": "build"
     },
     {
+      "name": "@types/bson",
+      "version": "^4.2.0",
+      "type": "build"
+    },
+    {
       "name": "@types/jest",
       "type": "build"
     },
