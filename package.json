@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.83",
+    "@types/bson": "^4.2.0",
     "@types/jest": "^26.0.24",
     "@types/mongodb": "^3.6.20",
     "@types/node": "^10.17.0",

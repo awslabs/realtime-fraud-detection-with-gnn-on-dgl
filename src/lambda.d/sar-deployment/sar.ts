@@ -127,7 +127,7 @@ export const handler: CloudFormationCustomResourceHandler = async (event, _conte
       console.log(err.stack);
     }
   }
-  return await sendResponse({
+  return sendResponse({
     Status: result,
     Reason: reason,
     PhysicalResourceId: (resourceId ? resourceId : _context.logStreamName),
