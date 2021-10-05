@@ -6321,14 +6321,14 @@ mongodb-client-encryption@^1.2.6:
     prebuild-install "6.1.2"
 
 mongodb@^3.7.0:
-  version "3.7.1"
-  resolved "https://registry.yarnpkg.com/mongodb/-/mongodb-3.7.1.tgz#492afe1e870eb11b2d98f7e302146d176bda1ed4"
-  integrity sha512-iSVgexYr8ID0ieeNFUbRfQeOZxOchRck6kEDVySQRaa8VIw/1Pm+/LgcpZcl/BWV6nT0L8lP9qyl7dRPJ6mnLw==
+  version "3.7.2"
+  resolved "https://registry.yarnpkg.com/mongodb/-/mongodb-3.7.2.tgz#d0d43b08ff1e5c13f4112175e321fa292cf35a3d"
+  integrity sha512-/Qi0LmOjzIoV66Y2JQkqmIIfFOy7ZKsXnQNlUXPFXChOw3FCdNqVD5zvci9ybm6pkMe/Nw+Rz9I0Zsk2a+05iQ==
   dependencies:
     bl "^2.2.1"
     bson "^1.1.4"
     denque "^1.4.1"
-    optional-require "^1.0.3"
+    optional-require "^1.1.8"
     safe-buffer "^5.1.2"
   optionalDependencies:
     saslprep "^1.0.0"
@@ -6704,7 +6704,7 @@ onetime@^5.1.0:
   dependencies:
     mimic-fn "^2.1.0"
 
-optional-require@^1.0.3:
+optional-require@^1.1.8:
   version "1.1.8"
   resolved "https://registry.yarnpkg.com/optional-require/-/optional-require-1.1.8.tgz#16364d76261b75d964c482b2406cb824d8ec44b7"
   integrity sha512-jq83qaUb0wNg9Krv1c5OQ+58EK+vHde6aBPzLvPPqJm89UQWsvSuFy9X/OSNJnFeSOKo7btE0n8Nl2+nE+z5nA==
