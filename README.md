@@ -63,7 +63,18 @@ The solution is using graph database [Amazon Neptune][neptune] for real-time fra
 - Asia Pacific (Mumbai):   ap-south-1
 - China (Ningxia):   cn-northwest-1
 
-### Prerequisites
+### Quick deployment
+
+Region name | Region code | Launch
+--- | --- | ---
+Global regions(switch to above region you want to deploy) | us-east-1(default) | [Launch](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=fraud-detection-on-dgl&templateURL=https://aws-gcr-solutions.s3.amazonaws.com/Realtime-fraud-detection-with-gnn-on-dgl-rel/latest/realtime-fraud-detection-with-gnn-on-dgl.template.json)
+AWS China(Ningxia) Region | cn-northwest-1 | [Launch](https://cn-northwest-1.console.amazonaws.cn/cloudformation/home?region=cn-northwest-1#/stacks/create/template?stackName=fraud-detection-on-dgl&templateURL=https://aws-gcr-solutions.s3.cn-north-1.amazonaws.com.cn/Realtime-fraud-detection-with-gnn-on-dgl-rel/latest/realtime-fraud-detection-with-gnn-on-dgl-aws-cn.template.json)
+
+See [deployment guide][deployment-guide] for detail steps.
+
+### Deploy from source
+
+#### Prerequisites
 
 - An AWS account
 - Configure [credential of aws cli][configure-aws-cli]
@@ -81,13 +92,13 @@ Run below command if you are deployed to China regions
 aws ecr get-login-password --region cn-northwest-1 | docker login --username AWS --password-stdin 727897471807.dkr.ecr.cn-northwest-1.amazonaws.com.cn
 ```
 
-### Deploy it in a new VPC
+#### Deploy it in a new VPC
 The deployment will create a new VPC acrossing two AZs at least and NAT gateways. Then the solution will be deployed into the newly created VPC.
 ```shell
 yarn deploy
 ```
 
-### Deploy it into existing VPC
+#### Deploy it into existing VPC
 If you want to deploy the solution to default VPC, use below command.
 ```shell
 yarn deploy-to-default-vpc
@@ -99,7 +110,7 @@ npx cdk deploy -c vpcId=<your vpc id>
 
 **NOTE: please make sure your existing VPC having both public subnets and private subnets with NAT gateway.**
 
-### Deploy it with custom Neptune instance class and replica count
+#### Deploy it with custom Neptune instance class and replica count
 
 The solution will deploy Neptune cluster with instance class `db.r5.xlarge` and `1` read replica by default. You can override the instance class and replica count like below,
 
@@ -107,14 +118,14 @@ The solution will deploy Neptune cluster with instance class `db.r5.xlarge` and 
 npx cdk deploy --parameters NeptuneInstaneType=db.r5.4xlarge -c NeptuneReplicaCount=2 
 ```
 
-### Deploy it with custom domain of dashboard
+#### Deploy it with custom domain of dashboard
 
 If you want use custom domain to access the dashbaord of solution, you can use below options when deploying the solution. NOTE: you need already create a public hosted zone in Route 53, see [Solution prerequisites](#prerequisites) for detail.
 ```shell
 npx cdk deploy -c EnableDashboardCustomDomain=true --parameters DashboardDomain=<the custom domain> --parameters Route53HostedZoneId=<hosted zone id of your domain>
 ```
 
-### Deploy it to China regions
+#### Deploy it to China regions
 Add below additional context parameters,
 ```shell
 npx cdk deploy -c TargetPartition=aws-cn
@@ -179,3 +190,4 @@ This project is licensed under the Apache-2.0 License.
 [aws-cdk]: https://aws.amazon.com/cdk/
 [cfn-stack]: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/stacks.html
 [create-public-hosted-zone]: https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/CreatingHostedZone.html
+[deployment-guide]: https://awslabs.github.io/realtime-fraud-detection-with-gnn-on-dgl/en/deployment/
