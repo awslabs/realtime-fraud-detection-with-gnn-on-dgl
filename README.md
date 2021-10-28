@@ -167,6 +167,14 @@ This solution has a few additional components and features than the current Amaz
 
 While this solution gives an overall architecture of an end-to-end real-time inference solution, the Amazon Neptune ML has been optimized for scalability and system-level performance, e.g. query latency. Therefore, later on when the Amazon Neptune ML supports real-time inference, it could be integrated into this solution as the main training and inference sub-system for customers who requires better scalability and low latency.
 
+### Deployment failure on creating `CloudWatch LogGroup`
+The deployment might fail due to creating CloudWatch log group with error message like below,
+
+```
+Cannot enable logging. Policy document length breaking Cloudwatch Logs Constraints, either < 1 or > 5120 (Service: AmazonApiGatewayV2; Status Code: 400; Error Code: BadRequestException; Request ID: xxx-yyy-zzz; Proxy: null)
+```
+
+It's caused by [CloudWatch Logs resource policies are limited to 5120 characters][cloudwatch-logs-limit]. The remediation is merging or removing useless policies then update the resource policy of CloudWatch logs to reduce the characters of policies.
 
 ## Security
 
@@ -191,3 +199,4 @@ This project is licensed under the Apache-2.0 License.
 [cfn-stack]: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/stacks.html
 [create-public-hosted-zone]: https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/CreatingHostedZone.html
 [deployment-guide]: https://awslabs.github.io/realtime-fraud-detection-with-gnn-on-dgl/en/deployment/
+[cloudwatch-logs-limit]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/AWS-logs-and-resource-policy.html#AWS-logs-infrastructure-CWL
