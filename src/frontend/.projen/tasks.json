@@ -36,17 +36,10 @@
       "name": "compile",
       "description": "Only compile"
     },
-    "test:compile": {
-      "name": "test:compile",
-      "description": "compiles the test code"
-    },
     "test": {
       "name": "test",
       "description": "Run tests",
       "steps": [
-        {
-          "spawn": "test:compile"
-        },
         {
           "exec": "react-scripts test --watchAll=false"
         }
@@ -64,48 +57,6 @@
         },
         {
           "exec": "react-scripts build"
-        }
-      ]
-    },
-    "upgrade": {
-      "name": "upgrade",
-      "description": "upgrade dependencies",
-      "env": {
-        "CI": "0"
-      },
-      "steps": [
-        {
-          "exec": "npm-check-updates --upgrade --target=minor --reject='projen'"
-        },
-        {
-          "exec": "yarn install --check-files"
-        },
-        {
-          "exec": "yarn upgrade @testing-library/jest-dom @testing-library/react @testing-library/user-event @types/jest @types/node @types/react @types/react-dom @types/react-loader-spinner @types/react-router-dom npm-check-updates typescript @material-ui/core @material-ui/icons @material-ui/lab @testing-library/jest-dom @testing-library/react @testing-library/user-event @types/jest @types/node @types/react-dom @types/react apexcharts aws-amplify aws-appsync aws-sdk axios best-queue graphql-tag i18next-browser-languagedetector i18next-http-backend i18next moment node-sass react react-apexcharts react-dom react-i18next react-loader-spinner react-router-dom react-scripts sweetalert2 web-vitals"
-        },
-        {
-          "exec": "npx projen"
-        }
-      ]
-    },
-    "upgrade-projen": {
-      "name": "upgrade-projen",
-      "description": "upgrade projen",
-      "env": {
-        "CI": "0"
-      },
-      "steps": [
-        {
-          "exec": "npm-check-updates --upgrade --target=minor --filter='projen'"
-        },
-        {
-          "exec": "yarn install --check-files"
-        },
-        {
-          "exec": "yarn upgrade projen"
-        },
-        {
-          "exec": "npx projen"
         }
       ]
     },
@@ -149,6 +100,72 @@
       "steps": [
         {
           "exec": "npx projen build"
+        }
+      ]
+    },
+    "upgrade": {
+      "name": "upgrade",
+      "description": "upgrade dependencies",
+      "env": {
+        "CI": "0"
+      },
+      "steps": [
+        {
+          "exec": "npm-check-updates --dep dev --upgrade --target=minor --reject='projen'"
+        },
+        {
+          "exec": "npm-check-updates --dep optional --upgrade --target=minor --reject='projen'"
+        },
+        {
+          "exec": "npm-check-updates --dep peer --upgrade --target=minor --reject='projen'"
+        },
+        {
+          "exec": "npm-check-updates --dep prod --upgrade --target=minor --reject='projen'"
+        },
+        {
+          "exec": "npm-check-updates --dep bundle --upgrade --target=minor --reject='projen'"
+        },
+        {
+          "exec": "yarn install --check-files"
+        },
+        {
+          "exec": "yarn upgrade @testing-library/jest-dom @testing-library/react @testing-library/user-event @types/jest @types/node @types/react @types/react-dom @types/react-loader-spinner @types/react-router-dom npm-check-updates typescript @material-ui/core @material-ui/icons @material-ui/lab @testing-library/jest-dom @testing-library/react @testing-library/user-event @types/jest @types/node @types/react-dom @types/react apexcharts aws-amplify aws-appsync aws-sdk axios best-queue graphql-tag i18next-browser-languagedetector i18next-http-backend i18next moment node-sass react react-apexcharts react-dom react-i18next react-loader-spinner react-router-dom react-scripts sweetalert2 web-vitals"
+        },
+        {
+          "exec": "npx projen"
+        }
+      ]
+    },
+    "upgrade-projen": {
+      "name": "upgrade-projen",
+      "description": "upgrade projen",
+      "env": {
+        "CI": "0"
+      },
+      "steps": [
+        {
+          "exec": "npm-check-updates --dep dev --upgrade --target=minor --filter='projen'"
+        },
+        {
+          "exec": "npm-check-updates --dep optional --upgrade --target=minor --filter='projen'"
+        },
+        {
+          "exec": "npm-check-updates --dep peer --upgrade --target=minor --filter='projen'"
+        },
+        {
+          "exec": "npm-check-updates --dep prod --upgrade --target=minor --filter='projen'"
+        },
+        {
+          "exec": "npm-check-updates --dep bundle --upgrade --target=minor --filter='projen'"
+        },
+        {
+          "exec": "yarn install --check-files"
+        },
+        {
+          "exec": "yarn upgrade projen"
+        },
+        {
+          "exec": "npx projen"
         }
       ]
     }

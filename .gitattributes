@@ -15,7 +15,6 @@
 /cdk.json                        	linguist-generated
 /package.json                    	linguist-generated
 /react-app-env.d.ts              	linguist-generated
-/tsconfig.eslint.json            	linguist-generated
-/tsconfig.jest.json              	linguist-generated
+/tsconfig.dev.json               	linguist-generated
 /tsconfig.json                   	linguist-generated
 /yarn.lock                       	linguist-generated
