@@ -90,7 +90,6 @@ import {
   CustomResource,
   CfnMapping,
   Aws,
-  Expiration,
   Fn,
   Resource,
   Stack,
@@ -365,14 +364,6 @@ export class TransactionDashboardStack extends NestedStack {
         defaultAuthorization: {
           authorizationType: AuthorizationType.IAM,
         },
-        additionalAuthorizationModes: [
-          {
-            authorizationType: AuthorizationType.API_KEY,
-            apiKeyConfig: {
-              expires: Expiration.after(Duration.days(30)),
-            },
-          },
-        ],
       },
       xrayEnabled: true,
     });

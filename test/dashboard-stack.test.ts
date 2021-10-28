@@ -295,11 +295,6 @@ describe('dashboard stack test suite', () => {
 
     expect(stack).toHaveResourceLike('AWS::AppSync::GraphQLApi', {
       AuthenticationType: 'AWS_IAM',
-      AdditionalAuthenticationProviders: [
-        {
-          AuthenticationType: 'API_KEY',
-        },
-      ],
       LogConfig: {
         CloudWatchLogsRoleArn: {
           'Fn::GetAtt': [
@@ -376,6 +371,10 @@ describe('dashboard stack test suite', () => {
       RequestMappingTemplate: '{"version": "2017-02-28", "operation": "Invoke", "payload": \n        {\n          "field": "getFraudTransactions",\n          "data":  {\n            "start": $context.arguments.start,\n            "end": $context.arguments.end\n          }\n        }\n      }',
       ResponseMappingTemplate: '$util.toJson($ctx.result)',
     });
+  });
+
+  test('no ApiKey of dashboard graphql is created', () => {
+    expect(stack).toCountResources('AWS::AppSync::ApiKey', 0);
   });
 
   test('transaction generator is created', () => {
