@@ -119,13 +119,15 @@ export const handler: CloudFormationCustomResourceHandler = async (event, _conte
         break;
     }
   } catch (err) {
-    console.error(`Failed to deploy SAR application due to ${err}.`);
-    responseData = err.message;
-    result = FAILED;
-    reason = err.message;
-    console.log(err.stack);
+    if (err instanceof Error) {
+      console.error(`Failed to deploy SAR application due to ${err}.`);
+      responseData = err.message;
+      result = FAILED;
+      reason = err.message;
+      console.log(err.stack);
+    }
   }
-  return await sendResponse({
+  return sendResponse({
     Status: result,
     Reason: reason,
     PhysicalResourceId: (resourceId ? resourceId : _context.logStreamName),

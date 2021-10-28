@@ -1,4 +1,4 @@
-const { AwsCdkTypeScriptApp, DependenciesUpgradeMechanism, web } = require('projen');
+const { AwsCdkTypeScriptApp, web } = require('projen');
 
 const tsExcludeConfig = {
   compilerOptions: {
@@ -78,6 +78,7 @@ const project = new AwsCdkTypeScriptApp({
   devDeps: [
     '@types/aws-lambda@^8.10.83',
     '@types/mongodb@^3.6.20',
+    '@types/bson@^4.2.0',
   ] /* Build dependencies for this module. */,
   // entrypoint: 'lib/index.js',                                               /* Module entrypoint (`main` in `package.json`). */
   // homepage: undefined,                                                      /* Package's Homepage / Website. */
@@ -178,12 +179,13 @@ const project = new AwsCdkTypeScriptApp({
   // sampleCode: true,                                                         /* Generate one-time sample in `src/` and `test/` if there are no files there. */
   tsconfig: tsExcludeConfig /* Custom TSConfig. */,
   // typescriptVersion: '^3.9.5',                                              /* TypeScript version to use. */
-  depsUpgrade: DependenciesUpgradeMechanism.githubWorkflow({
+  depsUpgradeOptions: {
+    ignoreProjen: false,
     workflowOptions: {
       labels: ['auto-approve', 'auto-merge'],
       secret: 'PROJEN_GITHUB_TOKEN',
     },
-  }),
+  },
 });
 
 project.addTask('deploy-to-default-vpc', {
@@ -199,9 +201,12 @@ project.addTask('postinstall', {
 project.package.addField('resolutions', {
   'trim-newlines': '^3.0.1',
   'pac-resolver': '^5.0.0',
+  'set-value': '^4.0.1',
+  'ansi-regex': '^5.0.1',
+
 });
 project.addFields({
-  version: '2.0.0-mainline',
+  version: '2.0.1-mainline',
 });
 
 const tsReactConfig = {
@@ -276,8 +281,11 @@ reactPrj.package.addField('resolutions', {
   'normalize-url': '^4.5.1',
   'browserslist': '^4.16.5',
   'css-what': '^5.0.1',
-  'ansi-html': '^0.0.7',
   'immer': '^9.0.6',
+  'axios': '^0.21.4',
+  'set-value': '^4.0.1',
+  'ansi-regex': '^5.0.1',
+  'nth-check': '^2.0.1',
 });
 
 project.synth();
