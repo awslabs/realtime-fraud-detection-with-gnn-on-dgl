@@ -1,5 +1,26 @@
 {
   "tasks": {
+    "build": {
+      "name": "build",
+      "description": "Full release build",
+      "steps": [
+        {
+          "spawn": "pre-compile"
+        },
+        {
+          "spawn": "compile"
+        },
+        {
+          "spawn": "post-compile"
+        },
+        {
+          "spawn": "test"
+        },
+        {
+          "spawn": "package"
+        }
+      ]
+    },
     "clobber": {
       "name": "clobber",
       "description": "hard resets to HEAD of origin and cleans the local repo",
@@ -34,27 +55,8 @@
     },
     "compile": {
       "name": "compile",
-      "description": "Only compile"
-    },
-    "test": {
-      "name": "test",
-      "description": "Run tests",
+      "description": "Only compile",
       "steps": [
-        {
-          "exec": "react-scripts test --watchAll=false"
-        }
-      ]
-    },
-    "build": {
-      "name": "build",
-      "description": "Full release build (test+compile)",
-      "steps": [
-        {
-          "spawn": "test"
-        },
-        {
-          "spawn": "compile"
-        },
         {
           "exec": "react-scripts build"
         }
@@ -62,18 +64,10 @@
     },
     "default": {
       "name": "default",
+      "description": "Synthesize project files",
       "steps": [
         {
           "exec": "node .projenrc.js"
-        }
-      ]
-    },
-    "watch": {
-      "name": "watch",
-      "description": "Watch & compile in the background",
-      "steps": [
-        {
-          "exec": "tsc --build -w"
         }
       ]
     },
@@ -95,11 +89,32 @@
         }
       ]
     },
+    "package": {
+      "name": "package",
+      "description": "Creates the distribution package"
+    },
+    "post-compile": {
+      "name": "post-compile",
+      "description": "Runs after successful compilation"
+    },
     "postinstall": {
       "name": "postinstall",
       "steps": [
         {
           "exec": "npx projen build"
+        }
+      ]
+    },
+    "pre-compile": {
+      "name": "pre-compile",
+      "description": "Prepare the project for compilation"
+    },
+    "test": {
+      "name": "test",
+      "description": "Run tests",
+      "steps": [
+        {
+          "exec": "react-scripts test --watchAll=false"
         }
       ]
     },
@@ -166,6 +181,15 @@
         },
         {
           "exec": "npx projen"
+        }
+      ]
+    },
+    "watch": {
+      "name": "watch",
+      "description": "Watch & compile in the background",
+      "steps": [
+        {
+          "exec": "tsc --build -w"
         }
       ]
     }
