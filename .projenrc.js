@@ -68,6 +68,7 @@ const project = new AwsCdkTypeScriptApp({
     '@aws-sdk/client-serverlessapplicationrepository@' + awsJSSDKV3,
     '@aws-sdk/client-lambda@' + awsJSSDKV3,
     '@aws-sdk/client-cloudformation@' + awsJSSDKV3,
+    '@types/aws-lambda@^8.10.83',
     'cfn-custom-resource@^5.0.14',
     'sync-fetch@^0.3.0',
     'mongodb@^3.7.0',
@@ -76,7 +77,6 @@ const project = new AwsCdkTypeScriptApp({
   description:
     'Real-time Fraud Detection with Graph Neural Network on DGL' /* The description is just a string that helps people understand the purpose of the package. */,
   devDeps: [
-    '@types/aws-lambda@^8.10.83',
     '@types/mongodb@^3.6.20',
     '@types/bson@^4.2.0',
   ] /* Build dependencies for this module. */,
