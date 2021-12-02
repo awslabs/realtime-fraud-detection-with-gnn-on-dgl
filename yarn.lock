@@ -1000,9 +1000,9 @@
     uuid "^8.3.2"
 
 "@aws-sdk/client-glue@^3.30.0":
-  version "3.43.0"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/client-glue/-/client-glue-3.43.0.tgz#edf26bc5df99d1dfeffb1bb1c69537fe83efe7fe"
-  integrity sha512-lUMtEm+nfCFjWHv/LZpb1edKmdEN40jVjzadWpvuQ8AjcAv/Vf8WevUMZlI/aSzo1IqqIRxj8/p9/JO4F2dL3A==
+  version "3.44.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/client-glue/-/client-glue-3.44.0.tgz#ac0898b87823e184c9ec285624c7dc388685fbcf"
+  integrity sha512-iHUqhcNh2z633viDjdets8+UtnyRiodVFkgz5V6vaoERwkC6/zUS98FOHVBREWWU57AHzpbMbROqC7NDZDL9uQ==
   dependencies:
     "@aws-crypto/sha256-browser" "2.0.0"
     "@aws-crypto/sha256-js" "2.0.0"
