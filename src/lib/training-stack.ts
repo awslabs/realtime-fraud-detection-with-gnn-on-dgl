@@ -1,22 +1,23 @@
 import * as path from 'path';
-import { IVpc, InstanceType, InstanceClass, InstanceSize, SecurityGroup, SubnetType } from '@aws-cdk/aws-ec2';
-import { Repository } from '@aws-cdk/aws-ecr';
-import { DockerImageAsset, DockerImageAssetProps } from '@aws-cdk/aws-ecr-assets';
-import { Cluster, FargateTaskDefinition, ContainerImage, LogDrivers, FargatePlatformVersion } from '@aws-cdk/aws-ecs';
-import { FileSystem, LifecyclePolicy } from '@aws-cdk/aws-efs';
-import { PolicyStatement, Effect, Role, ServicePrincipal } from '@aws-cdk/aws-iam';
-import { Key } from '@aws-cdk/aws-kms';
-import { Runtime, LayerVersion, Code, Tracing, FileSystem as LambdaFileSystem } from '@aws-cdk/aws-lambda';
-import { NodejsFunction } from '@aws-cdk/aws-lambda-nodejs';
-import { PythonFunction } from '@aws-cdk/aws-lambda-python';
-import { LogGroup, RetentionDays } from '@aws-cdk/aws-logs';
-import { IDatabaseCluster } from '@aws-cdk/aws-neptune';
-import { IBucket } from '@aws-cdk/aws-s3';
-import { BucketDeployment, Source } from '@aws-cdk/aws-s3-deployment';
-import { IntegrationPattern, StateMachine, Fail, Errors, TaskInput, LogLevel, JsonPath, Choice, Condition } from '@aws-cdk/aws-stepfunctions';
-import { LambdaInvoke, S3DataType, GlueStartJobRun, SageMakerCreateModel, S3Location, ContainerDefinition, Mode, DockerImage, SageMakerCreateEndpointConfig, SageMakerCreateEndpoint, SageMakerUpdateEndpoint, EcsRunTask, EcsFargateLaunchTarget, SageMakerCreateTrainingJob, InputMode } from '@aws-cdk/aws-stepfunctions-tasks';
-import { Construct, Duration, NestedStack, NestedStackProps, Arn, Stack, CfnMapping, Aws, RemovalPolicy, IgnoreMode, Size, Token, CfnResource, Aspects } from '@aws-cdk/core';
-import { AwsCliLayer } from '@aws-cdk/lambda-layer-awscli';
+import { PythonFunction } from '@aws-cdk/aws-lambda-python-alpha';
+import { IDatabaseCluster } from '@aws-cdk/aws-neptune-alpha';
+import { IVpc, InstanceType, InstanceClass, InstanceSize, SecurityGroup, SubnetType } from 'aws-cdk-lib/aws-ec2';
+import { Repository } from 'aws-cdk-lib/aws-ecr';
+import { DockerImageAsset, DockerImageAssetProps } from 'aws-cdk-lib/aws-ecr-assets';
+import { Cluster, FargateTaskDefinition, ContainerImage, LogDrivers, FargatePlatformVersion } from 'aws-cdk-lib/aws-ecs';
+import { FileSystem, LifecyclePolicy } from 'aws-cdk-lib/aws-efs';
+import { PolicyStatement, Effect, Role, ServicePrincipal, Policy } from 'aws-cdk-lib/aws-iam';
+import { Key } from 'aws-cdk-lib/aws-kms';
+import { Runtime, LayerVersion, Code, Tracing, FileSystem as LambdaFileSystem } from 'aws-cdk-lib/aws-lambda';
+import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
+import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
+import { IBucket } from 'aws-cdk-lib/aws-s3';
+import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
+import { IntegrationPattern, StateMachine, Fail, Errors, TaskInput, LogLevel, JsonPath, Choice, Condition } from 'aws-cdk-lib/aws-stepfunctions';
+import { LambdaInvoke, S3DataType, GlueStartJobRun, SageMakerCreateModel, S3Location, ContainerDefinition, Mode, DockerImage, SageMakerCreateEndpointConfig, SageMakerCreateEndpoint, SageMakerUpdateEndpoint, EcsRunTask, EcsFargateLaunchTarget, SageMakerCreateTrainingJob, InputMode } from 'aws-cdk-lib/aws-stepfunctions-tasks';
+import { Duration, NestedStack, NestedStackProps, Arn, Stack, CfnMapping, Aws, RemovalPolicy, IgnoreMode, Size, Token, CfnResource, Aspects } from 'aws-cdk-lib/core';
+import { AwsCliLayer } from 'aws-cdk-lib/lambda-layer-awscli';
+import { Construct } from 'constructs';
 import { getDatasetMapping, IEEE } from './dataset';
 import { ETLByGlue } from './etl-glue';
 import { WranglerLayer } from './layer';
@@ -47,7 +48,6 @@ export class TrainingStack extends NestedStack {
     const kmsKey = new Key(this, 'realtime-fraud-detection-with-gnn-on-dgl-training', {
       alias: 'realtime-fraud-detection-with-gnn-on-dgl/training',
       enableKeyRotation: true,
-      trustAccountIdentities: true,
       removalPolicy: RemovalPolicy.DESTROY,
     });
 
@@ -124,23 +124,27 @@ export class TrainingStack extends NestedStack {
       runtime: Runtime.NODEJS_14_X,
       tracing: Tracing.ACTIVE,
     });
-    dataCatalogCrawlerFn.role?.addToPolicy(new PolicyStatement({
-      effect: Effect.ALLOW,
-      actions: [
-        'glue:StartCrawler',
+    dataCatalogCrawlerFn.role?.attachInlinePolicy(new Policy(this, 'gluePolicy', {
+      statements: [
+        new PolicyStatement({
+          effect: Effect.ALLOW,
+          actions: [
+            'glue:StartCrawler',
+          ],
+          resources: [Arn.format({
+            service: 'glue',
+            resource: 'crawler',
+            resourceName: etlConstruct.crawlerName,
+          }, Stack.of(this))],
+        }),
+        new PolicyStatement({
+          effect: Effect.ALLOW,
+          actions: [
+            'glue:GetCrawlerMetrics',
+          ],
+          resources: ['*'],
+        }),
       ],
-      resources: [Arn.format({
-        service: 'glue',
-        resource: 'crawler',
-        resourceName: etlConstruct.crawlerName,
-      }, Stack.of(this))],
-    }));
-    dataCatalogCrawlerFn.role?.addToPolicy(new PolicyStatement({
-      effect: Effect.ALLOW,
-      actions: [
-        'glue:GetCrawlerMetrics',
-      ],
-      resources: ['*'],
     }));
 
     const dataIngestTask = new LambdaInvoke(this, 'Data Ingest', {
@@ -342,7 +346,7 @@ export class TrainingStack extends NestedStack {
       vpcSubnets: props.vpc.selectSubnets({
         subnetType: SubnetType.PRIVATE,
       }),
-      securityGroup: modelRepackageSG,
+      securityGroups: [modelRepackageSG],
       tracing: Tracing.ACTIVE,
     });
 
@@ -805,7 +809,7 @@ export class TarLayer extends LayerVersion {
     super(scope, id, {
       code: Code.fromAsset(path.join(__dirname, '../lambda.d/repackage-model/'), {
         bundling: {
-          image: Runtime.PROVIDED.bundlingDockerImage,
+          image: Runtime.PROVIDED.bundlingImage,
           user: 'root',
           command: [
             'bash', '-c', `

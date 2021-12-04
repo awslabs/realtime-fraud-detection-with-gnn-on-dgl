@@ -1,9 +1,9 @@
 // https://github.com/wchaws/cdk-bootstrapless-synthesizer/blob/26cc2dc9e4a9b63095f481e6239afed572b9b01a/src/index.ts
 import * as fs from 'fs';
 import * as path from 'path';
-import * as cxschema from '@aws-cdk/cloud-assembly-schema';
-import { DockerImageAssetLocation, DockerImageAssetSource, FileAssetLocation, FileAssetPackaging, FileAssetSource, Fn, ISynthesisSession, Stack, StackSynthesizer, Token } from '@aws-cdk/core';
 import * as cxapi from '@aws-cdk/cx-api';
+import * as cxschema from 'aws-cdk-lib/cloud-assembly-schema';
+import { DockerImageAssetLocation, DockerImageAssetSource, FileAssetLocation, FileAssetPackaging, FileAssetSource, Fn, ISynthesisSession, Stack, StackSynthesizer, Token } from 'aws-cdk-lib/core';
 
 
 const REGION_PLACEHOLDER = '${AWS::Region}';
@@ -248,7 +248,6 @@ export class BootstraplessStackSynthesizer extends StackSynthesizer {
       objectKey,
       httpUrl,
       s3ObjectUrl,
-      s3Url: httpUrl,
     };
   }
 

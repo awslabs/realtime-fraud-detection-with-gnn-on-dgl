@@ -1,24 +1,27 @@
 import * as path from 'path';
 import {
   HttpApi,
-  CfnIntegration,
   HttpIntegrationType,
   HttpConnectionType,
   PayloadFormatVersion,
   HttpMethod,
-  CfnRoute,
   HttpStage,
-  CfnStage,
-} from '@aws-cdk/aws-apigatewayv2';
-import { LambdaProxyIntegration } from '@aws-cdk/aws-apigatewayv2-integrations';
+} from '@aws-cdk/aws-apigatewayv2-alpha';
+import { LambdaProxyIntegration } from '@aws-cdk/aws-apigatewayv2-integrations-alpha';
 import {
   GraphqlApi,
   Schema,
   MappingTemplate,
   FieldLogLevel,
   AuthorizationType,
-} from '@aws-cdk/aws-appsync';
-import { Certificate, DnsValidatedCertificate } from '@aws-cdk/aws-certificatemanager';
+} from '@aws-cdk/aws-appsync-alpha';
+import { PythonFunction } from '@aws-cdk/aws-lambda-python-alpha';
+import {
+  CfnIntegration,
+  CfnRoute,
+  CfnStage,
+} from 'aws-cdk-lib/aws-apigatewayv2';
+import { Certificate, DnsValidatedCertificate } from 'aws-cdk-lib/aws-certificatemanager';
 import {
   Distribution,
   ViewerProtocolPolicy,
@@ -34,9 +37,9 @@ import {
   LambdaEdgeEventType,
   CfnDistribution,
   SecurityPolicyProtocol,
-} from '@aws-cdk/aws-cloudfront';
-import { S3Origin, HttpOrigin } from '@aws-cdk/aws-cloudfront-origins';
-import { ClusterParameterGroup, DatabaseCluster } from '@aws-cdk/aws-docdb';
+} from 'aws-cdk-lib/aws-cloudfront';
+import { S3Origin, HttpOrigin } from 'aws-cdk-lib/aws-cloudfront-origins';
+import { ClusterParameterGroup, DatabaseCluster } from 'aws-cdk-lib/aws-docdb';
 import {
   IVpc,
   SubnetType,
@@ -45,7 +48,7 @@ import {
   InstanceSize,
   SecurityGroup,
   Port,
-} from '@aws-cdk/aws-ec2';
+} from 'aws-cdk-lib/aws-ec2';
 import {
   Role,
   ServicePrincipal,
@@ -53,23 +56,22 @@ import {
   PolicyStatement,
   ArnPrincipal,
   ManagedPolicy,
-} from '@aws-cdk/aws-iam';
-import { Key } from '@aws-cdk/aws-kms';
-import { LayerVersion, Code, Runtime, Tracing } from '@aws-cdk/aws-lambda';
-import { SqsEventSource } from '@aws-cdk/aws-lambda-event-sources';
-import { NodejsFunction } from '@aws-cdk/aws-lambda-nodejs';
-import { PythonFunction } from '@aws-cdk/aws-lambda-python';
-import { RetentionDays, LogGroup } from '@aws-cdk/aws-logs';
-import { IHostedZone, ARecord, RecordTarget } from '@aws-cdk/aws-route53';
-import { CloudFrontTarget } from '@aws-cdk/aws-route53-targets';
-import { Bucket, BucketEncryption, BlockPublicAccess, IBucket } from '@aws-cdk/aws-s3';
+} from 'aws-cdk-lib/aws-iam';
+import { Key } from 'aws-cdk-lib/aws-kms';
+import { LayerVersion, Code, Runtime, Tracing } from 'aws-cdk-lib/aws-lambda';
+import { SqsEventSource } from 'aws-cdk-lib/aws-lambda-event-sources';
+import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
+import { RetentionDays, LogGroup } from 'aws-cdk-lib/aws-logs';
+import { IHostedZone, ARecord, RecordTarget } from 'aws-cdk-lib/aws-route53';
+import { CloudFrontTarget } from 'aws-cdk-lib/aws-route53-targets';
+import { Bucket, BucketEncryption, BlockPublicAccess, IBucket } from 'aws-cdk-lib/aws-s3';
 import {
   BucketDeployment,
   Source,
   CacheControl,
   StorageClass,
-} from '@aws-cdk/aws-s3-deployment';
-import { IQueue } from '@aws-cdk/aws-sqs';
+} from 'aws-cdk-lib/aws-s3-deployment';
+import { IQueue } from 'aws-cdk-lib/aws-sqs';
 import {
   IntegrationPattern,
   StateMachine,
@@ -78,10 +80,9 @@ import {
   Errors,
   Pass,
   DISCARD,
-} from '@aws-cdk/aws-stepfunctions';
-import { LambdaInvoke } from '@aws-cdk/aws-stepfunctions-tasks';
+} from 'aws-cdk-lib/aws-stepfunctions';
+import { LambdaInvoke } from 'aws-cdk-lib/aws-stepfunctions-tasks';
 import {
-  Construct,
   NestedStack,
   NestedStackProps,
   RemovalPolicy,
@@ -96,13 +97,15 @@ import {
   Arn,
   CfnResource,
   Aspects,
-} from '@aws-cdk/core';
+  ArnFormat,
+} from 'aws-cdk-lib/core';
 import {
   Provider,
   AwsCustomResource,
   PhysicalResourceId,
   AwsCustomResourcePolicy,
-} from '@aws-cdk/custom-resources';
+} from 'aws-cdk-lib/custom-resources';
+import { Construct } from 'constructs';
 import { IEEE, getDatasetMapping } from './dataset';
 import { WranglerLayer } from './layer';
 import { SARDeployment } from './sar';
@@ -131,7 +134,6 @@ export class TransactionDashboardStack extends NestedStack {
     const kmsKey = new Key(this, 'realtime-fraud-detection-with-gnn-on-dgl-dashboard', {
       alias: 'realtime-fraud-detection-with-gnn-on-dgl/dashboard',
       enableKeyRotation: true,
-      trustAccountIdentities: true,
       removalPolicy: RemovalPolicy.DESTROY,
     });
 
@@ -248,7 +250,7 @@ export class TransactionDashboardStack extends NestedStack {
       vpcSubnets: props.vpc.selectSubnets({
         subnetType: SubnetType.PRIVATE,
       }),
-      securityGroup: dashboardSG,
+      securityGroups: [dashboardSG],
       layers: [docDBCertLayer],
       tracing: Tracing.ACTIVE,
     });
@@ -290,7 +292,7 @@ export class TransactionDashboardStack extends NestedStack {
       vpcSubnets: props.vpc.selectSubnets({
         subnetType: SubnetType.PRIVATE,
       }),
-      securityGroup: createIndexSG,
+      securityGroups: [createIndexSG],
       layers: [docDBCertLayer],
       tracing: Tracing.ACTIVE,
     });
@@ -416,7 +418,7 @@ export class TransactionDashboardStack extends NestedStack {
       vpcSubnets: props.vpc.selectSubnets({
         subnetType: SubnetType.PRIVATE,
       }),
-      securityGroup: dashboardSG,
+      securityGroups: [dashboardSG],
       layers: [docDBCertLayer],
       tracing: Tracing.ACTIVE,
     });
@@ -781,7 +783,7 @@ export class TransactionDashboardStack extends NestedStack {
             service: 'lambda',
             resource: 'function',
             resourceName: 'serverlessrepo-AddSecurityH-UpdateEdgeCodeFunction-*',
-            sep: ':',
+            arnFormat: ArnFormat.COLON_RESOURCE_NAME,
           }, Stack.of(this)),
         ],
       }));
@@ -932,7 +934,7 @@ export class DocumentDBCertLayer extends LayerVersion {
     super(scope, id, {
       code: Code.fromAsset(path.join(__dirname, '../lambda.d/dashboard/'), {
         bundling: {
-          image: Runtime.PROVIDED.bundlingDockerImage,
+          image: Runtime.PROVIDED.bundlingImage,
           user: 'root',
           command: [
             'bash',

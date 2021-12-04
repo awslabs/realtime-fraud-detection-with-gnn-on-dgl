@@ -40,6 +40,11 @@
       "type": "build"
     },
     {
+      "name": "eslint-plugin-react-hooks",
+      "version": "next",
+      "type": "build"
+    },
+    {
       "name": "npm-check-updates",
       "version": "^11",
       "type": "build"

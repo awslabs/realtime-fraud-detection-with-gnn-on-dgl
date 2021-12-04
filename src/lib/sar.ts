@@ -1,8 +1,9 @@
 import * as path from 'path';
-import { PolicyStatement } from '@aws-cdk/aws-iam';
-import { Runtime, IFunction, Tracing } from '@aws-cdk/aws-lambda';
-import { NodejsFunction } from '@aws-cdk/aws-lambda-nodejs';
-import { Aws, Duration, Construct, Arn, Stack, CustomResource, CfnResource } from '@aws-cdk/core';
+import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { Runtime, IFunction, Tracing } from 'aws-cdk-lib/aws-lambda';
+import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
+import { Aws, Duration, Arn, Stack, CustomResource, CfnResource, ArnFormat } from 'aws-cdk-lib/core';
+import { Construct } from 'constructs';
 
 export interface SARDeploymentProps {
   application: string;
@@ -95,7 +96,7 @@ export class SARDeployment extends Construct {
           service: 'lambda',
           resource: 'function',
           resourceName: '*',
-          sep: ':',
+          arnFormat: ArnFormat.COLON_RESOURCE_NAME,
         }, Stack.of(this)),
       ],
     }));

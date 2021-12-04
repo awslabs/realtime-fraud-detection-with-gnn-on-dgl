@@ -1,4 +1,5 @@
-import { CfnMapping, Construct } from '@aws-cdk/core';
+import { CfnMapping } from 'aws-cdk-lib/core';
+import { Construct } from 'constructs';
 
 const DATASET_BASE_URL_CN = 'https://aws-gcr-solutions-assets.s3.cn-northwest-1.amazonaws.com.cn/open-dataset/ieee-fraud-detection/';
 const DATASET_BASE_URL = 'https://aws-gcr-solutions-assets.s3.amazonaws.com/open-dataset/ieee-fraud-detection/';

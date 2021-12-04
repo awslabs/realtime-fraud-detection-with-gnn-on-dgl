@@ -1,4 +1,4 @@
-import { App, Tags } from '@aws-cdk/core';
+import { App, Tags } from 'aws-cdk-lib/core';
 import { BootstraplessStackSynthesizer } from './BootstraplessStackSynthesizer';
 import { FraudDetectionStack } from './lib/stack';
 

@@ -1,6 +1,6 @@
 import * as path from 'path';
-import { LayerVersion, Runtime, RuntimeFamily, Code } from '@aws-cdk/aws-lambda';
-import { Construct } from '@aws-cdk/core';
+import { LayerVersion, Runtime, RuntimeFamily, Code } from 'aws-cdk-lib/aws-lambda';
+import { Construct } from 'constructs';
 import { artifactsHash } from './utils';
 
 export interface WranglerLayerProps {
