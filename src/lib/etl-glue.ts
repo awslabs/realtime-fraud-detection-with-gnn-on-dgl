@@ -1,11 +1,13 @@
 import * as path from 'path';
-import { IVpc, SecurityGroup, Port } from '@aws-cdk/aws-ec2';
-import { Database, DataFormat, Table, Schema, CfnJob, CfnConnection, CfnCrawler, SecurityConfiguration, S3EncryptionMode, JobBookmarksEncryptionMode, CloudWatchEncryptionMode } from '@aws-cdk/aws-glue';
-import { CompositePrincipal, ManagedPolicy, PolicyDocument, PolicyStatement, ServicePrincipal, Role } from '@aws-cdk/aws-iam';
-import { IKey } from '@aws-cdk/aws-kms';
-import { IBucket, Bucket, BucketEncryption } from '@aws-cdk/aws-s3';
-import { BucketDeployment, Source } from '@aws-cdk/aws-s3-deployment';
-import { Aws, Construct, RemovalPolicy, Stack, CfnResource } from '@aws-cdk/core';
+import { Database, DataFormat, Table, Schema, SecurityConfiguration, S3EncryptionMode, JobBookmarksEncryptionMode, CloudWatchEncryptionMode } from '@aws-cdk/aws-glue-alpha';
+import { IVpc, SecurityGroup, Port } from 'aws-cdk-lib/aws-ec2';
+import { CfnJob, CfnConnection, CfnCrawler } from 'aws-cdk-lib/aws-glue';
+import { CompositePrincipal, ManagedPolicy, PolicyDocument, PolicyStatement, ServicePrincipal, Role } from 'aws-cdk-lib/aws-iam';
+import { IKey } from 'aws-cdk-lib/aws-kms';
+import { IBucket, Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3';
+import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
+import { Aws, RemovalPolicy, Stack, CfnResource, ArnFormat } from 'aws-cdk-lib/core';
+import { Construct } from 'constructs';
 import { artifactHash } from './utils';
 
 export interface ETLProps {
@@ -164,7 +166,7 @@ export class ETLByGlue extends Construct {
             service: 'logs',
             resource: 'log-group',
             resourceName: `/aws-glue/jobs/${securityConfName}*`,
-            sep: ':',
+            arnFormat: ArnFormat.COLON_RESOURCE_NAME,
           }),
         },
       },
@@ -199,7 +201,7 @@ export class ETLByGlue extends Construct {
                   service: 'logs',
                   resource: 'log-group',
                   resourceName: `/aws-glue/jobs/${securityConfName}*`,
-                  sep: ':',
+                  arnFormat: ArnFormat.COLON_RESOURCE_NAME,
                 }),
               ],
             }),

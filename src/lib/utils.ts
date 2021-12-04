@@ -1,10 +1,11 @@
 /* eslint @typescript-eslint/no-require-imports: "off" */
 import * as crypto from 'crypto';
 import * as fs from 'fs';
-import { PolicyStatement, ServicePrincipal } from '@aws-cdk/aws-iam';
-import { IKey } from '@aws-cdk/aws-kms';
-import { Function } from '@aws-cdk/aws-lambda';
-import { IAspect, IConstruct, CfnResource, Arn, Stack } from '@aws-cdk/core';
+import { PolicyStatement, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
+import { IKey } from 'aws-cdk-lib/aws-kms';
+import { Function } from 'aws-cdk-lib/aws-lambda';
+import { IAspect, CfnResource, Arn, Stack, ArnFormat } from 'aws-cdk-lib/core';
+import { IConstruct } from 'constructs';
 const hash = require('object-hash');
 const fetch = require('sync-fetch');
 
@@ -54,7 +55,7 @@ export function grantKmsKeyPerm(key: IKey, logGroupName: string): void {
           service: 'logs',
           resource: 'log-group',
           resourceName: logGroupName,
-          sep: ':',
+          arnFormat: ArnFormat.COLON_RESOURCE_NAME,
         }, Stack.of(key)),
       },
     },

@@ -4,50 +4,35 @@ const tsExcludeConfig = {
   compilerOptions: {
     lib: ['dom', 'es2018'],
   },
-  exclude: ['src/frontend'],
+  exclude: ['src/frontend/**'],
 };
 
-const awsJSSDKV3 = '^3.30.0';
+const cdkAlphaDeps = [
+  '@aws-cdk/aws-apigatewayv2-alpha',
+  '@aws-cdk/aws-apigatewayv2-integrations-alpha',
+  '@aws-cdk/aws-appsync-alpha',
+  '@aws-cdk/aws-glue-alpha',
+  '@aws-cdk/aws-lambda-python-alpha',
+  '@aws-cdk/aws-neptune-alpha',
+].map(dep => `${dep}@2.0.0-alpha.11`);
+const awsSDKDeps = [
+  '@aws-sdk/client-glue',
+  '@aws-sdk/client-secrets-manager',
+  '@aws-sdk/client-sts',
+  '@aws-sdk/client-serverlessapplicationrepository',
+  '@aws-sdk/client-lambda',
+  '@aws-sdk/client-cloudformation',
+].map(dep => `${dep}@^3.30.0`);
 const project = new AwsCdkTypeScriptApp({
-  cdkVersion: '1.122.0',
+  cdkVersion: '2.0.0',
   name: 'realtime-fraud-detection-with-gnn-on-dgl',
   /* AwsCdkTypeScriptAppOptions */
   // appEntrypoint: 'main.ts',                                                 /* The CDK app's entrypoint (relative to the source directory, which is "src" by default). */
   cdkDependencies: [
-    '@aws-cdk/aws-apigatewayv2',
-    '@aws-cdk/aws-apigatewayv2-integrations',
-    '@aws-cdk/aws-appsync',
-    '@aws-cdk/aws-certificatemanager',
-    '@aws-cdk/aws-cloudfront',
-    '@aws-cdk/aws-cloudfront-origins',
-    '@aws-cdk/aws-docdb',
-    '@aws-cdk/aws-ec2',
-    '@aws-cdk/aws-ecs',
-    '@aws-cdk/aws-ecr',
-    '@aws-cdk/aws-ecr-assets',
-    '@aws-cdk/aws-efs',
-    '@aws-cdk/aws-glue',
-    '@aws-cdk/aws-iam',
-    '@aws-cdk/aws-kms',
-    '@aws-cdk/aws-lambda',
-    '@aws-cdk/aws-lambda-event-sources',
-    '@aws-cdk/aws-lambda-python',
-    '@aws-cdk/aws-lambda-nodejs',
-    '@aws-cdk/aws-logs',
-    '@aws-cdk/aws-neptune',
-    '@aws-cdk/aws-route53',
-    '@aws-cdk/aws-route53-targets',
-    '@aws-cdk/aws-s3',
-    '@aws-cdk/aws-s3-deployment',
-    '@aws-cdk/aws-sqs',
-    '@aws-cdk/aws-stepfunctions',
-    '@aws-cdk/aws-stepfunctions-tasks',
-    '@aws-cdk/cx-api',
     '@aws-cdk/cloud-assembly-schema',
-    '@aws-cdk/custom-resources',
-    '@aws-cdk/lambda-layer-awscli',
+    '@aws-cdk/cx-api',
   ] /* Which AWS CDK modules (those that start with "@aws-cdk/") this app uses. */,
-  cdkVersionPinning: true /* Use pinned version instead of caret version for CDK. */,
+  cdkVersionPinning: false /* Use pinned version instead of caret version for CDK. */,
   // context: undefined,                                                       /* Additional context to include in `cdk.json`. */
   // requireApproval: CdkApprovalLevel.BROADENING,                             /* To protect you against unintended changes that affect your security posture, the AWS CDK Toolkit prompts you to approve security-related changes before deploying them. */
 
@@ -62,17 +47,13 @@ const project = new AwsCdkTypeScriptApp({
   // bundledDeps: undefined,                                                   /* List of dependencies to bundle into this module. */
   deps: [
     'object-hash',
-    '@aws-sdk/client-glue@' + awsJSSDKV3,
-    '@aws-sdk/client-secrets-manager@' + awsJSSDKV3,
-    '@aws-sdk/client-sts@' + awsJSSDKV3,
-    '@aws-sdk/client-serverlessapplicationrepository@' + awsJSSDKV3,
-    '@aws-sdk/client-lambda@' + awsJSSDKV3,
-    '@aws-sdk/client-cloudformation@' + awsJSSDKV3,
     '@types/aws-lambda@^8.10.83',
     'cfn-custom-resource@^5.0.14',
     'sync-fetch@^0.3.0',
     'mongodb@^3.7.0',
     'mongodb-client-encryption@^1.2.6',
+    ...awsSDKDeps,
+    ...cdkAlphaDeps,
   ] /* Runtime dependencies of this module. */,
   description:
     'Real-time Fraud Detection with Graph Neural Network on DGL' /* The description is just a string that helps people understand the purpose of the package. */,
@@ -258,6 +239,7 @@ const reactPrj = new web.ReactTypeScriptProject({
   devDeps: [
     '@types/react-loader-spinner@^3.1.3',
     '@types/react-router-dom@^5.1.7',
+    'eslint-plugin-react-hooks@next',
   ],
   gitignore: ['src/aws-exports.js'],
   description: 'Dashboard frontend power by react.',
@@ -286,6 +268,7 @@ reactPrj.package.addField('resolutions', {
   'set-value': '^4.0.1',
   'ansi-regex': '^5.0.1',
   'nth-check': '^2.0.1',
+  'json-schema': '^0.4.0',
 });
 
 project.synth();

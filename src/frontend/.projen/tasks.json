@@ -144,7 +144,7 @@
           "exec": "yarn install --check-files"
         },
         {
-          "exec": "yarn upgrade @testing-library/jest-dom @testing-library/react @testing-library/user-event @types/jest @types/node @types/react @types/react-dom @types/react-loader-spinner @types/react-router-dom npm-check-updates typescript @material-ui/core @material-ui/icons @material-ui/lab @testing-library/jest-dom @testing-library/react @testing-library/user-event @types/jest @types/node @types/react-dom @types/react apexcharts aws-amplify aws-appsync aws-sdk axios best-queue graphql-tag i18next-browser-languagedetector i18next-http-backend i18next moment node-sass react react-apexcharts react-dom react-i18next react-loader-spinner react-router-dom react-scripts sweetalert2 web-vitals"
+          "exec": "yarn upgrade @testing-library/jest-dom @testing-library/react @testing-library/user-event @types/jest @types/node @types/react @types/react-dom @types/react-loader-spinner @types/react-router-dom eslint-plugin-react-hooks npm-check-updates typescript @material-ui/core @material-ui/icons @material-ui/lab @testing-library/jest-dom @testing-library/react @testing-library/user-event @types/jest @types/node @types/react-dom @types/react apexcharts aws-amplify aws-appsync aws-sdk axios best-queue graphql-tag i18next-browser-languagedetector i18next-http-backend i18next moment node-sass react react-apexcharts react-dom react-i18next react-loader-spinner react-router-dom react-scripts sweetalert2 web-vitals"
         },
         {
           "exec": "npx projen"

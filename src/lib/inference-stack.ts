@@ -1,11 +1,12 @@
 import * as path from 'path';
-import { IVpc, SecurityGroup } from '@aws-cdk/aws-ec2';
-import { PolicyStatement } from '@aws-cdk/aws-iam';
-import { IFunction, Runtime, Tracing } from '@aws-cdk/aws-lambda';
-import { PythonFunction, PythonLayerVersion } from '@aws-cdk/aws-lambda-python';
-import { IDatabaseCluster } from '@aws-cdk/aws-neptune';
-import { IQueue } from '@aws-cdk/aws-sqs';
-import { Construct, Duration, Stack, NestedStack, NestedStackProps, Aws, Token, CfnResource, Aspects } from '@aws-cdk/core';
+import { PythonFunction, PythonLayerVersion } from '@aws-cdk/aws-lambda-python-alpha';
+import { IDatabaseCluster } from '@aws-cdk/aws-neptune-alpha';
+import { IVpc, SecurityGroup } from 'aws-cdk-lib/aws-ec2';
+import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
+import { IFunction, Runtime, Tracing } from 'aws-cdk-lib/aws-lambda';
+import { IQueue } from 'aws-cdk-lib/aws-sqs';
+import { Duration, Stack, NestedStack, NestedStackProps, Aws, Token, CfnResource, Aspects } from 'aws-cdk-lib/core';
+import { Construct } from 'constructs';
 import { NeptuneUtilLayer } from './layer';
 import { CfnNagWhitelist } from './utils';
 
@@ -59,7 +60,7 @@ export class InferenceStack extends NestedStack {
         DUMMIED_COL: props.dataColumnsArg.dummies_cols,
       },
       vpc: props.vpc,
-      securityGroup: inferenceSG,
+      securityGroups: [inferenceSG],
     });
     props.queue.grantSendMessages(this.inferenceFn);
 

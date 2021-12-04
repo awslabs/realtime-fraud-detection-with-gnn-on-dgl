@@ -1,8 +1,8 @@
 import '@aws-cdk/assert/jest';
-import { Vpc } from '@aws-cdk/aws-ec2';
-import { DatabaseCluster, InstanceType } from '@aws-cdk/aws-neptune';
-import { Queue, QueueEncryption } from '@aws-cdk/aws-sqs';
-import { App, Stack, RemovalPolicy, Duration } from '@aws-cdk/core';
+import { DatabaseCluster, InstanceType } from '@aws-cdk/aws-neptune-alpha';
+import { Vpc } from 'aws-cdk-lib/aws-ec2';
+import { Queue, QueueEncryption } from 'aws-cdk-lib/aws-sqs';
+import { App, Stack, RemovalPolicy, Duration } from 'aws-cdk-lib/core';
 import { InferenceStack } from '../src/lib/inference-stack';
 
 describe('inference stack', () => {

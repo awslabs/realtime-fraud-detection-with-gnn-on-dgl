@@ -1,11 +1,11 @@
 import * as path from 'path';
 import '@aws-cdk/assert/jest';
 import { ResourcePart } from '@aws-cdk/assert/lib/assertions/have-resource';
-import { Vpc } from '@aws-cdk/aws-ec2';
-import { DockerImageAsset } from '@aws-cdk/aws-ecr-assets';
-import { DatabaseCluster, InstanceType } from '@aws-cdk/aws-neptune';
-import { Bucket } from '@aws-cdk/aws-s3';
-import { App, Stack } from '@aws-cdk/core';
+import { DatabaseCluster, InstanceType } from '@aws-cdk/aws-neptune-alpha';
+import { Vpc } from 'aws-cdk-lib/aws-ec2';
+import { DockerImageAsset } from 'aws-cdk-lib/aws-ecr-assets';
+import { Bucket } from 'aws-cdk-lib/aws-s3';
+import { App, Stack } from 'aws-cdk-lib/core';
 import { TrainingStack } from '../src/lib/training-stack';
 import { artifactHash, dirArtifactHash } from '../src/lib/utils';
 
@@ -23,7 +23,7 @@ describe('training stack test suite', () => {
     codeDirHash = dirArtifactHash(path.join(__dirname, '../src/sagemaker/FD_SL_DGL/code'));
     ({ stack } = initializeStackWithContextsAndEnvs({}));
     const asset = new DockerImageAsset(stack, 'Asset', stack._trainingImageAssets());
-    trainingImageHash = asset.sourceHash;
+    trainingImageHash = asset.assetHash;
   });
 
   beforeEach(() => {
@@ -44,7 +44,7 @@ describe('training stack test suite', () => {
           {
             Action: [
               's3:DeleteObject*',
-              's3:PutObject*',
+              's3:PutObject',
               's3:Abort*',
             ],
             Effect: 'Allow',
@@ -757,7 +757,7 @@ describe('training stack test suite', () => {
               's3:GetBucket*',
               's3:List*',
               's3:DeleteObject*',
-              's3:PutObject*',
+              's3:PutObject',
               's3:Abort*',
             ],
             Effect: 'Allow',
@@ -847,7 +847,7 @@ describe('training stack test suite', () => {
           {
             Action: [
               's3:DeleteObject*',
-              's3:PutObject*',
+              's3:PutObject',
               's3:Abort*',
             ],
             Effect: 'Allow',
@@ -976,18 +976,10 @@ describe('training stack test suite', () => {
     });
   });
 
-  test('crawl lambda task is created.', () => {
+  test('iam role/policy of crawl lambda task is created.', () => {
     expect(stack).toHaveResourceLike('AWS::IAM::Policy', {
       PolicyDocument: {
         Statement: [
-          {
-            Action: [
-              'xray:PutTraceSegments',
-              'xray:PutTelemetryRecords',
-            ],
-            Effect: 'Allow',
-            Resource: '*',
-          },
           {
             Action: 'glue:StartCrawler',
             Effect: 'Allow',
@@ -1021,8 +1013,12 @@ describe('training stack test suite', () => {
             Resource: '*',
           },
         ],
-        Version: '2012-10-17',
       },
+      Roles: [
+        {
+          Ref: 'DataCatalogCrawlerServiceRoleC6E16167',
+        },
+      ],
     });
   });
 
@@ -1101,17 +1097,9 @@ describe('training stack test suite', () => {
             },
             '","AlgorithmSpecification":{"TrainingInputMode":"File","TrainingImage":"',
             {
-              Ref: 'AWS::AccountId',
+              'Fn::Sub': '${AWS::AccountId}.dkr.ecr.${AWS::Region}.${AWS::URLSuffix}/cdk-hnb659fds-container-assets-${AWS::AccountId}-${AWS::Region}:' + trainingImageHash,
             },
-            '.dkr.ecr.',
-            {
-              Ref: 'AWS::Region',
-            },
-            '.',
-            {
-              Ref: 'AWS::URLSuffix',
-            },
-            `/aws-cdk/assets:${trainingImageHash}\"},\"InputDataConfig\":[{\"ChannelName\":\"train\",\"DataSource\":{\"S3DataSource\":{\"S3DataType\":\"S3Prefix\",\"S3Uri.$\":\"$.trainingParametersOutput.inputDataUri\"}}}],\"OutputDataConfig\":{\"S3OutputPath\":\"https://s3.`,
+            '"},"InputDataConfig":[{"ChannelName":"train","DataSource":{"S3DataSource":{"S3DataType":"S3Prefix","S3Uri.$":"$.trainingParametersOutput.inputDataUri"}}}],"OutputDataConfig":{"S3OutputPath":"https://s3.',
             {
               Ref: 'AWS::Region',
             },
