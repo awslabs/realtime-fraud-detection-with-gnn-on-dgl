@@ -1,7 +1,7 @@
 import '@aws-cdk/assert/jest';
 import { ResourcePart } from '@aws-cdk/assert/lib/assertions/have-resource';
 import * as cxapi from '@aws-cdk/cx-api';
-import { App, Stack, GetContextValueOptions, GetContextValueResult, Tags } from 'aws-cdk-lib/core';
+import { App, Stack, GetContextValueOptions, GetContextValueResult, Tags } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { FraudDetectionStack } from '../src/lib/stack';
 import * as mock from './context-provider-mock';

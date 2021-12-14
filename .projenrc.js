@@ -1,4 +1,4 @@
-const { AwsCdkTypeScriptApp, web } = require('projen');
+const { awscdk, web } = require('projen');
 
 const tsExcludeConfig = {
   compilerOptions: {
@@ -23,7 +23,7 @@ const awsSDKDeps = [
   '@aws-sdk/client-lambda',
   '@aws-sdk/client-cloudformation',
 ].map(dep => `${dep}@^3.30.0`);
-const project = new AwsCdkTypeScriptApp({
+const project = new awscdk.AwsCdkTypeScriptApp({
   cdkVersion: '2.0.0',
   name: 'realtime-fraud-detection-with-gnn-on-dgl',
   /* AwsCdkTypeScriptAppOptions */

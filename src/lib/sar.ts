@@ -1,8 +1,8 @@
 import * as path from 'path';
+import { Aws, Duration, Arn, Stack, CustomResource, CfnResource, ArnFormat } from 'aws-cdk-lib';
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { Runtime, IFunction, Tracing } from 'aws-cdk-lib/aws-lambda';
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs';
-import { Aws, Duration, Arn, Stack, CustomResource, CfnResource, ArnFormat } from 'aws-cdk-lib/core';
 import { Construct } from 'constructs';
 
 export interface SARDeploymentProps {

@@ -17,6 +17,23 @@ import {
 } from '@aws-cdk/aws-appsync-alpha';
 import { PythonFunction } from '@aws-cdk/aws-lambda-python-alpha';
 import {
+  NestedStack,
+  NestedStackProps,
+  RemovalPolicy,
+  CfnOutput,
+  Duration,
+  CustomResource,
+  CfnMapping,
+  Aws,
+  Fn,
+  Resource,
+  Stack,
+  Arn,
+  CfnResource,
+  Aspects,
+  ArnFormat,
+} from 'aws-cdk-lib';
+import {
   CfnIntegration,
   CfnRoute,
   CfnStage,
@@ -82,23 +99,6 @@ import {
   DISCARD,
 } from 'aws-cdk-lib/aws-stepfunctions';
 import { LambdaInvoke } from 'aws-cdk-lib/aws-stepfunctions-tasks';
-import {
-  NestedStack,
-  NestedStackProps,
-  RemovalPolicy,
-  CfnOutput,
-  Duration,
-  CustomResource,
-  CfnMapping,
-  Aws,
-  Fn,
-  Resource,
-  Stack,
-  Arn,
-  CfnResource,
-  Aspects,
-  ArnFormat,
-} from 'aws-cdk-lib/core';
 import {
   Provider,
   AwsCustomResource,

@@ -1,11 +1,11 @@
 import * as path from 'path';
 import { PythonFunction, PythonLayerVersion } from '@aws-cdk/aws-lambda-python-alpha';
 import { IDatabaseCluster } from '@aws-cdk/aws-neptune-alpha';
+import { Duration, Stack, NestedStack, NestedStackProps, Aws, Token, CfnResource, Aspects } from 'aws-cdk-lib';
 import { IVpc, SecurityGroup } from 'aws-cdk-lib/aws-ec2';
 import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 import { IFunction, Runtime, Tracing } from 'aws-cdk-lib/aws-lambda';
 import { IQueue } from 'aws-cdk-lib/aws-sqs';
-import { Duration, Stack, NestedStack, NestedStackProps, Aws, Token, CfnResource, Aspects } from 'aws-cdk-lib/core';
 import { Construct } from 'constructs';
 import { NeptuneUtilLayer } from './layer';
 import { CfnNagWhitelist } from './utils';

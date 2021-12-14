@@ -1,10 +1,10 @@
 import { ClusterParameterGroup, ParameterGroup, DatabaseCluster, InstanceType, IDatabaseCluster } from '@aws-cdk/aws-neptune-alpha';
+import { RemovalPolicy, Stack, StackProps, Duration, CfnParameter, CfnOutput, CfnResource } from 'aws-cdk-lib';
 import { GatewayVpcEndpointAwsService, Vpc, FlowLogDestination, SubnetType, IVpc, SecurityGroup } from 'aws-cdk-lib/aws-ec2';
 import { Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { CfnDBInstance } from 'aws-cdk-lib/aws-neptune';
 import { Bucket, BucketEncryption, IBucket } from 'aws-cdk-lib/aws-s3';
 import { Queue, QueueEncryption } from 'aws-cdk-lib/aws-sqs';
-import { RemovalPolicy, Stack, StackProps, Duration, CfnParameter, CfnOutput, CfnResource } from 'aws-cdk-lib/core';
 import { Construct } from 'constructs';
 import * as pjson from '../../package.json';
 import { TransactionDashboardStack } from './dashboard-stack';

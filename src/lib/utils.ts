@@ -1,10 +1,10 @@
 /* eslint @typescript-eslint/no-require-imports: "off" */
 import * as crypto from 'crypto';
 import * as fs from 'fs';
+import { IAspect, CfnResource, Arn, Stack, ArnFormat } from 'aws-cdk-lib';
 import { PolicyStatement, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { IKey } from 'aws-cdk-lib/aws-kms';
 import { Function } from 'aws-cdk-lib/aws-lambda';
-import { IAspect, CfnResource, Arn, Stack, ArnFormat } from 'aws-cdk-lib/core';
 import { IConstruct } from 'constructs';
 const hash = require('object-hash');
 const fetch = require('sync-fetch');

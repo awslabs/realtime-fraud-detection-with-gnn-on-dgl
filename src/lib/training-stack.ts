@@ -1,6 +1,7 @@
 import * as path from 'path';
 import { PythonFunction } from '@aws-cdk/aws-lambda-python-alpha';
 import { IDatabaseCluster } from '@aws-cdk/aws-neptune-alpha';
+import { Duration, NestedStack, NestedStackProps, Arn, Stack, CfnMapping, Aws, RemovalPolicy, IgnoreMode, Size, Token, CfnResource, Aspects } from 'aws-cdk-lib';
 import { IVpc, InstanceType, InstanceClass, InstanceSize, SecurityGroup, SubnetType } from 'aws-cdk-lib/aws-ec2';
 import { Repository } from 'aws-cdk-lib/aws-ecr';
 import { DockerImageAsset, DockerImageAssetProps } from 'aws-cdk-lib/aws-ecr-assets';
@@ -15,7 +16,6 @@ import { IBucket } from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import { IntegrationPattern, StateMachine, Fail, Errors, TaskInput, LogLevel, JsonPath, Choice, Condition } from 'aws-cdk-lib/aws-stepfunctions';
 import { LambdaInvoke, S3DataType, GlueStartJobRun, SageMakerCreateModel, S3Location, ContainerDefinition, Mode, DockerImage, SageMakerCreateEndpointConfig, SageMakerCreateEndpoint, SageMakerUpdateEndpoint, EcsRunTask, EcsFargateLaunchTarget, SageMakerCreateTrainingJob, InputMode } from 'aws-cdk-lib/aws-stepfunctions-tasks';
-import { Duration, NestedStack, NestedStackProps, Arn, Stack, CfnMapping, Aws, RemovalPolicy, IgnoreMode, Size, Token, CfnResource, Aspects } from 'aws-cdk-lib/core';
 import { AwsCliLayer } from 'aws-cdk-lib/lambda-layer-awscli';
 import { Construct } from 'constructs';
 import { getDatasetMapping, IEEE } from './dataset';

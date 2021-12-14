@@ -3,6 +3,7 @@
   "description": "Real-time Fraud Detection with Graph Neural Network on DGL",
   "scripts": {
     "build": "npx projen build",
+    "bundle": "npx projen bundle",
     "cdk-init": "npx projen cdk-init",
     "clobber": "npx projen clobber",
     "compile": "npx projen compile",
@@ -21,16 +22,18 @@
     "test:update": "npx projen test:update",
     "test:watch": "npx projen test:watch",
     "upgrade": "npx projen upgrade",
+    "watch": "npx projen watch",
     "projen": "npx projen"
   },
   "devDependencies": {
     "@types/bson": "^4.2.0",
     "@types/jest": "^26.0.24",
     "@types/mongodb": "^3.6.20",
-    "@types/node": "^14.17.0",
+    "@types/node": "^12",
     "@typescript-eslint/eslint-plugin": "^5",
     "@typescript-eslint/parser": "^5",
     "aws-cdk": "^2.0.0",
+    "esbuild": "^0.14.3",
     "eslint": "^8",
     "eslint-import-resolver-node": "^0.3.6",
     "eslint-import-resolver-typescript": "^2.5.0",
@@ -38,11 +41,11 @@
     "jest": "^26.6.3",
     "jest-junit": "^13",
     "json-schema": "^0.4.0",
-    "npm-check-updates": "^11",
-    "projen": "^0.36.5",
+    "npm-check-updates": "^12",
+    "projen": "^0.42.1",
     "ts-jest": "^26.5.6",
     "ts-node": "^9",
-    "typescript": "^4.5.2"
+    "typescript": "^4.5.4"
   },
   "dependencies": {
     "@aws-cdk/assert": "^2.0.0",
