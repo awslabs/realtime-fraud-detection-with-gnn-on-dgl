@@ -2,8 +2,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as cxapi from '@aws-cdk/cx-api';
+import { DockerImageAssetLocation, DockerImageAssetSource, FileAssetLocation, FileAssetPackaging, FileAssetSource, Fn, ISynthesisSession, Stack, StackSynthesizer, Token } from 'aws-cdk-lib';
 import * as cxschema from 'aws-cdk-lib/cloud-assembly-schema';
-import { DockerImageAssetLocation, DockerImageAssetSource, FileAssetLocation, FileAssetPackaging, FileAssetSource, Fn, ISynthesisSession, Stack, StackSynthesizer, Token } from 'aws-cdk-lib/core';
 
 
 const REGION_PLACEHOLDER = '${AWS::Region}';

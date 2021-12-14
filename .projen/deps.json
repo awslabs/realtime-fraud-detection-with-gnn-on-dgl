@@ -16,7 +16,7 @@
     },
     {
       "name": "@types/node",
-      "version": "^14.17.0",
+      "version": "^12",
       "type": "build"
     },
     {
@@ -32,6 +32,10 @@
     {
       "name": "aws-cdk",
       "version": "^2.0.0",
+      "type": "build"
+    },
+    {
+      "name": "esbuild",
       "type": "build"
     },
     {
@@ -66,7 +70,7 @@
     },
     {
       "name": "npm-check-updates",
-      "version": "^11",
+      "version": "^12",
       "type": "build"
     },
     {

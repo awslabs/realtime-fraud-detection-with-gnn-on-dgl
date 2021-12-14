@@ -2,10 +2,10 @@ import * as path from 'path';
 import '@aws-cdk/assert/jest';
 import { ResourcePart } from '@aws-cdk/assert/lib/assertions/have-resource';
 import { DatabaseCluster, InstanceType } from '@aws-cdk/aws-neptune-alpha';
+import { App, Stack } from 'aws-cdk-lib';
 import { Vpc } from 'aws-cdk-lib/aws-ec2';
 import { DockerImageAsset } from 'aws-cdk-lib/aws-ecr-assets';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
-import { App, Stack } from 'aws-cdk-lib/core';
 import { TrainingStack } from '../src/lib/training-stack';
 import { artifactHash, dirArtifactHash } from '../src/lib/utils';
 

@@ -1,12 +1,12 @@
 import * as path from 'path';
 import { Database, DataFormat, Table, Schema, SecurityConfiguration, S3EncryptionMode, JobBookmarksEncryptionMode, CloudWatchEncryptionMode } from '@aws-cdk/aws-glue-alpha';
+import { Aws, RemovalPolicy, Stack, CfnResource, ArnFormat } from 'aws-cdk-lib';
 import { IVpc, SecurityGroup, Port } from 'aws-cdk-lib/aws-ec2';
 import { CfnJob, CfnConnection, CfnCrawler } from 'aws-cdk-lib/aws-glue';
 import { CompositePrincipal, ManagedPolicy, PolicyDocument, PolicyStatement, ServicePrincipal, Role } from 'aws-cdk-lib/aws-iam';
 import { IKey } from 'aws-cdk-lib/aws-kms';
 import { IBucket, Bucket, BucketEncryption } from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
-import { Aws, RemovalPolicy, Stack, CfnResource, ArnFormat } from 'aws-cdk-lib/core';
 import { Construct } from 'constructs';
 import { artifactHash } from './utils';
 
