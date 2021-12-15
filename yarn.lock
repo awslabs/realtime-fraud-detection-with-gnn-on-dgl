@@ -47,10 +47,18 @@
     fs-extra "^9.1.0"
     md5 "^2.3.0"
 
-"@aws-cdk/cloud-assembly-schema@2.1.0", "@aws-cdk/cloud-assembly-schema@^2.0.0":
+"@aws-cdk/cloud-assembly-schema@2.1.0":
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/@aws-cdk/cloud-assembly-schema/-/cloud-assembly-schema-2.1.0.tgz#6fa14f77d9d0f405375ff8678abeee7a11ba9cf2"
   integrity sha512-qQvGljyUhrR9Z4AJkBpUPRWR2F0ovWPXGCfAsi18cpdhP7eKtS8CzQg/M1nOzFAFtqPq9TPeuoN/PVAvr/LUgw==
+  dependencies:
+    jsonschema "^1.4.0"
+    semver "^7.3.5"
+
+"@aws-cdk/cloud-assembly-schema@^2.0.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aws-cdk/cloud-assembly-schema/-/cloud-assembly-schema-2.2.0.tgz#9dce1666949a9a59f28fe401db7009e10281e546"
+  integrity sha512-dQBtGm9eLIDhYh4d1S6PFMLWtKT3XDIP35/O9SPKZsQQ73FSDZUQSFns6f6MxoJ3+6FFsMIoYGTrGzRTtAELEw==
   dependencies:
     jsonschema "^1.4.0"
     semver "^7.3.5"
