@@ -2001,9 +2001,9 @@ atob@^2.1.2:
   integrity sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==
 
 aws-cdk-lib@^2.0.0:
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/aws-cdk-lib/-/aws-cdk-lib-2.1.0.tgz#2497484cfd4e2eeaba99b070bbfa54486d52ae34"
-  integrity sha512-W607G3aSrWpawpcqzIuUYKlU+grfvkbszyqikyVYqJgMHFCCQXq0S1ynPMzfQ49CwjlwZsu4LIsPM+dNR+Yj6g==
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/aws-cdk-lib/-/aws-cdk-lib-2.2.0.tgz#9978f2fca17af481f15ef7af074a31af67b0ba51"
+  integrity sha512-WgNWgA35abebtK0vAEWi/U6j1re1/8DA6FhXFuemtYglAk5OBA11oJSaa642yVtEUa90yzGvLMjszFWspmL3Tw==
   dependencies:
     "@balena/dockerignore" "^1.0.2"
     case "1.6.3"
