@@ -3,11 +3,11 @@
 
 
 "@aws-cdk/assert@^2.0.0":
-  version "2.1.0"
-  resolved "https://registry.yarnpkg.com/@aws-cdk/assert/-/assert-2.1.0.tgz#25b473bfc4a5f51b1480978dca4e4dbfa82f594d"
-  integrity sha512-6TLRq297zQX8Hs+Cjr0ATAIPYvAzHjvxnc5AtbWySbxPrdkCEcrrOFqSnl3I3zXA+eDVJIWNMvmsqzPOMDOoZg==
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aws-cdk/assert/-/assert-2.2.0.tgz#6421398adc3da09faad1da0bf6043996e0aef096"
+  integrity sha512-ZVjlFKIKyrrv21anXH4Yh/Hp6vR9IZG8v3Lopi+uqdi08mMLt+xTGahaLB2+JXO1cMdHaJpWJ2GozHGRouF2tA==
   dependencies:
-    "@aws-cdk/cloudformation-diff" "2.1.0"
+    "@aws-cdk/cloudformation-diff" "2.2.0"
 
 "@aws-cdk/aws-apigatewayv2-alpha@2.0.0-alpha.11":
   version "2.0.0-alpha.11"
@@ -47,6 +47,14 @@
     fs-extra "^9.1.0"
     md5 "^2.3.0"
 
+"@aws-cdk/cfnspec@2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aws-cdk/cfnspec/-/cfnspec-2.2.0.tgz#2d09b5bbdac4fdd248935ab37c74bd885a795936"
+  integrity sha512-5MNqXvUahQpA6hp+UClSsiJiBbkj1QCkNZUtd3O39vjdyaeQfBiTUKMLpsTVnPFWYtvrYqcjHy8n/o7mrmF9ZA==
+  dependencies:
+    fs-extra "^9.1.0"
+    md5 "^2.3.0"
+
 "@aws-cdk/cloud-assembly-schema@2.1.0", "@aws-cdk/cloud-assembly-schema@^2.0.0":
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/@aws-cdk/cloud-assembly-schema/-/cloud-assembly-schema-2.1.0.tgz#6fa14f77d9d0f405375ff8678abeee7a11ba9cf2"
@@ -67,6 +75,19 @@
     fast-deep-equal "^3.1.3"
     string-width "^4.2.3"
     table "^6.7.3"
+
+"@aws-cdk/cloudformation-diff@2.2.0":
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/@aws-cdk/cloudformation-diff/-/cloudformation-diff-2.2.0.tgz#8b76297f0c3d4ffc882108f07bd6cd6c94bfeeea"
+  integrity sha512-ue5Y9elCTg0EqjREt/fnDH63FfDy5rrEw6pe7CwvXdgD0ytWIfpfnDyl3U1Yfn5EhB5xB6yi7UzrKzJRnjvQUw==
+  dependencies:
+    "@aws-cdk/cfnspec" "2.2.0"
+    "@types/node" "^10.17.60"
+    colors "^1.4.0"
+    diff "^5.0.0"
+    fast-deep-equal "^3.1.3"
+    string-width "^4.2.3"
+    table "^6.7.5"
 
 "@aws-cdk/cx-api@2.1.0", "@aws-cdk/cx-api@^2.0.0":
   version "2.1.0"
@@ -7103,7 +7124,7 @@ sync-fetch@^0.3.0:
     buffer "^5.7.0"
     node-fetch "^2.6.1"
 
-table@^6.7.3:
+table@^6.7.3, table@^6.7.5:
   version "6.7.5"
   resolved "https://registry.yarnpkg.com/table/-/table-6.7.5.tgz#f04478c351ef3d8c7904f0e8be90a1b62417d238"
   integrity sha512-LFNeryOqiQHqCVKzhkymKwt6ozeRhlm8IL1mE8rNUurkir4heF6PzMyRgaTa4tlyPTGGgXuvVOF/OLWiH09Lqw==
