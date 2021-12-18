@@ -1,5 +1,5 @@
 import { App, Tags } from 'aws-cdk-lib';
-import { BootstraplessStackSynthesizer } from './BootstraplessStackSynthesizer';
+import { BootstraplessStackSynthesizer } from 'cdk-bootstrapless-synthesizer';
 import { FraudDetectionStack } from './lib/stack';
 
 const app = new App();

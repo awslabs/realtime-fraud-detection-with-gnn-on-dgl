@@ -1,6 +1,21 @@
 {
   "dependencies": [
     {
+      "name": "@aws-cdk/assert",
+      "version": "^2.0.0",
+      "type": "build"
+    },
+    {
+      "name": "@aws-cdk/cloud-assembly-schema",
+      "version": "^2",
+      "type": "build"
+    },
+    {
+      "name": "@aws-cdk/cx-api",
+      "version": "^2",
+      "type": "build"
+    },
+    {
       "name": "@types/bson",
       "version": "^4.2.0",
       "type": "build"
@@ -32,6 +47,11 @@
     {
       "name": "aws-cdk",
       "version": "^2.0.0",
+      "type": "build"
+    },
+    {
+      "name": "constructs",
+      "version": "^10.0.5",
       "type": "build"
     },
     {
@@ -91,11 +111,6 @@
       "type": "build"
     },
     {
-      "name": "@aws-cdk/assert",
-      "version": "^2.0.0",
-      "type": "runtime"
-    },
-    {
       "name": "@aws-cdk/aws-apigatewayv2-alpha",
       "version": "2.0.0-alpha.11",
       "type": "runtime"
@@ -123,16 +138,6 @@
     {
       "name": "@aws-cdk/aws-neptune-alpha",
       "version": "2.0.0-alpha.11",
-      "type": "runtime"
-    },
-    {
-      "name": "@aws-cdk/cloud-assembly-schema",
-      "version": "^2.0.0",
-      "type": "runtime"
-    },
-    {
-      "name": "@aws-cdk/cx-api",
-      "version": "^2.0.0",
       "type": "runtime"
     },
     {
@@ -173,6 +178,11 @@
     {
       "name": "aws-cdk-lib",
       "version": "^2.0.0",
+      "type": "runtime"
+    },
+    {
+      "name": "cdk-bootstrapless-synthesizer",
+      "version": "^2",
       "type": "runtime"
     },
     {

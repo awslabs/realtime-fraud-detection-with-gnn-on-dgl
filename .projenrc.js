@@ -28,10 +28,6 @@ const project = new awscdk.AwsCdkTypeScriptApp({
   name: 'realtime-fraud-detection-with-gnn-on-dgl',
   /* AwsCdkTypeScriptAppOptions */
   // appEntrypoint: 'main.ts',                                                 /* The CDK app's entrypoint (relative to the source directory, which is "src" by default). */
-  cdkDependencies: [
-    '@aws-cdk/cloud-assembly-schema',
-    '@aws-cdk/cx-api',
-  ] /* Which AWS CDK modules (those that start with "@aws-cdk/") this app uses. */,
   cdkVersionPinning: false /* Use pinned version instead of caret version for CDK. */,
   // context: undefined,                                                       /* Additional context to include in `cdk.json`. */
   // requireApproval: CdkApprovalLevel.BROADENING,                             /* To protect you against unintended changes that affect your security posture, the AWS CDK Toolkit prompts you to approve security-related changes before deploying them. */
@@ -52,6 +48,7 @@ const project = new awscdk.AwsCdkTypeScriptApp({
     'sync-fetch@^0.3.0',
     'mongodb@^3.7.0',
     'mongodb-client-encryption@^1.2.6',
+    'cdk-bootstrapless-synthesizer@^2',
     ...awsSDKDeps,
     ...cdkAlphaDeps,
   ] /* Runtime dependencies of this module. */,
@@ -60,6 +57,10 @@ const project = new awscdk.AwsCdkTypeScriptApp({
   devDeps: [
     '@types/mongodb@^3.6.20',
     '@types/bson@^4.2.0',
+    'constructs@^10.0.5',
+    '@aws-cdk/cloud-assembly-schema@^2',
+    '@aws-cdk/cx-api@^2',
+    '@aws-cdk/assert@^2.0.0',
   ] /* Build dependencies for this module. */,
   // entrypoint: 'lib/index.js',                                               /* Module entrypoint (`main` in `package.json`). */
   // homepage: undefined,                                                      /* Package's Homepage / Website. */
