@@ -75,7 +75,7 @@ const project = new awscdk.AwsCdkTypeScriptApp({
   license: 'Apache-2.0' /* License's SPDX identifier. */,
   licensed: false /* Indicates if a license should be added. */,
   // maxNodeVersion: undefined,                                                /* Minimum node.js version to require via `engines` (inclusive). */
-  // minNodeVersion: undefined,                                                /* Minimum Node.js version to require via package.json `engines` (inclusive). */
+  minNodeVersion: '14.17.0', /* Minimum Node.js version to require via package.json `engines` (inclusive). */
   // npmTaskExecution: NpmTaskExecution.PROJEN,                                /* Determines how tasks are executed when invoked as npm scripts (yarn/npm run xyz). */
   // packageManager: NodePackageManager.YARN,                                  /* The Node Package Manager used to execute scripts. */
   // packageName: undefined,                                                   /* The "name" in package.json. */
@@ -89,7 +89,7 @@ const project = new awscdk.AwsCdkTypeScriptApp({
 
   /* NodeProjectOptions */
   // antitamper: true,                                                         /* Checks that after build there are no modified files on git. */
-  buildWorkflow: false /* Define a GitHub workflow for building PRs. */,
+  buildWorkflow: true /* Define a GitHub workflow for building PRs. */,
   // codeCov: false,                                                           /* Define a GitHub workflow step for sending code coverage metrics to https://codecov.io/ Uses codecov/codecov-action@v1 A secret is required for private repos. Configured with @codeCovTokenSecret. */
   // codeCovTokenSecret: undefined,                                            /* Define the secret name for a specified https://codecov.io/ token A secret is required to send coverage for private repositories. */
   // copyrightOwner: undefined,                                                /* License copyright owner. */
