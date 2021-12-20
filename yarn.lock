@@ -2658,9 +2658,9 @@ console-control-strings@^1.0.0, console-control-strings@^1.1.0, console-control-
   integrity sha1-PXz0Rk22RG6mRL9LOVB/mFEAjo4=
 
 constructs@^10.0.5:
-  version "10.0.12"
-  resolved "https://registry.yarnpkg.com/constructs/-/constructs-10.0.12.tgz#64f314d87f7cdf6da127c9eb0bf6a3d990989c4a"
-  integrity sha512-wVQcQgwwK7b//7yI54/3hundmXAw7RBpuy5f6yIBFNceJr8feTK6Cs2I2f3+gp3/ikszzTouLup9AzxioEEXPQ==
+  version "10.0.13"
+  resolved "https://registry.yarnpkg.com/constructs/-/constructs-10.0.13.tgz#81f5badc32365ec7c2f38c1ba49adbacfba6aac7"
+  integrity sha512-DWL96FNvVInYIINNdC11XaVKW9TGoU2i+H+RUuBf+LrJBZr2TZi8r1enloEL3zDoJ258nm9DlczeCl7Id+lDbA==
 
 conventional-changelog-config-spec@^2.1.0:
   version "2.1.0"
