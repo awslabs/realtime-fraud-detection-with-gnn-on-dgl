@@ -1217,6 +1217,12 @@ describe('dashboard stack test suite', () => {
         HttpVersion: 'http2',
         IPV6Enabled: false,
         PriceClass: 'PriceClass_All',
+        Logging: {
+          Bucket: {
+            Ref: 'referencetoTestStackAccessLogF5229892RegionalDomainName',
+          },
+          Prefix: 'cfAccessLog',
+        },
         CustomErrorResponses: [
           {
             ErrorCachingMinTTL: 30,

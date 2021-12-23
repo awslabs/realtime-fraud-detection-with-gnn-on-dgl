@@ -16,14 +16,32 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
-          cache: 'yarn'
+          cache: yarn
       - name: Install dependencies
         run: |
           yarn install --check-files --frozen-lockfile
           npx projen
       - name: synth
-        run: npx cdk synth -c EnableDashboardCustomDomain=true
+        run: npx cdk synth -c EnableDashboardCustomDomain=true --json -q
       - uses: stelligent/cfn_nag@master
         with:
           input_path: cdk.out/
-          extra_args: '--template-pattern ..*.template.json --fail-on-warnings -b .cfn-nag-ignore-lists.yml --print-suppression'
+          extra_args: >-
+            --template-pattern ..*.template.json --fail-on-warnings -b
+            .cfn-nag-ignore-lists.yml --print-suppression
+      - name: synth
+        run: npx cdk synth -c TargetPartition=aws-cn --json --output cn -q
+      - uses: stelligent/cfn_nag@master
+        with:
+          input_path: cn/
+          extra_args: >-
+            --template-pattern ..*.template.json --fail-on-warnings -b
+            .cfn-nag-ignore-lists.yml --print-suppression
+      - name: synth
+        run: npx cdk synth --json --output default -q
+      - uses: stelligent/cfn_nag@master
+        with:
+          input_path: default/
+          extra_args: >-
+            --template-pattern ..*.template.json --fail-on-warnings -b
+            .cfn-nag-ignore-lists.yml --print-suppression

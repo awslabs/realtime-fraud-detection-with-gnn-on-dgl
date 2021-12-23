@@ -124,7 +124,7 @@ export class TrainingStack extends NestedStack {
       runtime: Runtime.NODEJS_14_X,
       tracing: Tracing.ACTIVE,
     });
-    dataCatalogCrawlerFn.role?.attachInlinePolicy(new Policy(this, 'gluePolicy', {
+    const gluePolicy = new Policy(this, 'gluePolicy', {
       statements: [
         new PolicyStatement({
           effect: Effect.ALLOW,
@@ -145,7 +145,17 @@ export class TrainingStack extends NestedStack {
           resources: ['*'],
         }),
       ],
-    }));
+    });
+    (gluePolicy.node.defaultChild as CfnResource)
+      .addMetadata('cfn_nag', {
+        rules_to_suppress: [
+          {
+            id: 'W12',
+            reason: 'wildcard resource for glue:GetCrawlerMetrics is intended',
+          },
+        ],
+      });
+    dataCatalogCrawlerFn.role?.attachInlinePolicy(gluePolicy);
 
     const dataIngestTask = new LambdaInvoke(this, 'Data Ingest', {
       lambdaFunction: dataIngestFn,
