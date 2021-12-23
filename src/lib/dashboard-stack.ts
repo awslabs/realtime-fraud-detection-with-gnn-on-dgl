@@ -761,7 +761,20 @@ export class TransactionDashboardStack extends NestedStack {
             }],
           },
         ],
+        loggingConfig: {
+          bucket: accessLogBucket,
+          prefix: 'cfAccessLog',
+        },
       });
+      (distribution.node.defaultChild as CfnResource)
+        .addMetadata('cfn_nag', {
+          rules_to_suppress: [
+            {
+              id: 'W70',
+              reason: 'suppress minium TLSv1.2 warning when using default certificate of cloudfront',
+            },
+          ],
+        });
     } else {
       const addSecurityHeaderSar = new SARDeployment(this, 'AddSecurityHeader', {
         application: 'arn:aws:serverlessrepo:us-east-1:418289889111:applications/add-security-headers',
@@ -852,6 +865,17 @@ export class TransactionDashboardStack extends NestedStack {
           LambdaFunctionARN: addSecurityHeaderSar.funcVersionArn,
         },
       ]);
+      if (!customDomain) {
+        (distribution.node.defaultChild as CfnResource)
+          .addMetadata('cfn_nag', {
+            rules_to_suppress: [
+              {
+                id: 'W70',
+                reason: 'suppress minium TLSv1.2 warning when using default domain name of cloudfront',
+              },
+            ],
+          });
+      }
     }
 
     if (hostedZone) {
