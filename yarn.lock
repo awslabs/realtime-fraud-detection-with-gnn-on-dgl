@@ -2000,7 +2000,22 @@ atob@^2.1.2:
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.1.2.tgz#6d9517eb9e030d2436666651e86bd9f6f13533c9"
   integrity sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==
 
-aws-cdk-lib@2, aws-cdk-lib@^2.0.0:
+aws-cdk-lib@^2:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/aws-cdk-lib/-/aws-cdk-lib-2.3.0.tgz#9592e51f51d012e1e56f851700d1b8e9687eee93"
+  integrity sha512-fVQ7x+ahOmzcy5KCw+EaYp0II3igglJSpi/Rs4OyLrCxa7GBZ4G9iDu0IAPKjppw5IX3UshklmdfkEFP8d1b9w==
+  dependencies:
+    "@balena/dockerignore" "^1.0.2"
+    case "1.6.3"
+    fs-extra "^9.1.0"
+    ignore "^5.1.9"
+    jsonschema "^1.4.0"
+    minimatch "^3.0.4"
+    punycode "^2.1.1"
+    semver "^7.3.5"
+    yaml "1.10.2"
+
+aws-cdk-lib@^2.0.0:
   version "2.2.0"
   resolved "https://registry.yarnpkg.com/aws-cdk-lib/-/aws-cdk-lib-2.2.0.tgz#9978f2fca17af481f15ef7af074a31af67b0ba51"
   integrity sha512-WgNWgA35abebtK0vAEWi/U6j1re1/8DA6FhXFuemtYglAk5OBA11oJSaa642yVtEUa90yzGvLMjszFWspmL3Tw==
@@ -2408,12 +2423,13 @@ cdk-assets@2.2.0:
     mime "^2.6.0"
     yargs "^16.2.0"
 
-cdk-bootstrapless-synthesizer@^2:
-  version "2.0.4"
-  resolved "https://registry.yarnpkg.com/cdk-bootstrapless-synthesizer/-/cdk-bootstrapless-synthesizer-2.0.4.tgz#956f22a188d9a9341ba8c666bdb1f8d077b019b5"
-  integrity sha512-A9jighBaDliIX7K7dVvqlLEuBaFr63B2+L88TRLHLSJAEHL47/YR1zDcIYfYmQXzP9CX+k+BTSwJbOUtUK7urQ==
+cdk-bootstrapless-synthesizer@^2.0.7:
+  version "2.0.7"
+  resolved "https://registry.yarnpkg.com/cdk-bootstrapless-synthesizer/-/cdk-bootstrapless-synthesizer-2.0.7.tgz#8646f0362d54a2aa3ada84a2eac5e3cc0f041046"
+  integrity sha512-ZQDYLRYMlwVBJpv7Ls+FzScFeI+K+9agXWJwwE1BcIvffkQTyvvSCSjtO4kY3bfrRORXVcqGwTULfJQb8ooZbw==
   dependencies:
-    aws-cdk-lib "2"
+    aws-cdk-lib "^2"
+    constructs "^10.0.5"
 
 cfn-custom-resource@^5.0.14:
   version "5.0.14"
@@ -2658,9 +2674,9 @@ console-control-strings@^1.0.0, console-control-strings@^1.1.0, console-control-
   integrity sha1-PXz0Rk22RG6mRL9LOVB/mFEAjo4=
 
 constructs@^10.0.5:
-  version "10.0.12"
-  resolved "https://registry.yarnpkg.com/constructs/-/constructs-10.0.12.tgz#64f314d87f7cdf6da127c9eb0bf6a3d990989c4a"
-  integrity sha512-wVQcQgwwK7b//7yI54/3hundmXAw7RBpuy5f6yIBFNceJr8feTK6Cs2I2f3+gp3/ikszzTouLup9AzxioEEXPQ==
+  version "10.0.20"
+  resolved "https://registry.yarnpkg.com/constructs/-/constructs-10.0.20.tgz#246bba975a1da05d34f381d395bd728f727a8547"
+  integrity sha512-zSOneBR1c+Iifj5+gZkgtO1py+fZLVng6MEf0WCZbnprMqv0o4MhJH3lwQxzKhRWZ1enoVQjvPYRDwQ/85bDyQ==
 
 conventional-changelog-config-spec@^2.1.0:
   version "2.1.0"
