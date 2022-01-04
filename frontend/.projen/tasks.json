@@ -58,7 +58,7 @@
       "description": "Only compile",
       "steps": [
         {
-          "exec": "react-scripts build"
+          "exec": "tsc --build"
         }
       ]
     },
@@ -71,21 +71,12 @@
         }
       ]
     },
-    "dev": {
-      "name": "dev",
-      "description": "Starts the react application",
+    "eslint": {
+      "name": "eslint",
+      "description": "Runs eslint against the codebase",
       "steps": [
         {
-          "exec": "react-scripts start"
-        }
-      ]
-    },
-    "eject": {
-      "name": "eject",
-      "description": "Ejects your React application from react-scripts",
-      "steps": [
-        {
-          "exec": "react-scripts eject"
+          "exec": "eslint --ext .ts,.tsx --fix --no-error-on-unmatched-pattern src test build-tools .projenrc.js"
         }
       ]
     },
@@ -114,7 +105,28 @@
       "description": "Run tests",
       "steps": [
         {
-          "exec": "react-scripts test --watchAll=false"
+          "exec": "jest --passWithNoTests --all"
+        },
+        {
+          "spawn": "eslint"
+        }
+      ]
+    },
+    "test:update": {
+      "name": "test:update",
+      "description": "Update jest snapshots",
+      "steps": [
+        {
+          "exec": "jest --updateSnapshot"
+        }
+      ]
+    },
+    "test:watch": {
+      "name": "test:watch",
+      "description": "Run jest in watch mode",
+      "steps": [
+        {
+          "exec": "jest --watch"
         }
       ]
     },
@@ -144,7 +156,7 @@
           "exec": "yarn install --check-files"
         },
         {
-          "exec": "yarn upgrade @testing-library/jest-dom @testing-library/react @testing-library/user-event @types/jest @types/node @types/react @types/react-dom @types/react-loader-spinner @types/react-router-dom eslint-plugin-react-hooks npm-check-updates typescript @material-ui/core @material-ui/icons @material-ui/lab @testing-library/jest-dom @testing-library/react @testing-library/user-event @types/jest @types/node @types/react-dom @types/react apexcharts aws-amplify aws-appsync aws-sdk axios best-queue graphql-tag i18next-browser-languagedetector i18next-http-backend i18next moment node-sass react react-apexcharts react-dom react-i18next react-loader-spinner react-router-dom react-scripts sweetalert2 web-vitals"
+          "exec": "yarn upgrade @types/jest @types/node @types/react-dom @types/react-loader-spinner @types/react-router-dom @types/react @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint-import-resolver-node eslint-import-resolver-typescript eslint-plugin-import eslint-plugin-react-hooks eslint jest jest-junit json-schema npm-check-updates ts-jest typescript @material-ui/core @material-ui/icons @material-ui/lab @testing-library/jest-dom @testing-library/react @testing-library/user-event apexcharts aws-amplify aws-appsync aws-sdk axios best-queue graphql-tag i18next-browser-languagedetector i18next-http-backend i18next moment node-sass react-apexcharts react-dom react-i18next react-loader-spinner react-router-dom react-scripts react sweetalert2 web-vitals"
         },
         {
           "exec": "npx projen"

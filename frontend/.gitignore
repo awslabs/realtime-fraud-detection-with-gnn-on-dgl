@@ -29,12 +29,15 @@ jspm_packages/
 .yarn-integrity
 .cache
 src/aws-exports.js
+build/
 !/.projenrc.js
+/test-reports/
+junit.xml
+/coverage/
 !/test/
 !/tsconfig.json
 !/tsconfig.dev.json
 !/src/
 /lib
 /dist/
-/build/
-!/react-app-env.d.ts
+!/.eslintrc.json

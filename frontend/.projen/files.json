@@ -1,12 +1,12 @@
 {
   "files": [
+    ".eslintrc.json",
     ".gitattributes",
     ".gitignore",
     ".npmignore",
     ".projen/deps.json",
     ".projen/files.json",
     ".projen/tasks.json",
-    "react-app-env.d.ts",
     "tsconfig.dev.json",
     "tsconfig.json"
   ],

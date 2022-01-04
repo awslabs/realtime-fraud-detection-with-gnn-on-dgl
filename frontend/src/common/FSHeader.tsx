@@ -1,8 +1,10 @@
-import NotificationsIcon from '@material-ui/icons/Notifications';
-import LanguageIcon from '@material-ui/icons/Language';
+/* eslint @typescript-eslint/no-floating-promises: "off" */
+
 import Button from '@material-ui/core/Button';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
+import LanguageIcon from '@material-ui/icons/Language';
+import NotificationsIcon from '@material-ui/icons/Notifications';
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import logo from '../assets/images/logo.svg';
@@ -57,7 +59,6 @@ const FSHeader: React.FC<HeaderProps> = ({ changeLang }) => {
     } else {
       setCurLanguage(LanguageList[0]);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [i18n.language]);
 
   return (
