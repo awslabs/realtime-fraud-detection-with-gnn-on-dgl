@@ -71,6 +71,15 @@
         }
       ]
     },
+    "dev": {
+      "name": "dev",
+      "description": "Starts the react application",
+      "steps": [
+        {
+          "exec": "react-scripts start"
+        }
+      ]
+    },
     "eslint": {
       "name": "eslint",
       "description": "Runs eslint against the codebase",
@@ -86,7 +95,12 @@
     },
     "post-compile": {
       "name": "post-compile",
-      "description": "Runs after successful compilation"
+      "description": "Runs after successful compilation",
+      "steps": [
+        {
+          "exec": "react-scripts build"
+        }
+      ]
     },
     "postinstall": {
       "name": "postinstall",

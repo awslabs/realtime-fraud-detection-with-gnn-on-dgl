@@ -4,8 +4,8 @@ const tsExcludeConfig = {
   compilerOptions: {
     lib: ['dom', 'es2018'],
   },
-  exclude:[
-    'cdk.out/**/*'
+  exclude: [
+    'cdk.out/**/*',
   ],
 };
 
@@ -158,11 +158,7 @@ const project = new awscdk.AwsCdkTypeScriptApp({
   // docsDirectory: 'docs',                                                    /* Docs directory. */
   // entrypointTypes: undefined,                                               /* The .d.ts file that includes the type declarations for this module. */
   // eslint: true,                                                             /* Setup eslint. */
-  eslintOptions: {
-    ignorePatterns: [
-      'src/frontend/**/*',
-    ],
-  },                                                 /* Eslint options. */
+  // eslintOptions: undefined,                                                 /* Eslint options. */
   // package: true,                                                            /* Defines a `yarn package` command that will produce a tarball and place it under `dist/js`. */
   // sampleCode: true,                                                         /* Generate one-time sample in `src/` and `test/` if there are no files there. */
   tsconfig: tsExcludeConfig /* Custom TSConfig. */,
@@ -171,7 +167,6 @@ const project = new awscdk.AwsCdkTypeScriptApp({
     ignoreProjen: false,
     workflowOptions: {
       labels: ['auto-approve', 'auto-merge'],
-      secret: 'PROJEN_GITHUB_TOKEN',
     },
   },
 });
@@ -184,7 +179,7 @@ project.addTask('cdk-init', {
 });
 project.addTask('postinstall', {
   exec:
-    'git submodule init && git submodule sync && git submodule update && docker run --rm -v `pwd`/src/script-libs/amazon-neptune-tools/neptune-python-utils:/src --workdir /src python:3.8-buster bash -c "apt update && apt install -y sudo zip && rm -rf /src/target && /src/build.sh"',
+    'git submodule init && git submodule sync && git submodule update && docker run --rm -v `pwd`/src/script-libs/amazon-neptune-tools/neptune-python-utils:/src --workdir /src python:3.8-buster bash -c "apt update && apt install -y sudo zip && rm -rf /src/target && /src/build.sh" && yarn --cwd frontend install --check-files --frozen-lockfile',
 });
 project.package.addField('resolutions', {
   'trim-newlines': '^3.0.1',
@@ -275,6 +270,25 @@ const reactPrj = new typescript.TypeScriptAppProject({
 });
 reactPrj.addTask('postinstall', {
   exec: 'npx projen build',
+});
+reactPrj.postCompileTask.exec('react-scripts build');
+reactPrj.addTask('dev', {
+  description: 'Starts the react application',
+  exec: 'react-scripts start',
+});
+reactPrj.addFields({
+  browserslist: {
+    production: [
+      '>0.2%',
+      'not dead',
+      'not op_mini all',
+    ],
+    development: [
+      'last 1 chrome version',
+      'last 1 firefox version',
+      'last 1 safari version',
+    ],
+  },
 });
 reactPrj.package.addField('resolutions', {
   'trim-newlines': '^3.0.1',

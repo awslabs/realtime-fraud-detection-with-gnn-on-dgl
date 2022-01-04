@@ -6,6 +6,7 @@
     "clobber": "npx projen clobber",
     "compile": "npx projen compile",
     "default": "npx projen default",
+    "dev": "npx projen dev",
     "eslint": "npx projen eslint",
     "package": "npx projen package",
     "post-compile": "npx projen post-compile",
@@ -110,6 +111,18 @@
         "tsconfig": "tsconfig.dev.json"
       }
     }
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   },
   "resolutions": {
     "trim-newlines": "^3.0.1",
