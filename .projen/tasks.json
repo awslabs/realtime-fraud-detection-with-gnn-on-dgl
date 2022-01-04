@@ -134,7 +134,7 @@
       "description": "Runs after successful compilation",
       "steps": [
         {
-          "spawn": "synth"
+          "spawn": "synth:silent"
         }
       ]
     },
@@ -152,7 +152,16 @@
     },
     "synth": {
       "name": "synth",
-      "description": "Synthesizes your cdk app into cdk.out (part of \"yarn build\")",
+      "description": "Synthesizes your cdk app into cdk.out",
+      "steps": [
+        {
+          "exec": "cdk synth"
+        }
+      ]
+    },
+    "synth:silent": {
+      "name": "synth:silent",
+      "description": "Synthesizes your cdk app into cdk.out and suppresses the template in stdout (part of \"yarn build\")",
       "steps": [
         {
           "exec": "cdk synth > /dev/null"
