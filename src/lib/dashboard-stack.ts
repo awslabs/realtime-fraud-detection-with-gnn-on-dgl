@@ -919,7 +919,7 @@ export class TransactionDashboardStack extends NestedStack {
 
     const websiteDeployment = new BucketDeployment(this, 'DeployWebsite', {
       sources: [
-        Source.asset(path.join(__dirname, '../frontend/build/'), {
+        Source.asset(path.join(__dirname, '../../frontend/build/'), {
           exclude: [amplifyConfFile],
         }),
       ],

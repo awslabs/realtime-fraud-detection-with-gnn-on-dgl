@@ -1,3 +1,5 @@
+/* eslint @typescript-eslint/no-floating-promises: "off" */
+
 // import TimelapseIcon from '@material-ui/icons/Timelapse';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -14,15 +16,15 @@ import Select from '@material-ui/core/Select';
 import TextField from '@material-ui/core/TextField';
 import WbIncandescentIcon from '@material-ui/icons/WbIncandescent';
 
+import axios from 'axios';
+import { createQueue } from 'best-queue';
+import gql from 'graphql-tag';
 import React, { useState, useEffect, useCallback } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
+import Loader from 'react-loader-spinner';
 import { useParams } from 'react-router-dom';
 
-import axios from 'axios';
 import Swal from 'sweetalert2';
-import { createQueue } from 'best-queue';
-import Loader from 'react-loader-spinner';
-import gql from 'graphql-tag';
 
 import {
   momentFormatData,
@@ -34,6 +36,7 @@ import {
   DEFAULT_DURATION_TIME,
   TIME_TYPE,
 } from '../../assets/js/const';
+import ClientContext from '../../common/ClientContext';
 import { getTransactionStats, getFraudTransactions } from '../../graphql/queries';
 // import useWindowSize from '../../hooks/useWindowSize';
 
@@ -41,7 +44,6 @@ import CountCard from './comps/CountCard';
 import RealtimeChart from './comps/RealtimeChart';
 import TransactionList from './comps/TransactionList';
 
-import ClientContext from '../../common/ClientContext';
 
 interface FraudType {
   id: number;
@@ -92,7 +94,6 @@ const Dashboard: React.FC = () => {
     if (param.lang) {
       i18n.changeLanguage(param.lang);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const simulateData = () => {
@@ -299,7 +300,6 @@ const Dashboard: React.FC = () => {
       getDashboardData();
     }, pollingInterval);
     return () => clearInterval(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pollingInterval, dataDurationTime]);
 
   // Interval to Polling Chart Data
@@ -309,7 +309,6 @@ const Dashboard: React.FC = () => {
       getChartNextData();
     }, pollingChartInterval);
     return () => clearInterval(chartIntervalId);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pollingChartInterval]);
 
   // Change Duration
@@ -343,7 +342,6 @@ const Dashboard: React.FC = () => {
     getDashboardData();
     buildQueueList();
     setPollingChartInterval((dataDurationTime / CHART_INIT_COUNT) * 1000);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataDurationTime]);
 
   const handleClickOpen = () => {

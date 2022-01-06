@@ -1,20 +1,22 @@
+/* eslint @typescript-eslint/no-floating-promises: "off" */
+
 import Amplify from 'aws-amplify';
+import { AWSAppSyncClient, AUTH_TYPE } from 'aws-appsync';
 import AWS from 'aws-sdk';
 import axios from 'axios';
-import { AWSAppSyncClient, AUTH_TYPE } from 'aws-appsync';
 import React, { useState, useEffect, useCallback } from 'react';
 import { HashRouter, Route, Switch } from 'react-router-dom';
 // import Swal from 'sweetalert2';
 
+import { SYS_GATEWAY_API_URL } from './assets/js/const';
+import ClientContext from './common/ClientContext';
 import FSHeader from './common/FSHeader';
+import LanguageContext from './common/LanguageContext';
 import DataLoading from './common/Loading';
 
 import Dashboard from './pages/dashboard/Dashboard';
 import NotFound from './pages/error/NotFound';
 
-import { SYS_GATEWAY_API_URL } from './assets/js/const';
-import ClientContext from './common/ClientContext';
-import LanguageContext from './common/LanguageContext';
 
 // Amplify.configure(awsconfig);
 // loading component for suspense fallback

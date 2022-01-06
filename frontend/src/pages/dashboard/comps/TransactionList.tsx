@@ -10,17 +10,17 @@ import TableRow from '@material-ui/core/TableRow';
 import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 
-import React, { useEffect, useState } from 'react';
 
 // import { momentFormatData } from '../../../assets/js/const';
 import moment from 'moment';
+import React, { useEffect, useState } from 'react';
 import 'moment/locale/zh-cn';
 import 'moment/locale/en-gb';
-import useWindowSize from '../../../hooks/useWindowSize';
-import { momentFormatData, TIME_TYPE } from '../../../assets/js/const';
 import { useTranslation } from 'react-i18next';
+import { momentFormatData, TIME_TYPE } from '../../../assets/js/const';
 
 import LanguageContext from '../../../common/LanguageContext';
+import useWindowSize from '../../../hooks/useWindowSize';
 
 const HtmlTooltip = withStyles((theme: Theme) => ({
   tooltip: {

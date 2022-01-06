@@ -1,10 +1,12 @@
-const { awscdk, web } = require('projen');
+const { awscdk, typescript } = require('projen');
 
 const tsExcludeConfig = {
   compilerOptions: {
     lib: ['dom', 'es2018'],
   },
-  exclude: ['src/frontend/**'],
+  exclude: [
+    'cdk.out/**/*',
+  ],
 };
 
 const cdkAlphaDeps = [
@@ -165,7 +167,6 @@ const project = new awscdk.AwsCdkTypeScriptApp({
     ignoreProjen: false,
     workflowOptions: {
       labels: ['auto-approve', 'auto-merge'],
-      secret: 'PROJEN_GITHUB_TOKEN',
     },
   },
 });
@@ -178,7 +179,7 @@ project.addTask('cdk-init', {
 });
 project.addTask('postinstall', {
   exec:
-    'git submodule init && git submodule sync && git submodule update && docker run --rm -v `pwd`/src/script-libs/amazon-neptune-tools/neptune-python-utils:/src --workdir /src python:3.8-buster bash -c "apt update && apt install -y sudo zip && rm -rf /src/target && /src/build.sh"',
+    'git submodule init && git submodule sync && git submodule update && docker run --rm -v `pwd`/src/script-libs/amazon-neptune-tools/neptune-python-utils:/src --workdir /src python:3.8-buster bash -c "apt update && apt install -y sudo zip && rm -rf /src/target && /src/build.sh" && yarn --cwd frontend install --check-files --frozen-lockfile',
 });
 project.package.addField('resolutions', {
   'trim-newlines': '^3.0.1',
@@ -193,6 +194,7 @@ project.addFields({
 
 const tsReactConfig = {
   compilerOptions: {
+    rootDir: './',
     lib: ['dom', 'dom.iterable', 'esnext'],
     target: 'es5',
     module: 'esnext',
@@ -203,22 +205,23 @@ const tsReactConfig = {
     forceConsistentCasingInFileNames: true,
     moduleResolution: 'node',
     isolatedModules: true,
+    jsx: 'react-jsx',
     noEmit: true,
   },
+  include: [
+    'src/**/*.tsx',
+    'test/**/*.tsx',
+  ],
 };
 
-const reactPrj = new web.ReactTypeScriptProject({
+const reactPrj = new typescript.TypeScriptAppProject({
   deps: [
+    'react@^17.0.2',
+    'react-dom@^17.0.2',
+    'web-vitals@^1.1.2',
     '@material-ui/core@^4.11.4',
     '@material-ui/icons@^4.11.2',
     '@material-ui/lab@^5.0.0-alpha.25',
-    '@testing-library/jest-dom@^5.14.1',
-    '@testing-library/react@^11.2.7',
-    '@testing-library/user-event@^13.1.9',
-    '@types/jest@^26.0.23',
-    '@types/node@^12.0.0',
-    '@types/react@^17.0.11',
-    '@types/react-dom@^17.0.7',
     'apexcharts@^3.27.1',
     'aws-sdk@^2.929.0',
     'aws-appsync@^1.8.1',
@@ -235,21 +238,31 @@ const reactPrj = new web.ReactTypeScriptProject({
     'react-i18next@^11.11.0',
     'react-loader-spinner@^4.0.0',
     'react-router-dom@^5.2.0',
+    'react-scripts@^4.0.0',
     'sweetalert2@^10.16.9',
+    '@testing-library/jest-dom@^5.14.1',
+    '@testing-library/react@^11.2.7',
+    '@testing-library/user-event@^13.1.9',
   ],
   devDeps: [
+    '@types/node@^14',
+    '@types/react@^17.0.11',
+    '@types/react-dom@^17.0.8',
+    '@types/jest@^26.0.23',
     '@types/react-loader-spinner@^3.1.3',
     '@types/react-router-dom@^5.1.7',
     'eslint-plugin-react-hooks@next',
   ],
-  gitignore: ['src/aws-exports.js'],
+  gitignore: [
+    'src/aws-exports.js',
+    'build/',
+  ],
   description: 'Dashboard frontend power by react.',
   version: '0.1.0',
   name: 'fraud-detection-solution-dashboard',
-  jsiiFqn: 'projen.web.ReactTypeScriptProject',
   license: 'Apache-2.0',
   licensed: false,
-  outdir: 'src/frontend',
+  outdir: 'frontend',
   readme: undefined,
   defaultReleaseBranch: 'main',
   parent: project,
@@ -257,6 +270,25 @@ const reactPrj = new web.ReactTypeScriptProject({
 });
 reactPrj.addTask('postinstall', {
   exec: 'npx projen build',
+});
+reactPrj.postCompileTask.exec('react-scripts build');
+reactPrj.addTask('dev', {
+  description: 'Starts the react application',
+  exec: 'react-scripts start',
+});
+reactPrj.addFields({
+  browserslist: {
+    production: [
+      '>0.2%',
+      'not dead',
+      'not op_mini all',
+    ],
+    development: [
+      'last 1 chrome version',
+      'last 1 firefox version',
+      'last 1 safari version',
+    ],
+  },
 });
 reactPrj.package.addField('resolutions', {
   'trim-newlines': '^3.0.1',

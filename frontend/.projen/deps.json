@@ -1,18 +1,6 @@
 {
   "dependencies": [
     {
-      "name": "@testing-library/jest-dom",
-      "type": "build"
-    },
-    {
-      "name": "@testing-library/react",
-      "type": "build"
-    },
-    {
-      "name": "@testing-library/user-event",
-      "type": "build"
-    },
-    {
       "name": "@types/jest",
       "type": "build"
     },
@@ -22,11 +10,8 @@
       "type": "build"
     },
     {
-      "name": "@types/react",
-      "type": "build"
-    },
-    {
       "name": "@types/react-dom",
+      "version": "^17.0.8",
       "type": "build"
     },
     {
@@ -40,8 +25,53 @@
       "type": "build"
     },
     {
+      "name": "@types/react",
+      "version": "^17.0.11",
+      "type": "build"
+    },
+    {
+      "name": "@typescript-eslint/eslint-plugin",
+      "version": "^5",
+      "type": "build"
+    },
+    {
+      "name": "@typescript-eslint/parser",
+      "version": "^5",
+      "type": "build"
+    },
+    {
+      "name": "eslint-import-resolver-node",
+      "type": "build"
+    },
+    {
+      "name": "eslint-import-resolver-typescript",
+      "type": "build"
+    },
+    {
+      "name": "eslint-plugin-import",
+      "type": "build"
+    },
+    {
       "name": "eslint-plugin-react-hooks",
       "version": "next",
+      "type": "build"
+    },
+    {
+      "name": "eslint",
+      "version": "^8",
+      "type": "build"
+    },
+    {
+      "name": "jest",
+      "type": "build"
+    },
+    {
+      "name": "jest-junit",
+      "version": "^13",
+      "type": "build"
+    },
+    {
+      "name": "json-schema",
       "type": "build"
     },
     {
@@ -54,8 +84,11 @@
       "type": "build"
     },
     {
+      "name": "ts-jest",
+      "type": "build"
+    },
+    {
       "name": "typescript",
-      "version": "^4.0.3",
       "type": "build"
     },
     {
@@ -86,26 +119,6 @@
     {
       "name": "@testing-library/user-event",
       "version": "^13.1.9",
-      "type": "runtime"
-    },
-    {
-      "name": "@types/jest",
-      "version": "^26.0.23",
-      "type": "runtime"
-    },
-    {
-      "name": "@types/node",
-      "version": "^12.0.0",
-      "type": "runtime"
-    },
-    {
-      "name": "@types/react-dom",
-      "version": "^17.0.7",
-      "type": "runtime"
-    },
-    {
-      "name": "@types/react",
-      "version": "^17.0.11",
       "type": "runtime"
     },
     {
@@ -169,16 +182,13 @@
       "type": "runtime"
     },
     {
-      "name": "react",
-      "type": "runtime"
-    },
-    {
       "name": "react-apexcharts",
       "version": "^1.3.9",
       "type": "runtime"
     },
     {
       "name": "react-dom",
+      "version": "^17.0.2",
       "type": "runtime"
     },
     {
@@ -202,12 +212,18 @@
       "type": "runtime"
     },
     {
+      "name": "react",
+      "version": "^17.0.2",
+      "type": "runtime"
+    },
+    {
       "name": "sweetalert2",
       "version": "^10.16.9",
       "type": "runtime"
     },
     {
       "name": "web-vitals",
+      "version": "^1.1.2",
       "type": "runtime"
     }
   ],
