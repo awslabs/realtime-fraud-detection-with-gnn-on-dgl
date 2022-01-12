@@ -3,11 +3,11 @@
 
 
 "@aws-cdk/assert@^2.0.0":
-  version "2.5.0"
-  resolved "https://registry.yarnpkg.com/@aws-cdk/assert/-/assert-2.5.0.tgz#e3f8f6696d18d169a01a180833181f82fa45c428"
-  integrity sha512-n6i0xVmS/XNy8+LrxnSoNhiHytNgWK57x3MFrNhj30rOt/M1PIHZTSMxGPbQAz3twlZVin1uOGZIHDuk4g+1TQ==
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/@aws-cdk/assert/-/assert-2.7.0.tgz#a8ef33a2164a598e01f37d81057d7d666e20630f"
+  integrity sha512-0d0yts1v6OD6/HFruRvspY8GQ7Tl6heNXEcqeTKYQfeiYJLOkGTIcrbSHximb36vjCTqburEXvla7AFG62zgig==
   dependencies:
-    "@aws-cdk/cloudformation-diff" "2.5.0"
+    "@aws-cdk/cloudformation-diff" "2.7.0"
 
 "@aws-cdk/aws-apigatewayv2-alpha@2.0.0-alpha.11":
   version "2.0.0-alpha.11"
@@ -47,6 +47,14 @@
     fs-extra "^9.1.0"
     md5 "^2.3.0"
 
+"@aws-cdk/cfnspec@2.7.0":
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/@aws-cdk/cfnspec/-/cfnspec-2.7.0.tgz#0bd5937b805ad3335189340a90803617a9900e7f"
+  integrity sha512-RZbQLtTYZzC/DZkdW8Kla/9dI+UMgIrzAoEXhgTU9U0lVjXQ/3bdmmwSgC1bi3ckRRGJAL3+UBqoj2SAWh9ypg==
+  dependencies:
+    fs-extra "^9.1.0"
+    md5 "^2.3.0"
+
 "@aws-cdk/cloud-assembly-schema@2.5.0", "@aws-cdk/cloud-assembly-schema@^2":
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/@aws-cdk/cloud-assembly-schema/-/cloud-assembly-schema-2.5.0.tgz#c15154a36af6b9242765e5ed5f387a765841a109"
@@ -67,6 +75,19 @@
     fast-deep-equal "^3.1.3"
     string-width "^4.2.3"
     table "^6.7.5"
+
+"@aws-cdk/cloudformation-diff@2.7.0":
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/@aws-cdk/cloudformation-diff/-/cloudformation-diff-2.7.0.tgz#60c6c2711dc679e7f436f3ccdc389c081078d580"
+  integrity sha512-2bu2+13K6rsGwV0T3W+sTQzw0MgYcvVvB7SYqRSIhDJ+1ylZby7+0IApAn+XuIUr6+1KmcedvNku7LEiUWV8DA==
+  dependencies:
+    "@aws-cdk/cfnspec" "2.7.0"
+    "@types/node" "^10.17.60"
+    chalk "^4"
+    diff "^5.0.0"
+    fast-deep-equal "^3.1.3"
+    string-width "^4.2.3"
+    table "^6.8.0"
 
 "@aws-cdk/cx-api@2.5.0", "@aws-cdk/cx-api@^2":
   version "2.5.0"
@@ -2440,7 +2461,7 @@ chalk@^2.0.0:
     escape-string-regexp "^1.0.5"
     supports-color "^5.3.0"
 
-chalk@^4.0.0, chalk@^4.1.0, chalk@^4.1.2:
+chalk@^4, chalk@^4.0.0, chalk@^4.1.0, chalk@^4.1.2:
   version "4.1.2"
   resolved "https://registry.yarnpkg.com/chalk/-/chalk-4.1.2.tgz#aac4e2b7734a740867aeb16bf02aad556a1e7a01"
   integrity sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==
@@ -7219,7 +7240,7 @@ sync-fetch@^0.3.0:
     buffer "^5.7.0"
     node-fetch "^2.6.1"
 
-table@^6.7.5:
+table@^6.7.5, table@^6.8.0:
   version "6.8.0"
   resolved "https://registry.yarnpkg.com/table/-/table-6.8.0.tgz#87e28f14fa4321c3377ba286f07b79b281a3b3ca"
   integrity sha512-s/fitrbVeEyHKFa7mFdkuQMWlH1Wgw/yEXMt5xACT4ZpzWFluehAxRtUUQKPuWhaLAWhFcVx6w3oC8VKaUfPGA==
