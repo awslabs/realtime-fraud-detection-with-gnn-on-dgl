@@ -3,11 +3,11 @@
 
 
 "@aws-cdk/assert@^2.0.0":
-  version "2.7.0"
-  resolved "https://registry.yarnpkg.com/@aws-cdk/assert/-/assert-2.7.0.tgz#a8ef33a2164a598e01f37d81057d7d666e20630f"
-  integrity sha512-0d0yts1v6OD6/HFruRvspY8GQ7Tl6heNXEcqeTKYQfeiYJLOkGTIcrbSHximb36vjCTqburEXvla7AFG62zgig==
+  version "2.8.0"
+  resolved "https://registry.yarnpkg.com/@aws-cdk/assert/-/assert-2.8.0.tgz#c9248188ef1eb1e6ac15a81985f99f3f77ecd685"
+  integrity sha512-NSSPMs2hXn42x7qWPhNCIg+CUAgqNZNuvU9v/EJo+xENADc+bm2X2y0RNJOjS5jcvMiy2AHtwT9Gj3uHd0S/IQ==
   dependencies:
-    "@aws-cdk/cloudformation-diff" "2.7.0"
+    "@aws-cdk/cloudformation-diff" "2.8.0"
 
 "@aws-cdk/aws-apigatewayv2-alpha@2.0.0-alpha.11":
   version "2.0.0-alpha.11"
@@ -47,6 +47,14 @@
     fs-extra "^9.1.0"
     md5 "^2.3.0"
 
+"@aws-cdk/cfnspec@2.8.0":
+  version "2.8.0"
+  resolved "https://registry.yarnpkg.com/@aws-cdk/cfnspec/-/cfnspec-2.8.0.tgz#9a33195bd16af86bf8654f7e085a4995bfb7dfc9"
+  integrity sha512-MLaTOu8IBRdaosXyAZF1xpubIeAPiNKtII7bw8JKOb07/HVUmdnNCStjPZCsPP5yQ4/OO2Qg2rPhPqocufpWlQ==
+  dependencies:
+    fs-extra "^9.1.0"
+    md5 "^2.3.0"
+
 "@aws-cdk/cloud-assembly-schema@2.7.0", "@aws-cdk/cloud-assembly-schema@^2":
   version "2.7.0"
   resolved "https://registry.yarnpkg.com/@aws-cdk/cloud-assembly-schema/-/cloud-assembly-schema-2.7.0.tgz#4dee82bd2e8d21ac0eb8411b0155c4ebe90eee8b"
@@ -61,6 +69,19 @@
   integrity sha512-2bu2+13K6rsGwV0T3W+sTQzw0MgYcvVvB7SYqRSIhDJ+1ylZby7+0IApAn+XuIUr6+1KmcedvNku7LEiUWV8DA==
   dependencies:
     "@aws-cdk/cfnspec" "2.7.0"
+    "@types/node" "^10.17.60"
+    chalk "^4"
+    diff "^5.0.0"
+    fast-deep-equal "^3.1.3"
+    string-width "^4.2.3"
+    table "^6.8.0"
+
+"@aws-cdk/cloudformation-diff@2.8.0":
+  version "2.8.0"
+  resolved "https://registry.yarnpkg.com/@aws-cdk/cloudformation-diff/-/cloudformation-diff-2.8.0.tgz#410366d5d4c8b47596a0757dd7390ca0894a71f3"
+  integrity sha512-9Z1b1oFBjP4r1dNgWaJF9Hg0+ND1OIsw6BWacFS7V016ZT055FttYD5bbaqlE09ZdjReDaDw6UHbE9s+IhD9sA==
+  dependencies:
+    "@aws-cdk/cfnspec" "2.8.0"
     "@types/node" "^10.17.60"
     chalk "^4"
     diff "^5.0.0"
