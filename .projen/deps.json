@@ -182,7 +182,7 @@
     },
     {
       "name": "cdk-bootstrapless-synthesizer",
-      "version": "^2.0.7",
+      "version": "^2.1.1",
       "type": "runtime"
     },
     {
