@@ -1,5 +1,5 @@
-import { App, Tags } from 'aws-cdk-lib';
-import { BootstraplessStackSynthesizer } from 'cdk-bootstrapless-synthesizer';
+import { App, Tags, Aspects } from 'aws-cdk-lib';
+import { BootstraplessStackSynthesizer, CompositeECRRepositoryAspect } from 'cdk-bootstrapless-synthesizer';
 import { FraudDetectionStack } from './lib/stack';
 
 const app = new App();
@@ -17,6 +17,10 @@ const stack = new FraudDetectionStack(app, 'realtime-fraud-detection-with-gnn-on
     app: 'realtime-fraud-detection-with-gnn-on-dgl',
   },
 });
+
+if (process.env.USE_BSS) {
+  Aspects.of(app).add(new CompositeECRRepositoryAspect());
+}
 
 Tags.of(stack).add('app', 'realtime-fraud-detection-with-gnn-on-dgl', {
   includeResourceTypes: [

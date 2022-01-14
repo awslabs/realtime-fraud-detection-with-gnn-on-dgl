@@ -50,7 +50,7 @@ const project = new awscdk.AwsCdkTypeScriptApp({
     'sync-fetch@^0.3.0',
     'mongodb@^3.7.0',
     'mongodb-client-encryption@^1.2.6',
-    'cdk-bootstrapless-synthesizer@^2.0.7',
+    'cdk-bootstrapless-synthesizer@^2.1.1',
     ...awsSDKDeps,
     ...cdkAlphaDeps,
   ] /* Runtime dependencies of this module. */,
