@@ -84,6 +84,11 @@
       "type": "build"
     },
     {
+      "name": "react-scripts",
+      "version": "^4.0.3",
+      "type": "build"
+    },
+    {
       "name": "ts-jest",
       "type": "build"
     },
@@ -204,11 +209,6 @@
     {
       "name": "react-router-dom",
       "version": "^5.2.0",
-      "type": "runtime"
-    },
-    {
-      "name": "react-scripts",
-      "version": "^4.0.3",
       "type": "runtime"
     },
     {

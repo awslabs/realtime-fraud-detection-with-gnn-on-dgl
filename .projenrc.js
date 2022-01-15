@@ -238,7 +238,6 @@ const reactPrj = new typescript.TypeScriptAppProject({
     'react-i18next@^11.11.0',
     'react-loader-spinner@^4.0.0',
     'react-router-dom@^5.2.0',
-    'react-scripts@^4.0.3',
     'sweetalert2@^10.16.9',
     '@testing-library/jest-dom@^5.14.1',
     '@testing-library/react@^11.2.7',
@@ -252,6 +251,7 @@ const reactPrj = new typescript.TypeScriptAppProject({
     '@types/react-loader-spinner@^3.1.3',
     '@types/react-router-dom@^5.1.7',
     'eslint-plugin-react-hooks@next',
+    'react-scripts@^4.0.3',
   ],
   gitignore: [
     'src/aws-exports.js',
