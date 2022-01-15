@@ -98,7 +98,7 @@
       "description": "Runs after successful compilation",
       "steps": [
         {
-          "exec": "react-scripts build"
+          "exec": "react-scripts --max_old_space_size=4096 build"
         }
       ]
     },

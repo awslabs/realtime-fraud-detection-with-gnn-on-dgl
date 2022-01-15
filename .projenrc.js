@@ -271,7 +271,7 @@ const reactPrj = new typescript.TypeScriptAppProject({
 reactPrj.addTask('postinstall', {
   exec: 'npx projen build',
 });
-reactPrj.postCompileTask.exec('react-scripts build');
+reactPrj.postCompileTask.exec('react-scripts --max_old_space_size=4096 build');
 reactPrj.addTask('dev', {
   description: 'Starts the react application',
   exec: 'react-scripts start',
