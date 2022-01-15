@@ -301,9 +301,6 @@ reactPrj.package.addField('resolutions', {
   'ansi-regex': '^5.0.1',
   'nth-check': '^2.0.1',
   'json-schema': '^0.4.0',
-  'node-forge': '^1.2.1',
-  'follow-redirects': '^1.14.7',
-  'shelljs': '^0.8.5',
 });
 
 project.synth();
