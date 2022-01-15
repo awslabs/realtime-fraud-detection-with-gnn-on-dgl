@@ -304,6 +304,7 @@ reactPrj.package.addField('resolutions', {
   'node-forge': '^1.2.1',
   'follow-redirects': '^1.14.7',
   'shelljs': '^0.8.5',
+  'ansi-html': 'https://registry.npmjs.org/ansi-html-community/-/ansi-html-community-0.0.8.tgz',
 });
 
 project.synth();
