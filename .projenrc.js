@@ -238,7 +238,7 @@ const reactPrj = new typescript.TypeScriptAppProject({
     'react-i18next@^11.11.0',
     'react-loader-spinner@^4.0.0',
     'react-router-dom@^5.2.0',
-    'react-scripts@^4.0.3',
+    'react-scripts@^4.0.0',
     'sweetalert2@^10.16.9',
     '@testing-library/jest-dom@^5.14.1',
     '@testing-library/react@^11.2.7',

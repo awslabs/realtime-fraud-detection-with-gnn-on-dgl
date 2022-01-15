@@ -208,7 +208,7 @@
     },
     {
       "name": "react-scripts",
-      "version": "^4.0.3",
+      "version": "^4.0.0",
       "type": "runtime"
     },
     {

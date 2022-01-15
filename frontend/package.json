@@ -68,7 +68,7 @@
     "react-i18next": "^11.11.0",
     "react-loader-spinner": "^4.0.0",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "^4.0.3",
+    "react-scripts": "^4.0.0",
     "sweetalert2": "^10.16.9",
     "web-vitals": "^1.1.2"
   },
