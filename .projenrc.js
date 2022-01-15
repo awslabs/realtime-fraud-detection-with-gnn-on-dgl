@@ -229,7 +229,7 @@ const reactPrj = new typescript.TypeScriptAppProject({
     'i18next@^20.3.1',
     'i18next-browser-languagedetector@^6.1.1',
     'i18next-http-backend@^1.2.6',
-    'axios@^0.21.4',
+    'axios@^0.24.0',
     'aws-amplify@^4.3.12',
     'best-queue@^2.0.1',
     'moment@^2.29.1',
@@ -297,11 +297,11 @@ reactPrj.package.addField('resolutions', {
   'browserslist': '^4.16.5',
   'css-what': '^5.0.1',
   'immer': '^9.0.6',
-  'axios': '^0.21.4',
   'set-value': '^4.0.1',
   'ansi-regex': '^5.0.1',
   'nth-check': '^2.0.1',
   'json-schema': '^0.4.0',
+  'node-forge': '^1.2.1',
 });
 
 project.synth();
