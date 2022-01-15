@@ -224,7 +224,7 @@ const reactPrj = new typescript.TypeScriptAppProject({
     '@material-ui/lab@^5.0.0-alpha.25',
     'apexcharts@^3.27.1',
     'aws-sdk@^2.1058.0',
-    'aws-appsync@^1.8.1',
+    'aws-appsync@^4.0.3',
     'graphql-tag@^2.12.4',
     'i18next@^20.3.1',
     'i18next-browser-languagedetector@^6.1.1',
