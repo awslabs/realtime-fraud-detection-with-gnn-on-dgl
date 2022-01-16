@@ -128,22 +128,22 @@
     },
     {
       "name": "aws-amplify",
-      "version": "^3.4.3",
+      "version": "^4.3.12",
       "type": "runtime"
     },
     {
       "name": "aws-appsync",
-      "version": "^1.8.1",
+      "version": "^4.0.3",
       "type": "runtime"
     },
     {
       "name": "aws-sdk",
-      "version": "^2.929.0",
+      "version": "^2.1058.0",
       "type": "runtime"
     },
     {
       "name": "axios",
-      "version": "^0.21.4",
+      "version": "^0.24.0",
       "type": "runtime"
     },
     {

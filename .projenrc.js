@@ -223,14 +223,14 @@ const reactPrj = new typescript.TypeScriptAppProject({
     '@material-ui/icons@^4.11.2',
     '@material-ui/lab@^5.0.0-alpha.25',
     'apexcharts@^3.27.1',
-    'aws-sdk@^2.929.0',
-    'aws-appsync@^1.8.1',
+    'aws-sdk@^2.1058.0',
+    'aws-appsync@^4.0.3',
     'graphql-tag@^2.12.4',
     'i18next@^20.3.1',
     'i18next-browser-languagedetector@^6.1.1',
     'i18next-http-backend@^1.2.6',
-    'axios@^0.21.4',
-    'aws-amplify@^3.4.3',
+    'axios@^0.24.0',
+    'aws-amplify@^4.3.12',
     'best-queue@^2.0.1',
     'moment@^2.29.1',
     'node-sass@^5.0.0',
@@ -271,7 +271,7 @@ const reactPrj = new typescript.TypeScriptAppProject({
 reactPrj.addTask('postinstall', {
   exec: 'npx projen build',
 });
-reactPrj.postCompileTask.exec('react-scripts build');
+reactPrj.postCompileTask.exec('react-scripts --max_old_space_size=4096 build');
 reactPrj.addTask('dev', {
   description: 'Starts the react application',
   exec: 'react-scripts start',
@@ -297,11 +297,14 @@ reactPrj.package.addField('resolutions', {
   'browserslist': '^4.16.5',
   'css-what': '^5.0.1',
   'immer': '^9.0.6',
-  'axios': '^0.21.4',
   'set-value': '^4.0.1',
   'ansi-regex': '^5.0.1',
   'nth-check': '^2.0.1',
   'json-schema': '^0.4.0',
+  'node-forge': '^1.2.1',
+  'follow-redirects': '^1.14.7',
+  'shelljs': '^0.8.5',
+  'ansi-html': 'https://registry.npmjs.org/ansi-html-community/-/ansi-html-community-0.0.8.tgz',
 });
 
 project.synth();
