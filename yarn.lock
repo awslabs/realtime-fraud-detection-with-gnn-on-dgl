@@ -2451,9 +2451,9 @@ cdk-assets@2.8.0:
     yargs "^16.2.0"
 
 cdk-bootstrapless-synthesizer@^2.1.1:
-  version "2.1.4"
-  resolved "https://registry.yarnpkg.com/cdk-bootstrapless-synthesizer/-/cdk-bootstrapless-synthesizer-2.1.4.tgz#9a8388ba88b5271052f263187c444fc37b80b219"
-  integrity sha512-XDxegC7ffxr8nejMtVcZ1qEiPpp3fpn4aV939bf/P2eoCB5l6PejfwBcG04Lvvp43DOHr0YZnQmH2SGj18vMpQ==
+  version "2.1.5"
+  resolved "https://registry.yarnpkg.com/cdk-bootstrapless-synthesizer/-/cdk-bootstrapless-synthesizer-2.1.5.tgz#4e4b541f427a173b71da3c6fcfc91387a427e19f"
+  integrity sha512-p0zGt+b4EjuAm5LnIo3nhomAlNJrIvPMpZCXv4jcoe431rFDyJoM1bXFJUyvN7IeAiK5GBhrQH7Q9J6H5FKKcg==
   dependencies:
     aws-cdk-lib "^2"
     constructs "^10.0.5"
