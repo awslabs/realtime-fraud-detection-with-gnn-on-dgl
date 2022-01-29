@@ -7,6 +7,7 @@
     "compile": "npx projen compile",
     "default": "npx projen default",
     "dev": "npx projen dev",
+    "eject": "npx projen eject",
     "eslint": "npx projen eslint",
     "package": "npx projen package",
     "post-compile": "npx projen post-compile",
