@@ -1,7 +1,6 @@
-import '@aws-cdk/assert/jest';
-import { ResourcePart } from '@aws-cdk/assert/lib/assertions/have-resource';
 import * as cxapi from '@aws-cdk/cx-api';
 import { App, Stack, GetContextValueOptions, GetContextValueResult, Tags } from 'aws-cdk-lib';
+import { Template } from 'aws-cdk-lib/assertions';
 import { Construct } from 'constructs';
 import { FraudDetectionStack } from '../src/lib/stack';
 import * as mock from './context-provider-mock';
@@ -22,7 +21,7 @@ describe('fraud detection stack test suite', () => {
   });
 
   test('vpc and bucket are created', () => {
-    expect(stack).toHaveResourceLike('AWS::S3::Bucket', {
+    Template.fromStack(stack).hasResource('AWS::S3::Bucket', {
       Properties: {
         BucketEncryption: {
           ServerSideEncryptionConfiguration: [
@@ -42,14 +41,14 @@ describe('fraud detection stack test suite', () => {
       },
       UpdateReplacePolicy: 'Retain',
       DeletionPolicy: 'Retain',
-    }, ResourcePart.CompleteDefinition);
+    });
 
-    expect(stack).toHaveResourceLike('AWS::EC2::VPC', {
+    Template.fromStack(stack).hasResourceProperties('AWS::EC2::VPC', {
       CidrBlock: '10.0.0.0/16',
       EnableDnsHostnames: true,
       EnableDnsSupport: true,
     });
-    expect(stack).toHaveResourceLike('AWS::EC2::VPCEndpoint', {
+    Template.fromStack(stack).hasResourceProperties('AWS::EC2::VPCEndpoint', {
       ServiceName: {
         'Fn::Join': [
           '',
@@ -65,7 +64,7 @@ describe('fraud detection stack test suite', () => {
       VpcEndpointType: 'Gateway',
     });
 
-    expect(stack).toHaveResourceLike('AWS::EC2::FlowLog', {
+    Template.fromStack(stack).hasResourceProperties('AWS::EC2::FlowLog', {
       ResourceType: 'VPC',
       TrafficType: 'ALL',
       LogDestination: {
@@ -88,14 +87,14 @@ describe('fraud detection stack test suite', () => {
 
   test('Neptune cluster and dbs created', () => {
 
-    expect(stack).toHaveResourceLike('AWS::Neptune::DBClusterParameterGroup', {
+    Template.fromStack(stack).hasResourceProperties('AWS::Neptune::DBClusterParameterGroup', {
       Family: 'neptune1',
       Parameters: {
         neptune_enable_audit_log: '1',
       },
     });
 
-    expect(stack).toHaveResourceLike('AWS::Neptune::DBCluster', {
+    Template.fromStack(stack).hasResource('AWS::Neptune::DBCluster', {
       Properties: {
         AssociatedRoles: [
           {
@@ -134,9 +133,9 @@ describe('fraud detection stack test suite', () => {
       },
       UpdateReplacePolicy: 'Delete',
       DeletionPolicy: 'Delete',
-    }, ResourcePart.CompleteDefinition);
+    });
 
-    expect(stack).toHaveResourceLike('AWS::Neptune::DBInstance', {
+    Template.fromStack(stack).hasResource('AWS::Neptune::DBInstance', {
       Properties: {
         DBInstanceClass: {
           Ref: 'NeptuneInstaneType',
@@ -151,25 +150,25 @@ describe('fraud detection stack test suite', () => {
       },
       UpdateReplacePolicy: 'Delete',
       DeletionPolicy: 'Delete',
-    }, ResourcePart.CompleteDefinition);
+    });
 
-    expect(stack).toCountResources('AWS::Neptune::DBInstance', 2);
+    Template.fromStack(stack).resourceCountIs('AWS::Neptune::DBInstance', 2);
   });
 
   test('overriding replica count of Neptune cluster', () => {
     ({ app, stack } = initializeStackWithContextsAndEnvs({
       NeptuneReplicaCount: 0,
     }));
-    expect(stack).toCountResources('AWS::Neptune::DBInstance', 1);
+    Template.fromStack(stack).resourceCountIs('AWS::Neptune::DBInstance', 1);
 
     ({ app, stack } = initializeStackWithContextsAndEnvs({
       NeptuneReplicaCount: 3,
     }));
-    expect(stack).toCountResources('AWS::Neptune::DBInstance', 4);
+    Template.fromStack(stack).resourceCountIs('AWS::Neptune::DBInstance', 4);
   });
 
   test('ingress rules of neptune SG', () => {
-    expect(stack).toHaveResourceLike('AWS::EC2::SecurityGroupIngress', {
+    Template.fromStack(stack).hasResourceProperties('AWS::EC2::SecurityGroupIngress', {
       IpProtocol: 'tcp',
       FromPort: {
         'Fn::GetAtt': [
@@ -197,7 +196,7 @@ describe('fraud detection stack test suite', () => {
       },
     });
 
-    expect(stack).toHaveResourceLike('AWS::EC2::SecurityGroupIngress', {
+    Template.fromStack(stack).hasResourceProperties('AWS::EC2::SecurityGroupIngress', {
       IpProtocol: 'tcp',
       FromPort: {
         'Fn::GetAtt': [
@@ -227,7 +226,7 @@ describe('fraud detection stack test suite', () => {
   });
 
   test('nested stacks', () => {
-    expect(stack).toCountResources('AWS::CloudFormation::Stack', 3);
+    Template.fromStack(stack).resourceCountIs('AWS::CloudFormation::Stack', 3);
   });
 
   test('report error when the specified vpc is without private subnet', () => {
@@ -242,7 +241,7 @@ describe('fraud detection stack test suite', () => {
   });
 
   test('sqs queue is created', () => {
-    expect(stack).toHaveResourceLike('AWS::SQS::Queue', {
+    Template.fromStack(stack).hasResourceProperties('AWS::SQS::Queue', {
       ContentBasedDeduplication: true,
       FifoQueue: true,
       KmsMasterKeyId: 'alias/aws/sqs',
@@ -258,7 +257,7 @@ describe('fraud detection stack test suite', () => {
       },
     });
 
-    expect(stack).toCountResources('AWS::SQS::Queue', 2);
+    Template.fromStack(stack).resourceCountIs('AWS::SQS::Queue', 2);
   });
 
   function _mockVpcWithoutPrivateSubnet(): (scope: Construct, options: GetContextValueOptions) => GetContextValueResult {

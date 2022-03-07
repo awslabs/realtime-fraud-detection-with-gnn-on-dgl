@@ -29,7 +29,6 @@
     "projen": "npx projen"
   },
   "devDependencies": {
-    "@aws-cdk/assert": "^2.0.0",
     "@aws-cdk/cloud-assembly-schema": "^2",
     "@aws-cdk/cx-api": "^2",
     "@types/bson": "^4.2.0",
