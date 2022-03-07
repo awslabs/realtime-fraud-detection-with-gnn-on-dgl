@@ -3,6 +3,7 @@ site_name: 基于深度学习图神经网络的实时反欺诈解决方案
 site_description: 基于深度学习图神经网络（GNN）的实时反欺诈解决方案实现手册
 docs_dir: zh
 site_dir: ./site/zh
+edit_uri: edit/main/docs/zh/
 theme:
   language: zh
 nav:
