@@ -1,6 +1,6 @@
-import '@aws-cdk/assert/jest';
 import { DatabaseCluster, InstanceType } from '@aws-cdk/aws-neptune-alpha';
 import { App, Stack, RemovalPolicy, Duration } from 'aws-cdk-lib';
+import { Template } from 'aws-cdk-lib/assertions';
 import { Vpc } from 'aws-cdk-lib/aws-ec2';
 import { Queue, QueueEncryption } from 'aws-cdk-lib/aws-sqs';
 import { InferenceStack } from '../src/lib/inference-stack';
@@ -16,7 +16,7 @@ describe('inference stack', () => {
   });
 
   test('inference generator is created', () => {
-    expect(stack).toHaveResourceLike('AWS::Lambda::Function', {
+    Template.fromStack(stack).hasResourceProperties('AWS::Lambda::Function', {
       Environment: {
         Variables: {
           QUEUE_URL: {

@@ -1,11 +1,6 @@
 {
   "dependencies": [
     {
-      "name": "@aws-cdk/assert",
-      "version": "^2.0.0",
-      "type": "build"
-    },
-    {
       "name": "@aws-cdk/cloud-assembly-schema",
       "version": "^2",
       "type": "build"

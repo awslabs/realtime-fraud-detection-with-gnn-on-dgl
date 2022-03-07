@@ -2,7 +2,6 @@ import * as cxschema from '@aws-cdk/cloud-assembly-schema';
 import * as cxapi from '@aws-cdk/cx-api';
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import '@aws-cdk/assert/jest';
 
 export interface MockVcpContextResponse {
   readonly vpcId: string;

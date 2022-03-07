@@ -1,8 +1,7 @@
 import * as path from 'path';
-import '@aws-cdk/assert/jest';
-import { ResourcePart } from '@aws-cdk/assert/lib/assertions/have-resource';
 import { DatabaseCluster, InstanceType } from '@aws-cdk/aws-neptune-alpha';
 import { App, Stack } from 'aws-cdk-lib';
+import { Template } from 'aws-cdk-lib/assertions';
 import { Vpc } from 'aws-cdk-lib/aws-ec2';
 import { DockerImageAsset } from 'aws-cdk-lib/aws-ecr-assets';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
@@ -30,7 +29,7 @@ describe('training stack test suite', () => {
   });
 
   test('data ingest lambda is created.', () => {
-    expect(stack).toHaveResourceLike('AWS::IAM::Policy', {
+    Template.fromStack(stack).hasResourceProperties('AWS::IAM::Policy', {
       PolicyDocument: {
         Statement: [
           {
@@ -79,13 +78,13 @@ describe('training stack test suite', () => {
       ],
     });
 
-    expect(stack).toHaveResourceLike('AWS::Lambda::LayerVersion', {
+    Template.fromStack(stack).hasResourceProperties('AWS::Lambda::LayerVersion', {
       CompatibleRuntimes: [
         'python3.8',
       ],
     });
 
-    expect(stack).toHaveResourceLike('AWS::Lambda::Function', {
+    Template.fromStack(stack).hasResourceProperties('AWS::Lambda::Function', {
       Environment: {
         Variables: {
           TargetBucket: {
@@ -120,7 +119,7 @@ describe('training stack test suite', () => {
   });
 
   test('glue connection is created.', () => {
-    expect(stack).toHaveResourceLike('AWS::Glue::Connection', {
+    Template.fromStack(stack).hasResourceProperties('AWS::Glue::Connection', {
       ConnectionInput: {
         ConnectionProperties: {},
         ConnectionType: 'NETWORK',
@@ -148,11 +147,11 @@ describe('training stack test suite', () => {
       },
     });
 
-    expect(stack).toCountResources('AWS::Glue::Connection', 2);
+    Template.fromStack(stack).resourceCountIs('AWS::Glue::Connection', 2);
   });
 
   test('glue security configuration is created.', () => {
-    expect(stack).toHaveResourceLike('AWS::Glue::SecurityConfiguration', {
+    Template.fromStack(stack).hasResourceProperties('AWS::Glue::SecurityConfiguration', {
       EncryptionConfiguration: {
         CloudWatchEncryption: {
           CloudWatchEncryptionMode: 'SSE-KMS',
@@ -194,7 +193,7 @@ describe('training stack test suite', () => {
 
   test('key policy of custom kms key', () => {
     // check custom KMS key grant logs to encrypt
-    expect(stack).toHaveResourceLike('AWS::KMS::Key', {
+    Template.fromStack(stack).hasResourceProperties('AWS::KMS::Key', {
       KeyPolicy: {
         Statement: [
           {
@@ -394,7 +393,7 @@ describe('training stack test suite', () => {
   });
 
   test('glue crawler is created.', () => {
-    expect(stack).toHaveResourceLike('AWS::IAM::Policy', {
+    Template.fromStack(stack).hasResourceProperties('AWS::IAM::Policy', {
       PolicyDocument: {
         Statement: [
           {
@@ -431,7 +430,7 @@ describe('training stack test suite', () => {
       ],
     });
 
-    expect(stack).toHaveResourceLike('AWS::Glue::Crawler', {
+    Template.fromStack(stack).hasResourceProperties('AWS::Glue::Crawler', {
       Targets: {
         CatalogTargets: [
           {
@@ -460,7 +459,7 @@ describe('training stack test suite', () => {
   });
 
   test('s3 bucket for glue job', () => {
-    expect(stack).toHaveResourceLike('AWS::S3::Bucket', {
+    Template.fromStack(stack).hasResourceProperties('AWS::S3::Bucket', {
       BucketEncryption: {
         ServerSideEncryptionConfiguration: [
           {
@@ -480,7 +479,7 @@ describe('training stack test suite', () => {
   });
 
   test('glue job is created', () => {
-    expect(stack).toHaveResourceLike('AWS::IAM::Role', {
+    Template.fromStack(stack).hasResourceProperties('AWS::IAM::Role', {
       AssumeRolePolicyDocument: {
         Statement: [
           {
@@ -624,7 +623,7 @@ describe('training stack test suite', () => {
       ],
     });
 
-    expect(stack).toHaveResourceLike('AWS::IAM::Policy', {
+    Template.fromStack(stack).hasResourceProperties('AWS::IAM::Policy', {
       PolicyDocument: {
         Statement: [
           {
@@ -889,7 +888,7 @@ describe('training stack test suite', () => {
       ],
     });
 
-    expect(stack).toHaveResourceLike('AWS::Glue::Job', {
+    Template.fromStack(stack).hasResourceProperties('AWS::Glue::Job', {
       Command: {
         Name: 'glueetl',
         PythonVersion: '3',
@@ -989,7 +988,7 @@ describe('training stack test suite', () => {
   });
 
   test('iam role/policy of crawl lambda task is created.', () => {
-    expect(stack).toHaveResourceLike('AWS::IAM::Policy', {
+    Template.fromStack(stack).hasResourceProperties('AWS::IAM::Policy', {
       PolicyDocument: {
         Statement: [
           {
@@ -1035,7 +1034,7 @@ describe('training stack test suite', () => {
   });
 
   test('model training pipeline is created.', () => {
-    expect(stack).toHaveResourceLike('AWS::StepFunctions::StateMachine', {
+    Template.fromStack(stack).hasResourceProperties('AWS::StepFunctions::StateMachine', {
       DefinitionString: {
         'Fn::Join': [
           '',
@@ -1240,7 +1239,7 @@ describe('training stack test suite', () => {
 
   // see https://docs.aws.amazon.com/step-functions/latest/dg/bp-cwl.html for detail
   test('log group of states is applied the best practise.', () => {
-    expect(stack).toHaveResourceLike('AWS::Logs::LogGroup', {
+    Template.fromStack(stack).hasResource('AWS::Logs::LogGroup', {
       Properties: {
         LogGroupName: {
           'Fn::Join': [
@@ -1257,8 +1256,8 @@ describe('training stack test suite', () => {
       },
       UpdateReplacePolicy: 'Delete',
       DeletionPolicy: 'Delete',
-    }, ResourcePart.CompleteDefinition);
-    expect(stack).toHaveResourceLike('AWS::StepFunctions::StateMachine', {
+    });
+    Template.fromStack(stack).hasResourceProperties('AWS::StepFunctions::StateMachine', {
       LoggingConfiguration: {
         Destinations: [
           {
@@ -1280,7 +1279,7 @@ describe('training stack test suite', () => {
 
   test('model repackaging is created.', () => {
     // EFS is created
-    expect(stack).toHaveResourceLike('AWS::EFS::FileSystem', {
+    Template.fromStack(stack).hasResource('AWS::EFS::FileSystem', {
       Properties: {
         Encrypted: true,
         LifecyclePolicies: [
@@ -1291,9 +1290,8 @@ describe('training stack test suite', () => {
       },
       UpdateReplacePolicy: 'Delete',
       DeletionPolicy: 'Delete',
-    },
-    ResourcePart.CompleteDefinition);
-    expect(stack).toHaveResourceLike('AWS::EFS::AccessPoint', {
+    });
+    Template.fromStack(stack).hasResourceProperties('AWS::EFS::AccessPoint', {
       FileSystemId: {
         Ref: 'TempFilesystem02DFD7EB',
       },
@@ -1312,7 +1310,7 @@ describe('training stack test suite', () => {
     },
     );
 
-    expect(stack).toHaveResourceLike('AWS::Lambda::Function', {
+    Template.fromStack(stack).hasResourceProperties('AWS::Lambda::Function', {
       Code: {
         S3Bucket: {
         },

@@ -1,6 +1,5 @@
-import '@aws-cdk/assert/jest';
-import { ResourcePart } from '@aws-cdk/assert/lib/assertions/have-resource';
 import { App, Stack, RemovalPolicy, Duration, CfnParameter } from 'aws-cdk-lib';
+import { Template } from 'aws-cdk-lib/assertions';
 import { Vpc } from 'aws-cdk-lib/aws-ec2';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { Queue, QueueEncryption } from 'aws-cdk-lib/aws-sqs';
@@ -17,14 +16,14 @@ describe('dashboard stack test suite', () => {
   });
 
   test('docdb is created.', () => {
-    expect(stack).toHaveResourceLike('AWS::DocDB::DBClusterParameterGroup', {
+    Template.fromStack(stack).hasResourceProperties('AWS::DocDB::DBClusterParameterGroup', {
       Family: 'docdb4.0',
       Parameters: {
         audit_logs: 'enabled',
       },
     });
 
-    expect(stack).toHaveResourceLike('AWS::DocDB::DBCluster', {
+    Template.fromStack(stack).hasResource('AWS::DocDB::DBCluster', {
       Properties: {
         MasterUsername: {
           'Fn::Join': [
@@ -60,11 +59,11 @@ describe('dashboard stack test suite', () => {
       },
       UpdateReplacePolicy: 'Delete',
       DeletionPolicy: 'Delete',
-    }, ResourcePart.CompleteDefinition);
+    });
   });
 
   test('SG of docdb.', () => {
-    expect(stack).toHaveResourceLike('AWS::EC2::SecurityGroupIngress', {
+    Template.fromStack(stack).hasResourceProperties('AWS::EC2::SecurityGroupIngress', {
       IpProtocol: 'tcp',
       FromPort: {
         'Fn::GetAtt': [
@@ -92,7 +91,7 @@ describe('dashboard stack test suite', () => {
       },
     });
 
-    expect(stack).toHaveResourceLike('AWS::EC2::SecurityGroupIngress', {
+    Template.fromStack(stack).hasResourceProperties('AWS::EC2::SecurityGroupIngress', {
       IpProtocol: 'tcp',
       FromPort: {
         'Fn::GetAtt': [
@@ -122,7 +121,7 @@ describe('dashboard stack test suite', () => {
   });
 
   test('rotating password of DocDB', () => {
-    expect(stack).toHaveResourceLike('AWS::SecretsManager::RotationSchedule', {
+    Template.fromStack(stack).hasResourceProperties('AWS::SecretsManager::RotationSchedule', {
       SecretId: {
         Ref: 'DashboardDatabaseSecretAttachmentB749CF34',
       },
@@ -137,7 +136,7 @@ describe('dashboard stack test suite', () => {
       },
     });
 
-    expect(stack).toHaveResourceLike('AWS::SecretsManager::ResourcePolicy', {
+    Template.fromStack(stack).hasResourceProperties('AWS::SecretsManager::ResourcePolicy', {
       ResourcePolicy: {
         Statement: [
           {
@@ -170,7 +169,7 @@ describe('dashboard stack test suite', () => {
       },
     });
 
-    expect(stack).toHaveResourceLike('AWS::Serverless::Application', {
+    Template.fromStack(stack).hasResourceProperties('AWS::Serverless::Application', {
       Location: {
         ApplicationId: {
           'Fn::FindInMap': [
@@ -214,21 +213,21 @@ describe('dashboard stack test suite', () => {
   test('rotating password of DocDB is supported since v1.109.0 when deploying to China regions', () => {
     const context = deployToCNRegion();
 
-    expect(context.stack).toCountResources('AWS::SecretsManager::RotationSchedule', 1);
+    Template.fromStack(context.stack).resourceCountIs('AWS::SecretsManager::RotationSchedule', 1);
 
-    expect(context.stack).toCountResources('AWS::SecretsManager::ResourcePolicy', 1);
+    Template.fromStack(context.stack).resourceCountIs('AWS::SecretsManager::ResourcePolicy', 1);
 
-    expect(context.stack).toCountResources('AWS::Serverless::Application', 1);
+    Template.fromStack(context.stack).resourceCountIs('AWS::Serverless::Application', 1);
   });
 
   test('layer for docdb cert is created', () => {
-    expect(stack).toHaveResourceLike('AWS::Lambda::LayerVersion', {
+    Template.fromStack(stack).hasResourceProperties('AWS::Lambda::LayerVersion', {
       Description: '/RDS CAs',
     });
   });
 
   test('custom resource for creating indexes of docdb', () => {
-    expect(stack).toHaveResourceLike('Custom::DocDB-CreateIndexes', {
+    Template.fromStack(stack).hasResource('Custom::DocDB-CreateIndexes', {
       Properties: {
         ServiceToken: {
           'Fn::GetAtt': [
@@ -258,11 +257,11 @@ describe('dashboard stack test suite', () => {
         'DashboardDatabaseSecretCF9F4299',
         'DashboardDatabaseSubnetsD80E6AA1',
       ],
-    }, ResourcePart.CompleteDefinition);
+    });
   });
 
   test('dashboard graphql is created', () => {
-    expect(stack).toHaveResourceLike('AWS::IAM::Role', {
+    Template.fromStack(stack).hasResourceProperties('AWS::IAM::Role', {
       AssumeRolePolicyDocument: {
         Statement: [
           {
@@ -293,7 +292,7 @@ describe('dashboard stack test suite', () => {
       ],
     });
 
-    expect(stack).toHaveResourceLike('AWS::AppSync::GraphQLApi', {
+    Template.fromStack(stack).hasResourceProperties('AWS::AppSync::GraphQLApi', {
       AuthenticationType: 'AWS_IAM',
       LogConfig: {
         CloudWatchLogsRoleArn: {
@@ -307,7 +306,7 @@ describe('dashboard stack test suite', () => {
       XrayEnabled: true,
     });
 
-    expect(stack).toHaveResourceLike('AWS::AppSync::GraphQLSchema', {
+    Template.fromStack(stack).hasResourceProperties('AWS::AppSync::GraphQLSchema', {
       ApiId: {
         'Fn::GetAtt': [
           'FraudDetectionDashboardAPID13F00C7',
@@ -317,7 +316,7 @@ describe('dashboard stack test suite', () => {
       Definition: 'type Transaction @aws_iam @aws_api_key {\n  id: String!\n  amount: Float!\n  timestamp: AWSTimestamp!\n  productCD: String\n  card1: String\n  card2: String\n  card3: String\n  card4: String\n  card5: String\n  card6: String\n  addr1: String\n  addr2: String\n  dist1: String\n  dist2: String\n  pEmaildomain: String\n  rEmaildomain: String\n  isFraud: Boolean!\n}\n\ntype TransactionStats @aws_iam @aws_api_key {\n  totalCount: Int!\n  totalAmount: Float!\n  fraudCount: Int!\n  totalFraudAmount: Float!\n}\n\ntype Query @aws_iam @aws_api_key {\n  getTransactionStats(start: Int, end: Int): TransactionStats\n  getFraudTransactions(start: Int, end: Int): [ Transaction ]\n}',
     });
 
-    expect(stack).toHaveResourceLike('AWS::AppSync::DataSource', {
+    Template.fromStack(stack).hasResourceProperties('AWS::AppSync::DataSource', {
       ApiId: {
         'Fn::GetAtt': [
           'FraudDetectionDashboardAPID13F00C7',
@@ -342,7 +341,7 @@ describe('dashboard stack test suite', () => {
       },
     });
 
-    expect(stack).toHaveResourceLike('AWS::AppSync::Resolver', {
+    Template.fromStack(stack).hasResourceProperties('AWS::AppSync::Resolver', {
       ApiId: {
         'Fn::GetAtt': [
           'FraudDetectionDashboardAPID13F00C7',
@@ -357,7 +356,7 @@ describe('dashboard stack test suite', () => {
       ResponseMappingTemplate: '$util.toJson($ctx.result)',
     });
 
-    expect(stack).toHaveResourceLike('AWS::AppSync::Resolver', {
+    Template.fromStack(stack).hasResourceProperties('AWS::AppSync::Resolver', {
       ApiId: {
         'Fn::GetAtt': [
           'FraudDetectionDashboardAPID13F00C7',
@@ -374,11 +373,11 @@ describe('dashboard stack test suite', () => {
   });
 
   test('no ApiKey of dashboard graphql is created', () => {
-    expect(stack).toCountResources('AWS::AppSync::ApiKey', 0);
+    Template.fromStack(stack).resourceCountIs('AWS::AppSync::ApiKey', 0);
   });
 
   test('transaction generator is created', () => {
-    expect(stack).toHaveResourceLike('AWS::Lambda::Function', {
+    Template.fromStack(stack).hasResourceProperties('AWS::Lambda::Function', {
       Environment: {
         Variables: {
           INFERENCE_ARN: 'arn:aws:lambda:ap-southeast-1:123456789012:function:inference-func',
@@ -407,7 +406,7 @@ describe('dashboard stack test suite', () => {
       },
     });
 
-    expect(stack).toHaveResourceLike('AWS::StepFunctions::StateMachine', {
+    Template.fromStack(stack).hasResourceProperties('AWS::StepFunctions::StateMachine', {
       DefinitionString: {
         'Fn::Join': [
           '',
@@ -446,7 +445,7 @@ describe('dashboard stack test suite', () => {
 
   // see https://docs.aws.amazon.com/step-functions/latest/dg/bp-cwl.html for detail
   test('log group of states is applied the best practise.', () => {
-    expect(stack).toHaveResourceLike('AWS::Logs::LogGroup', {
+    Template.fromStack(stack).hasResource('AWS::Logs::LogGroup', {
       Properties: {
         LogGroupName: {
           'Fn::Join': [
@@ -463,8 +462,8 @@ describe('dashboard stack test suite', () => {
       },
       UpdateReplacePolicy: 'Delete',
       DeletionPolicy: 'Delete',
-    }, ResourcePart.CompleteDefinition);
-    expect(stack).toHaveResourceLike('AWS::StepFunctions::StateMachine', {
+    });
+    Template.fromStack(stack).hasResourceProperties('AWS::StepFunctions::StateMachine', {
       LoggingConfiguration: {
         Destinations: [
           {
@@ -485,7 +484,7 @@ describe('dashboard stack test suite', () => {
   });
 
   test('fn processes the sqs events', () => {
-    expect(stack).toHaveResourceLike('AWS::Lambda::Function', {
+    Template.fromStack(stack).hasResourceProperties('AWS::Lambda::Function', {
       Role: {
         'Fn::GetAtt': [
           'TransacationEventFuncServiceRoleE7060D37',
@@ -543,7 +542,7 @@ describe('dashboard stack test suite', () => {
       },
     });
 
-    expect(stack).toHaveResourceLike('AWS::Lambda::EventSourceMapping', {
+    Template.fromStack(stack).hasResourceProperties('AWS::Lambda::EventSourceMapping', {
       FunctionName: {
         Ref: 'TransacationEventFuncE6A7AC47',
       },
@@ -556,11 +555,11 @@ describe('dashboard stack test suite', () => {
   });
 
   test('http api for dashboard', () => {
-    expect(stack).toHaveResourceLike('AWS::ApiGatewayV2::Api', {
+    Template.fromStack(stack).hasResourceProperties('AWS::ApiGatewayV2::Api', {
       ProtocolType: 'HTTP',
     });
 
-    expect(stack).toHaveResourceLike('AWS::ApiGatewayV2::Stage', {
+    Template.fromStack(stack).hasResourceProperties('AWS::ApiGatewayV2::Stage', {
       StageName: 'api',
       AccessLogSettings: {
         DestinationArn: {
@@ -574,9 +573,9 @@ describe('dashboard stack test suite', () => {
       AutoDeploy: true,
     });
 
-    expect(stack).toCountResources('AWS::ApiGatewayV2::Stage', 1);
+    Template.fromStack(stack).resourceCountIs('AWS::ApiGatewayV2::Stage', 1);
 
-    expect(stack).toHaveResourceLike('AWS::ApiGatewayV2::Integration', {
+    Template.fromStack(stack).hasResourceProperties('AWS::ApiGatewayV2::Integration', {
       IntegrationType: 'AWS_PROXY',
       ConnectionType: 'INTERNET',
       CredentialsArn: {
@@ -596,7 +595,7 @@ describe('dashboard stack test suite', () => {
       TimeoutInMillis: 10000,
     });
 
-    expect(stack).toHaveResourceLike('AWS::ApiGatewayV2::Route', {
+    Template.fromStack(stack).hasResourceProperties('AWS::ApiGatewayV2::Route', {
       RouteKey: 'POST /start',
       AuthorizationType: 'NONE',
       Target: {
@@ -612,7 +611,7 @@ describe('dashboard stack test suite', () => {
       },
     });
 
-    expect(stack).toHaveResourceLike('AWS::IAM::Policy', {
+    Template.fromStack(stack).hasResourceProperties('AWS::IAM::Policy', {
       PolicyDocument: {
         Statement: [
           {
@@ -628,7 +627,7 @@ describe('dashboard stack test suite', () => {
   });
 
   test('http api for getting token of appsync', () => {
-    expect(stack).toHaveResourceLike('AWS::ApiGatewayV2::Integration', {
+    Template.fromStack(stack).hasResourceProperties('AWS::ApiGatewayV2::Integration', {
       ApiId: {
         Ref: 'FraudDetectionDashboardApiE395505A',
       },
@@ -642,14 +641,14 @@ describe('dashboard stack test suite', () => {
       PayloadFormatVersion: '2.0',
     });
 
-    expect(stack).toHaveResourceLike('AWS::ApiGatewayV2::Route', {
+    Template.fromStack(stack).hasResourceProperties('AWS::ApiGatewayV2::Route', {
       ApiId: {
         Ref: 'FraudDetectionDashboardApiE395505A',
       },
       RouteKey: 'GET /token',
     });
 
-    expect(stack).toHaveResourceLike('AWS::ApiGatewayV2::Stage', {
+    Template.fromStack(stack).hasResourceProperties('AWS::ApiGatewayV2::Stage', {
       ApiId: {
         Ref: 'FraudDetectionDashboardApiE395505A',
       },
@@ -659,21 +658,19 @@ describe('dashboard stack test suite', () => {
   });
 
   test('dashboard stack output', () => {
-    expect(stack).toHaveOutput({
-      outputName: 'DashboardDBEndpoint',
+    const template = Template.fromStack(stack);
+    template.hasOutput('DashboardDBEndpoint', {
     });
 
-    expect(stack).toHaveOutput({
-      outputName: 'DashboardGrapqlEndpoint',
+    template.hasOutput('DashboardGrapqlEndpoint', {
     });
 
-    expect(stack).toHaveOutput({
-      outputName: 'DashboardWebsiteUrl',
+    template.hasOutput('DashboardWebsiteUrl', {
     });
   });
 
   test('distributed dashboard website by s3 and cloudfront in standarnd partition', () => {
-    expect(stack).toHaveResourceLike('AWS::S3::Bucket', {
+    Template.fromStack(stack).hasResource('AWS::S3::Bucket', {
       Properties: {
         BucketEncryption: {
           ServerSideEncryptionConfiguration: [
@@ -699,9 +696,9 @@ describe('dashboard stack test suite', () => {
       },
       UpdateReplacePolicy: 'Delete',
       DeletionPolicy: 'Delete',
-    }, ResourcePart.CompleteDefinition);
+    });
 
-    expect(stack).toHaveResourceLike('AWS::S3::BucketPolicy', {
+    Template.fromStack(stack).hasResourceProperties('AWS::S3::BucketPolicy', {
       PolicyDocument: {
         Statement: [
           {
@@ -772,7 +769,7 @@ describe('dashboard stack test suite', () => {
       },
     });
 
-    expect(stack).toHaveResourceLike('AWS::CloudFront::CachePolicy', {
+    Template.fromStack(stack).hasResourceProperties('AWS::CloudFront::CachePolicy', {
       CachePolicyConfig: {
         DefaultTTL: 604800,
         MaxTTL: 2592000,
@@ -805,7 +802,7 @@ describe('dashboard stack test suite', () => {
     });
 
     // deploy sar application as lambda@edge
-    expect(stack).toHaveResourceLike('AWS::CloudFormation::CustomResource', {
+    Template.fromStack(stack).hasResourceProperties('AWS::CloudFormation::CustomResource', {
       ServiceToken: {
         'Fn::GetAtt': [
           'AddSecurityHeaderTransacationFunc920B9BE4',
@@ -849,7 +846,7 @@ describe('dashboard stack test suite', () => {
       ],
     });
 
-    expect(stack).toHaveResourceLike('AWS::CloudFront::Distribution', {
+    Template.fromStack(stack).hasResourceProperties('AWS::CloudFront::Distribution', {
       DistributionConfig: {
         CacheBehaviors: [
           {
@@ -969,7 +966,7 @@ describe('dashboard stack test suite', () => {
       },
     });
 
-    expect(stack).toHaveResourceLike('Custom::AWS', {
+    Template.fromStack(stack).hasResourceProperties('Custom::AWS', {
       Create: {
         'Fn::Join': [
           '',
@@ -1027,7 +1024,7 @@ describe('dashboard stack test suite', () => {
       InstallLatestAwsSdk: false,
     });
 
-    expect(stack).toHaveResourceLike('Custom::CDKBucketDeployment', {
+    Template.fromStack(stack).hasResource('Custom::CDKBucketDeployment', {
       Properties: {
         DestinationBucketName: {
           Ref: 'DashboardUI1FD1D9B2',
@@ -1052,7 +1049,7 @@ describe('dashboard stack test suite', () => {
         'CreateAwsExportsCustomResourcePolicyE986A674',
         'CreateAwsExports353D691F',
       ],
-    }, ResourcePart.CompleteDefinition);
+    });
   });
 
   test('cloudfront with custom domain in standarnd partition', () => {
@@ -1068,7 +1065,7 @@ describe('dashboard stack test suite', () => {
     ({ stack } = initializeStackWithContextsAndEnvs({}, undefined, parentStack,
       dashboardDomainNamePara.valueAsString, r53HostZoneIdPara.valueAsString));
 
-    expect(stack).toHaveResourceLike('AWS::CloudFront::Distribution', {
+    Template.fromStack(stack).hasResourceProperties('AWS::CloudFront::Distribution', {
       DistributionConfig: {
         ViewerCertificate: {
           AcmCertificateArn: {
@@ -1084,7 +1081,7 @@ describe('dashboard stack test suite', () => {
     });
 
     //TODO: Stack.resolve does not work if there is no a precede expection!!!
-    expect(stack).toHaveResourceLike('AWS::CloudFront::Distribution', {
+    Template.fromStack(stack).hasResourceProperties('AWS::CloudFront::Distribution', {
       DistributionConfig: {
         Aliases: [
           stack.resolve(dashboardDomainNamePara.valueAsString),
@@ -1097,7 +1094,7 @@ describe('dashboard stack test suite', () => {
   test('distributed dashboard website by s3 and cloudfront in aws-cn regions', () => {
     const context = deployToCNRegion();
 
-    expect(context.stack).toHaveResourceLike('AWS::S3::BucketPolicy', {
+    Template.fromStack(context.stack).hasResourceProperties('AWS::S3::BucketPolicy', {
       PolicyDocument: {
         Statement: [
           {
@@ -1168,7 +1165,7 @@ describe('dashboard stack test suite', () => {
       },
     });
 
-    expect(context.stack).toHaveResourceLike('AWS::CloudFront::Distribution', {
+    Template.fromStack(context.stack).hasResourceProperties('AWS::CloudFront::Distribution', {
       DistributionConfig: {
         Aliases: [
           context.stack.resolve(context.dashboardDomainNamePara.valueAsString),
@@ -1289,7 +1286,7 @@ describe('dashboard stack test suite', () => {
       },
     });
 
-    expect(context.stack).toHaveResourceLike('AWS::Route53::RecordSet', {
+    Template.fromStack(context.stack).hasResourceProperties('AWS::Route53::RecordSet', {
       Name: {
         'Fn::Join': [
           '',

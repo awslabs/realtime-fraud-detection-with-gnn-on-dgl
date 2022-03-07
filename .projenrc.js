@@ -62,7 +62,6 @@ const project = new awscdk.AwsCdkTypeScriptApp({
     'constructs@^10.0.5',
     '@aws-cdk/cloud-assembly-schema@^2',
     '@aws-cdk/cx-api@^2',
-    '@aws-cdk/assert@^2.0.0',
   ] /* Build dependencies for this module. */,
   // entrypoint: 'lib/index.js',                                               /* Module entrypoint (`main` in `package.json`). */
   // homepage: undefined,                                                      /* Package's Homepage / Website. */
