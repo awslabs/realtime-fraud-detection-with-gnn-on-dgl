@@ -177,11 +177,6 @@
       "type": "runtime"
     },
     {
-      "name": "node-sass",
-      "version": "^5.0.0",
-      "type": "runtime"
-    },
-    {
       "name": "react-apexcharts",
       "version": "^1.3.9",
       "type": "runtime"

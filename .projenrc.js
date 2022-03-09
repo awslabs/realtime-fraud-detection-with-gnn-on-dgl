@@ -232,7 +232,6 @@ const reactPrj = new typescript.TypeScriptAppProject({
     'aws-amplify@^4.3.12',
     'best-queue@^2.0.1',
     'moment@^2.29.1',
-    'node-sass@^5.0.0',
     'react-apexcharts@^1.3.9',
     'react-i18next@^11.11.0',
     'react-loader-spinner@^4.0.0',
@@ -303,6 +302,9 @@ reactPrj.package.addField('resolutions', {
   'node-forge': '^1.2.1',
   'follow-redirects': '^1.14.7',
   'shelljs': '^0.8.5',
+  'url-parse': '^1.5.9',
+  'follow-redirects': '^1.14.8',
+  'node-fetch': '^2.6.7',
   'ansi-html': 'https://registry.npmjs.org/ansi-html-community/-/ansi-html-community-0.0.8.tgz',
 });
 
