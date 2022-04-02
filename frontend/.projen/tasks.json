@@ -171,64 +171,25 @@
           "exec": "yarn upgrade npm-check-updates"
         },
         {
-          "exec": "npm-check-updates --dep dev --upgrade --target=minor --reject='eslint-plugin-react-hooks,projen'"
+          "exec": "npm-check-updates --dep dev --upgrade --target=minor --reject='eslint-plugin-react-hooks'"
         },
         {
-          "exec": "npm-check-updates --dep optional --upgrade --target=minor --reject='eslint-plugin-react-hooks,projen'"
+          "exec": "npm-check-updates --dep optional --upgrade --target=minor --reject='eslint-plugin-react-hooks'"
         },
         {
-          "exec": "npm-check-updates --dep peer --upgrade --target=minor --reject='eslint-plugin-react-hooks,projen'"
+          "exec": "npm-check-updates --dep peer --upgrade --target=minor --reject='eslint-plugin-react-hooks'"
         },
         {
-          "exec": "npm-check-updates --dep prod --upgrade --target=minor --reject='eslint-plugin-react-hooks,projen'"
+          "exec": "npm-check-updates --dep prod --upgrade --target=minor --reject='eslint-plugin-react-hooks'"
         },
         {
-          "exec": "npm-check-updates --dep bundle --upgrade --target=minor --reject='eslint-plugin-react-hooks,projen'"
-        },
-        {
-          "exec": "yarn install --check-files"
-        },
-        {
-          "exec": "yarn upgrade @types/jest @types/node @types/react-dom @types/react-loader-spinner @types/react-router-dom @types/react @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint-import-resolver-node eslint-import-resolver-typescript eslint-plugin-import eslint-plugin-react-hooks eslint jest jest-junit json-schema npm-check-updates ts-jest typescript @material-ui/core @material-ui/icons @material-ui/lab @testing-library/jest-dom @testing-library/react @testing-library/user-event apexcharts aws-amplify aws-appsync aws-sdk axios best-queue graphql-tag i18next-browser-languagedetector i18next-http-backend i18next moment react-apexcharts react-dom react-i18next react-loader-spinner react-router-dom react-scripts react sweetalert2 web-vitals"
-        },
-        {
-          "exec": "npx projen"
-        },
-        {
-          "spawn": "post-upgrade"
-        }
-      ]
-    },
-    "upgrade-projen": {
-      "name": "upgrade-projen",
-      "description": "upgrade projen",
-      "env": {
-        "CI": "0"
-      },
-      "steps": [
-        {
-          "exec": "yarn upgrade npm-check-updates"
-        },
-        {
-          "exec": "npm-check-updates --dep dev --upgrade --target=minor --filter='projen'"
-        },
-        {
-          "exec": "npm-check-updates --dep optional --upgrade --target=minor --filter='projen'"
-        },
-        {
-          "exec": "npm-check-updates --dep peer --upgrade --target=minor --filter='projen'"
-        },
-        {
-          "exec": "npm-check-updates --dep prod --upgrade --target=minor --filter='projen'"
-        },
-        {
-          "exec": "npm-check-updates --dep bundle --upgrade --target=minor --filter='projen'"
+          "exec": "npm-check-updates --dep bundle --upgrade --target=minor --reject='eslint-plugin-react-hooks'"
         },
         {
           "exec": "yarn install --check-files"
         },
         {
-          "exec": "yarn upgrade projen"
+          "exec": "yarn upgrade"
         },
         {
           "exec": "npx projen"
