@@ -167,9 +167,9 @@
     uuid "^8.3.2"
 
 "@aws-sdk/client-glue@^3.30.0":
-  version "3.67.0"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/client-glue/-/client-glue-3.67.0.tgz#f12f76097fa28957b9305c1577ef15a554bdcc1c"
-  integrity sha512-RPQ3+z+LvOwCp9tYLQXSRKXnPkd4TJtLID3ncnIuXmIUMnUQZnWoqx1nZQIcx7aTjRMNwAV6UVgGK2vrJOyb3A==
+  version "3.71.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/client-glue/-/client-glue-3.71.0.tgz#5cad67844e25b7d4be745ef3d680ae3018ab0d41"
+  integrity sha512-3n4fE1NEs/zuVpciKq7Enr6tpNi/mJjqNVayoWzNtTMCOnP7M5uiy6GkTwJmfB0gym8+2eTPNht6J1SUMhVxfQ==
   dependencies:
     "@aws-crypto/sha256-browser" "2.0.0"
     "@aws-crypto/sha256-js" "2.0.0"
