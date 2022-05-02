@@ -6,7 +6,7 @@
 """
     This is the entry point of SageMaker inference endpoint, it fulfills:
     1. Receive request and parse out the heterogeneous graph and target node
-    2. But a DGL heterogeneous graph
+    2. Build a DGL heterogeneous graph
     3. Use the RGCN model to perform inference
     4. Send the score back to requesters
 """
