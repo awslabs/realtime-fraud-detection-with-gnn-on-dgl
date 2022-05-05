@@ -305,6 +305,10 @@ reactPrj.package.addField('resolutions', {
   'url-parse': '^1.5.9',
   'follow-redirects': '^1.14.8',
   'node-fetch': '^2.6.7',
+  'cross-fetch': '^3.1.5',
+  'ejs': '^3.1.7',
+  'async': '^2.6.4',
+  'moment': '^2.29.2',
   'ansi-html': 'https://registry.npmjs.org/ansi-html-community/-/ansi-html-community-0.0.8.tgz',
 });
 
