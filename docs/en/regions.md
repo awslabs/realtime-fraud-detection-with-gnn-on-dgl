@@ -16,6 +16,7 @@ The solution is using graph database [Amazon Neptune][neptune] for real-time fra
 - Asia Pacific (Singapore):   ap-southeast-1
 - Asia Pacific (Sydney):   ap-southeast-2
 - Asia Pacific (Mumbai):   ap-south-1
+- China (Beijing) Region operated by Sinnet:   cn-north-1
 - China (Ningxia) Region operated by NWCD:   cn-northwest-1
 
 [neptune]: https://aws.amazon.com/en/neptune/
