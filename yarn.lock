@@ -247,9 +247,9 @@
     tslib "^2.3.1"
 
 "@aws-sdk/client-secrets-manager@^3.30.0":
-  version "3.87.0"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/client-secrets-manager/-/client-secrets-manager-3.87.0.tgz#9943ab7693935532f4db83ea14f21b42421ed6e4"
-  integrity sha512-pvUCNTiPIXO3iTwM0bYJW8yvdkR/Wcm16rTEiYIYEedA8CTxLuqTicg8fD1zcJPjrszMEL5yGwCh8laFOxcOXA==
+  version "3.89.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/client-secrets-manager/-/client-secrets-manager-3.89.0.tgz#956a10a0922797555f58c0cfaf47a60f42a5b724"
+  integrity sha512-GaaQDUa5tLpQh7OXaq6bJXHNs9t+EfPnPnbjLzyCz0y0vfpMJXRG6hxDHVMW7jUZnDG4myqqkCEMbJDXZzCmJQ==
   dependencies:
     "@aws-crypto/sha256-browser" "2.0.0"
     "@aws-crypto/sha256-js" "2.0.0"
