@@ -68,18 +68,12 @@ export class TrainingStack extends NestedStack {
       runtime: Runtime.NODEJS_14_X,
       tracing: Tracing.ACTIVE,
     });
-    const parametersNormalizeTask = new class extends LambdaInvoke {
-      public toStateJson(): object {
-        return {
-          ...super.toStateJson(),
-          ResultSelector: {
-            'parameters.$': '$.Payload.parameters',
-          },
-        };
-      }
-    }(this, 'Parameters normalize', {
+    const parametersNormalizeTask = new LambdaInvoke(this, 'Parameters normalize', {
       lambdaFunction: parametersNormalizeFn,
       integrationPattern: IntegrationPattern.REQUEST_RESPONSE,
+      resultSelector: {
+        'parameters.$': '$.Payload.parameters',
+      },
     }).addCatch(failure, {
       errors: [Errors.ALL],
       resultPath: '$.error',
@@ -201,20 +195,14 @@ export class TrainingStack extends NestedStack {
         InputDataRoot: props.bucket.urlForObject(etlConstruct.processedOutputPrefix),
       },
     });
-    const hyperParaTask = new class extends LambdaInvoke {
-      public toStateJson(): object {
-        return {
-          ...super.toStateJson(),
-          ResultSelector: {
-            'hyperParameters.$': '$.Payload.hyperParameters',
-            'inputDataUri.$': '$.Payload.inputDataUri',
-          },
-        };
-      }
-    }(this, 'Build hyperparameters', {
+    const hyperParaTask = new LambdaInvoke(this, 'Build hyperparameters', {
       lambdaFunction: hyperParaFn,
       integrationPattern: IntegrationPattern.REQUEST_RESPONSE,
       resultPath: '$.trainingParametersOutput',
+      resultSelector: {
+        'hyperParameters.$': '$.Payload.hyperParameters',
+        'inputDataUri.$': '$.Payload.inputDataUri',
+      },
     }).addCatch(failure, {
       errors: [Errors.ALL],
       resultPath: '$.error',
@@ -225,10 +213,6 @@ export class TrainingStack extends NestedStack {
       public toStateJson(): object {
         const json:{[key: string]: any} = {
           ...super.toStateJson(),
-          ResultSelector: {
-            'TrainingJobName.$': '$.TrainingJobName',
-            'ModelArtifacts.$': '$.ModelArtifacts',
-          },
         };
         json.Parameters['TrainingJobName.$'] =
           "States.Format('fraud-detection-model-{}', $.dataProcessOutput.CompletedOn)";
@@ -246,6 +230,10 @@ export class TrainingStack extends NestedStack {
     }(this, 'Train model', {
       integrationPattern: IntegrationPattern.RUN_JOB,
       resultPath: '$.trainingJobOutput',
+      resultSelector: {
+        'TrainingJobName.$': '$.TrainingJobName',
+        'ModelArtifacts.$': '$.ModelArtifacts',
+      },
       trainingJobName: TaskInput.fromJsonPathAt('$.dataProcessOutput.CompletedOn').value,
       algorithmSpecification: {
         trainingInputMode: InputMode.FILE,
@@ -364,16 +352,7 @@ export class TrainingStack extends NestedStack {
     props.bucket.grantRead(modelRepackageFunc, `${codePrefix}/*`);
     props.bucket.grantReadWrite(modelRepackageFunc, `${modelOutputPrefix}/*`);
 
-    const modelRepackagingTask = new class extends LambdaInvoke {
-      public toStateJson(): object {
-        return {
-          ...super.toStateJson(),
-          ResultSelector: {
-            'RepackagedArtifact.$': '$.Payload.RepackagedArtifact',
-          },
-        };
-      }
-    }(this, 'Package model with code', {
+    const modelRepackagingTask = new LambdaInvoke(this, 'Package model with code', {
       lambdaFunction: modelRepackageFunc,
       integrationPattern: IntegrationPattern.REQUEST_RESPONSE,
       timeout: stateTimeout,
@@ -381,6 +360,9 @@ export class TrainingStack extends NestedStack {
         ModelArtifact: TaskInput.fromJsonPathAt('$.trainingJobOutput.ModelArtifacts.S3ModelArtifacts').value,
       }),
       resultPath: '$.modelPackagingOutput',
+      resultSelector: {
+        'RepackagedArtifact.$': '$.Payload.RepackagedArtifact',
+      },
     }).addCatch(failure, {
       errors: [Errors.ALL],
       resultPath: '$.error',
@@ -602,16 +584,7 @@ export class TrainingStack extends NestedStack {
         },
       },
     });
-    const createModelTask = new class extends SageMakerCreateModel {
-      public toStateJson(): object {
-        return {
-          ...super.toStateJson(),
-          ResultSelector: {
-            'ModelArn.$': '$.ModelArn',
-          },
-        };
-      }
-    }(this, 'Create model', {
+    const createModelTask = new SageMakerCreateModel(this, 'Create model', {
       integrationPattern: IntegrationPattern.REQUEST_RESPONSE,
       modelName: TaskInput.fromJsonPathAt('$.trainingJobOutput.TrainingJobName').value,
       primaryContainer: new ContainerDefinition({
@@ -629,6 +602,9 @@ export class TrainingStack extends NestedStack {
         }),
       }),
       resultPath: '$.modelOutput',
+      resultSelector: {
+        'ModelArn.$': '$.ModelArn',
+      },
     });
     (createModelTask.node.findChild('SagemakerRole').node.defaultChild as CfnResource)
       .addMetadata('cfn_nag', {
@@ -642,12 +618,19 @@ export class TrainingStack extends NestedStack {
 
     const createEndpointConfigTask = new class extends SageMakerCreateEndpointConfig {
       public toStateJson(): object {
-        return {
+        const json:{[key: string]: any} = {
           ...super.toStateJson(),
-          ResultSelector: {
-            'EndpointConfigArn.$': '$.EndpointConfigArn',
-          },
         };
+        if ((/true/i).test(this.node.tryGetContext('ServerlessInference'))) {
+          json.Parameters.ProductionVariants[0].VariantName = 'ServerlessInference';
+          json.Parameters.ProductionVariants[0].ServerlessConfig = {
+            MaxConcurrency: this.node.tryGetContext('ServerlessInferenceConcurrency') ?? 50,
+            MemorySizeInMB: this.node.tryGetContext('ServerlessInferenceMemorySizeInMB') ?? 2048,
+          };
+          delete json.Parameters.ProductionVariants[0].InitialInstanceCount;
+          delete json.Parameters.ProductionVariants[0].InstanceType;
+        }
+        return json;
       }
     }(this, 'Create endpoint config', {
       integrationPattern: IntegrationPattern.REQUEST_RESPONSE,
@@ -659,6 +642,9 @@ export class TrainingStack extends NestedStack {
         variantName: 'c5-4x',
       }],
       resultPath: '$.endpointConfigOutput',
+      resultSelector: {
+        'EndpointConfigArn.$': '$.EndpointConfigArn',
+      },
     }).addCatch(failure, {
       errors: [Errors.ALL],
       resultPath: '$.error',
@@ -681,16 +667,7 @@ export class TrainingStack extends NestedStack {
         }, Stack.of(this)),
       ],
     }));
-    const checkEndpointTask = new class extends LambdaInvoke {
-      public toStateJson(): object {
-        return {
-          ...super.toStateJson(),
-          ResultSelector: {
-            'Endpoint.$': '$.Payload.Endpoint',
-          },
-        };
-      }
-    }(this, 'Check the existence of endpoint', {
+    const checkEndpointTask = new LambdaInvoke(this, 'Check the existence of endpoint', {
       lambdaFunction: checkEndpointFn,
       integrationPattern: IntegrationPattern.REQUEST_RESPONSE,
       timeout: Duration.seconds(30),
@@ -698,6 +675,9 @@ export class TrainingStack extends NestedStack {
         EndpointName: this.endpointName,
       }),
       resultPath: '$.checkEndpointOutput',
+      resultSelector: {
+        'Endpoint.$': '$.Payload.Endpoint',
+      },
     }).addCatch(failure, {
       errors: [Errors.ALL],
       resultPath: '$.error',
