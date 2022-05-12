@@ -12,7 +12,7 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2
     && unzip awscliv2.zip \
     && ./aws/install \
     && rm -rf awscliv2.zip aws/
-RUN python -m pip install --user boto3
+RUN python -m pip install --user boto3 certifi
     
 COPY container.d/load-graph-data/bulk-load.py container.d/load-graph-data/prepare-data.sh /app/
 COPY --from=builder /data/site-packages/ /var/lang/lib/python3.8/site-packages/
