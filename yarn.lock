@@ -207,9 +207,9 @@
     tslib "^2.3.1"
 
 "@aws-sdk/client-lambda@^3.30.0":
-  version "3.87.0"
-  resolved "https://registry.yarnpkg.com/@aws-sdk/client-lambda/-/client-lambda-3.87.0.tgz#96ce1872ba424c6047c41088d03203ec4fd650e9"
-  integrity sha512-KF9dd4p1PnQJJX49nfNP7s+lE3omjN70qMO/S718Jd7eTDXHB1b+zRZF1QSV2oO6Vt4/MTp8kybjRq+hJzMpZA==
+  version "3.90.0"
+  resolved "https://registry.yarnpkg.com/@aws-sdk/client-lambda/-/client-lambda-3.90.0.tgz#ff57df33046d88ee489bead21a151dc628fece8f"
+  integrity sha512-GNoVYROUOv0s1/bsGGuH5PaSAdMmyIUEfZhxM3EOO8IL7BGGuS9ndF5yae0PJcFBdGJ9p854oTqaoC000ccHaQ==
   dependencies:
     "@aws-crypto/sha256-browser" "2.0.0"
     "@aws-crypto/sha256-js" "2.0.0"
