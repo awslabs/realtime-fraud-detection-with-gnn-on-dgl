@@ -120,6 +120,11 @@ The solution will deploy Neptune cluster with instance class `db.r5.xlarge` and 
 npx cdk deploy --parameters NeptuneInstaneType=db.r5.4xlarge -c NeptuneReplicaCount=2 
 ```
 
+#### Deploy it with using [SageMaker Serverless Inference][serverless-inference](experimental)
+```shell
+npx cdk deploy -c ServerlessInference=true -c ServerlessInferenceConcurrency=50 -c ServerlessInferenceMemorySizeInMB=2048
+```
+
 #### Deploy it with custom domain of dashboard
 
 If you want use custom domain to access the dashbaord of solution, you can use below options when deploying the solution. NOTE: you need already create a public hosted zone in Route 53, see [Solution prerequisites](#prerequisites) for detail.
@@ -202,3 +207,4 @@ This project is licensed under the Apache-2.0 License.
 [create-public-hosted-zone]: https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/CreatingHostedZone.html
 [deployment-guide]: https://awslabs.github.io/realtime-fraud-detection-with-gnn-on-dgl/en/deployment/
 [cloudwatch-logs-limit]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/AWS-logs-and-resource-policy.html#AWS-logs-infrastructure-CWL
+[serverless-inference]: https://docs.aws.amazon.com/sagemaker/latest/dg/serverless-endpoints.html

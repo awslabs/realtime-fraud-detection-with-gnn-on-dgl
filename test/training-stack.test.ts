@@ -1039,7 +1039,7 @@ describe('training stack test suite', () => {
         'Fn::Join': [
           '',
           [
-            '{"StartAt":"Parameters normalize","States":{"Parameters normalize":{"Next":"Data Ingest","Retry":[{"ErrorEquals":["Lambda.ServiceException","Lambda.AWSLambdaException","Lambda.SdkClientException"],"IntervalSeconds":2,"MaxAttempts":6,"BackoffRate":2}],"Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","Resource":"arn:',
+            '{"StartAt":"Parameters normalize","States":{"Parameters normalize":{"Next":"Data Ingest","Retry":[{"ErrorEquals":["Lambda.ServiceException","Lambda.AWSLambdaException","Lambda.SdkClientException"],"IntervalSeconds":2,"MaxAttempts":6,"BackoffRate":2}],"Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","ResultSelector":{"parameters.$":"$.Payload.parameters"},"Resource":"arn:',
             {
               Ref: 'AWS::Partition',
             },
@@ -1050,7 +1050,7 @@ describe('training stack test suite', () => {
                 'Arn',
               ],
             },
-            '","Payload.$":"$"},"ResultSelector":{"parameters.$":"$.Payload.parameters"}},"Data Ingest":{"Next":"Data Catalog Crawl","Retry":[{"ErrorEquals":["Lambda.ServiceException","Lambda.AWSLambdaException","Lambda.SdkClientException"],"IntervalSeconds":2,"MaxAttempts":6,"BackoffRate":2}],"Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","TimeoutSeconds":900,"ResultPath":null,"Resource":"arn:',
+            '","Payload.$":"$"}},"Data Ingest":{"Next":"Data Catalog Crawl","Retry":[{"ErrorEquals":["Lambda.ServiceException","Lambda.AWSLambdaException","Lambda.SdkClientException"],"IntervalSeconds":2,"MaxAttempts":6,"BackoffRate":2}],"Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","TimeoutSeconds":900,"ResultPath":null,"Resource":"arn:',
             {
               Ref: 'AWS::Partition',
             },
@@ -1084,7 +1084,7 @@ describe('training stack test suite', () => {
             {
               Ref: 'ETLCompPreprocessingJobB535A575',
             },
-            '","Timeout":300}},"Build hyperparameters":{"Next":"Train model","Retry":[{"ErrorEquals":["Lambda.ServiceException","Lambda.AWSLambdaException","Lambda.SdkClientException"],"IntervalSeconds":2,"MaxAttempts":6,"BackoffRate":2}],"Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","ResultPath":"$.trainingParametersOutput","Resource":"arn:',
+            '","Timeout":300}},"Build hyperparameters":{"Next":"Train model","Retry":[{"ErrorEquals":["Lambda.ServiceException","Lambda.AWSLambdaException","Lambda.SdkClientException"],"IntervalSeconds":2,"MaxAttempts":6,"BackoffRate":2}],"Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","ResultPath":"$.trainingParametersOutput","ResultSelector":{"hyperParameters.$":"$.Payload.hyperParameters","inputDataUri.$":"$.Payload.inputDataUri"},"Resource":"arn:',
             {
               Ref: 'AWS::Partition',
             },
@@ -1095,7 +1095,7 @@ describe('training stack test suite', () => {
                 'Arn',
               ],
             },
-            '","Payload.$":"$"},"ResultSelector":{"hyperParameters.$":"$.Payload.hyperParameters","inputDataUri.$":"$.Payload.inputDataUri"}},"Train model":{"Next":"Load the graph data to Graph database","Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","ResultPath":"$.trainingJobOutput","Resource":"arn:',
+            '","Payload.$":"$"}},"Train model":{"Next":"Load the graph data to Graph database","Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","ResultPath":"$.trainingJobOutput","ResultSelector":{"TrainingJobName.$":"$.TrainingJobName","ModelArtifacts.$":"$.ModelArtifacts"},"Resource":"arn:',
             {
               Ref: 'AWS::Partition',
             },
@@ -1122,7 +1122,7 @@ describe('training stack test suite', () => {
             {
               Ref: 'referencetoTestStackBucket80A092C2Ref',
             },
-            '/fraud-detection/model_output"},"ResourceConfig":{"VolumeSizeInGB":50,"InstanceCount.$":"$.parameters.trainingJob.instanceCount","InstanceType.$":"$.parameters.trainingJob.instanceType"},"StoppingCondition":{"MaxRuntimeInSeconds.$":"$.parameters.trainingJob.timeoutInSeconds"},"HyperParameters.$":"$.trainingParametersOutput.hyperParameters"},"ResultSelector":{"TrainingJobName.$":"$.TrainingJobName","ModelArtifacts.$":"$.ModelArtifacts"}},"Load the graph data to Graph database":{"Next":"Package model with code","Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","TimeoutSeconds":7200,"ResultPath":null,"Resource":"arn:',
+            '/fraud-detection/model_output"},"ResourceConfig":{"VolumeSizeInGB":50,"InstanceCount.$":"$.parameters.trainingJob.instanceCount","InstanceType.$":"$.parameters.trainingJob.instanceType"},"StoppingCondition":{"MaxRuntimeInSeconds.$":"$.parameters.trainingJob.timeoutInSeconds"},"HyperParameters.$":"$.trainingParametersOutput.hyperParameters"}},"Load the graph data to Graph database":{"Next":"Package model with code","Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","TimeoutSeconds":7200,"ResultPath":null,"Resource":"arn:',
             {
               Ref: 'AWS::Partition',
             },
@@ -1164,7 +1164,7 @@ describe('training stack test suite', () => {
             {
               Ref: 'AWS::Region',
             },
-            '","--neptune_iam_role_arn","arn:aws::123456789012:role/neptune-role"],"Environment":[{"Name":"MODEL_PACKAGE","Value.$":"$.trainingJobOutput.ModelArtifacts.S3ModelArtifacts"},{"Name":"JOB_NAME","Value.$":"$.trainingJobOutput.TrainingJobName"},{"Name":"GRAPH_DATA_PATH","Value.$":"$.trainingParametersOutput.inputDataUri"}]}]},"LaunchType":"FARGATE","PlatformVersion":"1.4.0"}},"Package model with code":{"Next":"Create model","Retry":[{"ErrorEquals":["Lambda.ServiceException","Lambda.AWSLambdaException","Lambda.SdkClientException"],"IntervalSeconds":2,"MaxAttempts":6,"BackoffRate":2}],"Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","TimeoutSeconds":900,"ResultPath":"$.modelPackagingOutput","Resource":"arn:',
+            '","--neptune_iam_role_arn","arn:aws::123456789012:role/neptune-role"],"Environment":[{"Name":"MODEL_PACKAGE","Value.$":"$.trainingJobOutput.ModelArtifacts.S3ModelArtifacts"},{"Name":"JOB_NAME","Value.$":"$.trainingJobOutput.TrainingJobName"},{"Name":"GRAPH_DATA_PATH","Value.$":"$.trainingParametersOutput.inputDataUri"}]}]},"LaunchType":"FARGATE","PlatformVersion":"1.4.0"}},"Package model with code":{"Next":"Create model","Retry":[{"ErrorEquals":["Lambda.ServiceException","Lambda.AWSLambdaException","Lambda.SdkClientException"],"IntervalSeconds":2,"MaxAttempts":6,"BackoffRate":2}],"Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","TimeoutSeconds":900,"ResultPath":"$.modelPackagingOutput","ResultSelector":{"RepackagedArtifact.$":"$.Payload.RepackagedArtifact"},"Resource":"arn:',
             {
               Ref: 'AWS::Partition',
             },
@@ -1175,7 +1175,7 @@ describe('training stack test suite', () => {
                 'Arn',
               ],
             },
-            '","Payload":{"ModelArtifact.$":"$.trainingJobOutput.ModelArtifacts.S3ModelArtifacts"}},"ResultSelector":{"RepackagedArtifact.$":"$.Payload.RepackagedArtifact"}},"Create model":{"Next":"Create endpoint config","Type":"Task","ResultPath":"$.modelOutput","Resource":"arn:',
+            '","Payload":{"ModelArtifact.$":"$.trainingJobOutput.ModelArtifacts.S3ModelArtifacts"}}},"Create model":{"Next":"Create endpoint config","Type":"Task","ResultPath":"$.modelOutput","ResultSelector":{"ModelArn.$":"$.ModelArn"},"Resource":"arn:',
             {
               Ref: 'AWS::Partition',
             },
@@ -1204,11 +1204,11 @@ describe('training stack test suite', () => {
             {
               Ref: 'AWS::URLSuffix',
             },
-            "/pytorch-inference:1.6.0-cpu-py36-ubuntu16.04\",\"Mode\":\"SingleModel\",\"ModelDataUrl.$\":\"$.modelPackagingOutput.RepackagedArtifact\",\"Environment\":{\"SAGEMAKER_PROGRAM\":\"fd_sl_deployment_entry_point.py\",\"HIDDEN_SIZE.$\":\"$.parameters.trainingJob.hyperparameters['n-hidden']\"}}},\"ResultSelector\":{\"ModelArn.$\":\"$.ModelArn\"}},\"Create endpoint config\":{\"Next\":\"Check the existence of endpoint\",\"Catch\":[{\"ErrorEquals\":[\"States.ALL\"],\"ResultPath\":\"$.error\",\"Next\":\"Fail\"}],\"Type\":\"Task\",\"ResultPath\":\"$.endpointConfigOutput\",\"Resource\":\"arn:",
+            "/pytorch-inference:1.6.0-cpu-py36-ubuntu16.04\",\"Mode\":\"SingleModel\",\"ModelDataUrl.$\":\"$.modelPackagingOutput.RepackagedArtifact\",\"Environment\":{\"SAGEMAKER_PROGRAM\":\"fd_sl_deployment_entry_point.py\",\"HIDDEN_SIZE.$\":\"$.parameters.trainingJob.hyperparameters['n-hidden']\"}}}},\"Create endpoint config\":{\"Next\":\"Check the existence of endpoint\",\"Catch\":[{\"ErrorEquals\":[\"States.ALL\"],\"ResultPath\":\"$.error\",\"Next\":\"Fail\"}],\"Type\":\"Task\",\"ResultPath\":\"$.endpointConfigOutput\",\"ResultSelector\":{\"EndpointConfigArn.$\":\"$.EndpointConfigArn\"},\"Resource\":\"arn:",
             {
               Ref: 'AWS::Partition',
             },
-            ':states:::sagemaker:createEndpointConfig","Parameters":{"EndpointConfigName.$":"$.trainingJobOutput.TrainingJobName","ProductionVariants":[{"InitialInstanceCount":1,"InstanceType":"ml.c5.4xlarge","ModelName.$":"$.trainingJobOutput.TrainingJobName","VariantName":"c5-4x"}]},"ResultSelector":{"EndpointConfigArn.$":"$.EndpointConfigArn"}},"Check the existence of endpoint":{"Next":"Create or update endpoint","Retry":[{"ErrorEquals":["Lambda.ServiceException","Lambda.AWSLambdaException","Lambda.SdkClientException"],"IntervalSeconds":2,"MaxAttempts":6,"BackoffRate":2}],"Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","TimeoutSeconds":30,"ResultPath":"$.checkEndpointOutput","Resource":"arn:',
+            ':states:::sagemaker:createEndpointConfig","Parameters":{"EndpointConfigName.$":"$.trainingJobOutput.TrainingJobName","ProductionVariants":[{"InitialInstanceCount":1,"InstanceType":"ml.c5.4xlarge","ModelName.$":"$.trainingJobOutput.TrainingJobName","VariantName":"c5-4x"}]}},"Check the existence of endpoint":{"Next":"Create or update endpoint","Retry":[{"ErrorEquals":["Lambda.ServiceException","Lambda.AWSLambdaException","Lambda.SdkClientException"],"IntervalSeconds":2,"MaxAttempts":6,"BackoffRate":2}],"Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","TimeoutSeconds":30,"ResultPath":"$.checkEndpointOutput","ResultSelector":{"Endpoint.$":"$.Payload.Endpoint"},"Resource":"arn:',
             {
               Ref: 'AWS::Partition',
             },
@@ -1219,7 +1219,7 @@ describe('training stack test suite', () => {
                 'Arn',
               ],
             },
-            '","Payload":{"EndpointName":"frauddetection"}},"ResultSelector":{"Endpoint.$":"$.Payload.Endpoint"}},"Create or update endpoint":{"Type":"Choice","Choices":[{"Variable":"$.checkEndpointOutput.Endpoint.frauddetection","BooleanEquals":false,"Next":"Create endpoint"}],"Default":"Update endpoint"},"Update endpoint":{"End":true,"Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","Resource":"arn:',
+            '","Payload":{"EndpointName":"frauddetection"}}},"Create or update endpoint":{"Type":"Choice","Choices":[{"Variable":"$.checkEndpointOutput.Endpoint.frauddetection","BooleanEquals":false,"Next":"Create endpoint"}],"Default":"Update endpoint"},"Update endpoint":{"End":true,"Catch":[{"ErrorEquals":["States.ALL"],"ResultPath":"$.error","Next":"Fail"}],"Type":"Task","Resource":"arn:',
             {
               Ref: 'AWS::Partition',
             },
