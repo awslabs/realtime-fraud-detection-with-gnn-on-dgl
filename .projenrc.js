@@ -241,7 +241,6 @@ const reactPrj = new typescript.TypeScriptAppProject({
     '@testing-library/jest-dom@^5.14.1',
     '@testing-library/react@^11.2.7',
     '@testing-library/user-event@^13.1.9',
-    'eventsource@^2.0.2',
   ],
   devDeps: [
     '@types/node@^14',
@@ -251,6 +250,7 @@ const reactPrj = new typescript.TypeScriptAppProject({
     '@types/react-loader-spinner@^3.1.3',
     '@types/react-router-dom@^5.1.7',
     'eslint-plugin-react-hooks@next',
+    'eventsource@^2.0.2',    
   ],
   gitignore: [
     'src/aws-exports.js',
@@ -311,6 +311,7 @@ reactPrj.package.addField('resolutions',
     'ejs': '^3.1.7',
     'async': '^2.6.4',
     'ansi-html': 'https://registry.npmjs.org/ansi-html-community/-/ansi-html-community-0.0.8.tgz',
+    'eventsource': '^2.0.2',
   }));
 
 project.synth();
