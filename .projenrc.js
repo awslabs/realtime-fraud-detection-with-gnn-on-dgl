@@ -250,7 +250,7 @@ const reactPrj = new typescript.TypeScriptAppProject({
     '@types/react-loader-spinner@^3.1.3',
     '@types/react-router-dom@^5.1.7',
     'eslint-plugin-react-hooks@next',
-    'eventsource@^2.0.2',    
+    'eventsource@^2.0.2',
   ],
   gitignore: [
     'src/aws-exports.js',
