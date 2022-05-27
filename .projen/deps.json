@@ -100,11 +100,11 @@
     },
     {
       "name": "ts-node",
-      "version": "^9",
       "type": "build"
     },
     {
       "name": "typescript",
+      "version": "~4.6.0",
       "type": "build"
     },
     {

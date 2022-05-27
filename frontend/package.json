@@ -56,6 +56,7 @@
     "aws-sdk": "^2.1058.0",
     "axios": "^0.24.0",
     "best-queue": "^2.0.1",
+    "eventsource": "^2.0.2",
     "graphql-tag": "^2.12.4",
     "i18next": "^20.3.1",
     "i18next-browser-languagedetector": "^6.1.1",
