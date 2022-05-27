@@ -154,6 +154,11 @@
       "type": "runtime"
     },
     {
+      "name": "eventsource",
+      "version": "^2.0.2",
+      "type": "runtime"
+    },
+    {
       "name": "graphql-tag",
       "version": "^2.12.4",
       "type": "runtime"

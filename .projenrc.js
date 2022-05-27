@@ -161,7 +161,7 @@ const project = new awscdk.AwsCdkTypeScriptApp({
   // package: true,                                                            /* Defines a `yarn package` command that will produce a tarball and place it under `dist/js`. */
   // sampleCode: true,                                                         /* Generate one-time sample in `src/` and `test/` if there are no files there. */
   tsconfig: tsExcludeConfig /* Custom TSConfig. */,
-  // typescriptVersion: '^3.9.5',                                              /* TypeScript version to use. */
+  typescriptVersion: '~4.6.0', /* TypeScript version to use. */
   depsUpgradeOptions: {
     ignoreProjen: false,
     workflowOptions: {
@@ -180,13 +180,13 @@ project.addTask('postinstall', {
   exec:
     'git submodule init && git submodule sync && git submodule update && docker run --rm -v `pwd`/src/script-libs/amazon-neptune-tools/neptune-python-utils:/src --workdir /src python:3.8-buster bash -c "apt update && apt install -y sudo zip && rm -rf /src/target && /src/build.sh" && yarn --cwd frontend install --check-files --frozen-lockfile',
 });
-project.package.addField('resolutions', {
-  'trim-newlines': '^3.0.1',
-  'pac-resolver': '^5.0.0',
-  'set-value': '^4.0.1',
-  'ansi-regex': '^5.0.1',
-
-});
+project.package.addField('resolutions',
+  Object.assign({}, project.package.manifest.resolutions ? project.package.manifest.resolutions : {}, {
+    'trim-newlines': '^3.0.1',
+    'pac-resolver': '^5.0.0',
+    'set-value': '^4.0.1',
+    'ansi-regex': '^5.0.1',
+  }));
 project.addFields({
   version: '2.0.1-mainline',
 });
@@ -241,6 +241,7 @@ const reactPrj = new typescript.TypeScriptAppProject({
     '@testing-library/jest-dom@^5.14.1',
     '@testing-library/react@^11.2.7',
     '@testing-library/user-event@^13.1.9',
+    'eventsource@^2.0.2',
   ],
   devDeps: [
     '@types/node@^14',
@@ -288,27 +289,28 @@ reactPrj.addFields({
     ],
   },
 });
-reactPrj.package.addField('resolutions', {
-  'trim-newlines': '^3.0.1',
-  'glob-parent': '^5.1.2',
-  'normalize-url': '^4.5.1',
-  'browserslist': '^4.16.5',
-  'css-what': '^5.0.1',
-  'immer': '^9.0.6',
-  'set-value': '^4.0.1',
-  'ansi-regex': '^5.0.1',
-  'nth-check': '^2.0.1',
-  'json-schema': '^0.4.0',
-  'node-forge': '^1.2.1',
-  'follow-redirects': '^1.14.7',
-  'shelljs': '^0.8.5',
-  'url-parse': '^1.5.9',
-  'follow-redirects': '^1.14.8',
-  'node-fetch': '^2.6.7',
-  'cross-fetch': '^3.1.5',
-  'ejs': '^3.1.7',
-  'async': '^2.6.4',
-  'ansi-html': 'https://registry.npmjs.org/ansi-html-community/-/ansi-html-community-0.0.8.tgz',
-});
+reactPrj.package.addField('resolutions',
+  Object.assign({}, reactPrj.package.manifest.resolutions ? reactPrj.package.manifest.resolutions : {}, {
+    'trim-newlines': '^3.0.1',
+    'glob-parent': '^5.1.2',
+    'normalize-url': '^4.5.1',
+    'browserslist': '^4.16.5',
+    'css-what': '^5.0.1',
+    'immer': '^9.0.6',
+    'set-value': '^4.0.1',
+    'ansi-regex': '^5.0.1',
+    'nth-check': '^2.0.1',
+    'json-schema': '^0.4.0',
+    'node-forge': '^1.2.1',
+    'follow-redirects': '^1.14.7',
+    'shelljs': '^0.8.5',
+    'url-parse': '^1.5.9',
+    'follow-redirects': '^1.14.8',
+    'node-fetch': '^2.6.7',
+    'cross-fetch': '^3.1.5',
+    'ejs': '^3.1.7',
+    'async': '^2.6.4',
+    'ansi-html': 'https://registry.npmjs.org/ansi-html-community/-/ansi-html-community-0.0.8.tgz',
+  }));
 
 project.synth();
