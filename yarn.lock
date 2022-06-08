@@ -1584,9 +1584,9 @@
   integrity sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==
 
 "@types/aws-lambda@^8.10.83":
-  version "8.10.98"
-  resolved "https://registry.yarnpkg.com/@types/aws-lambda/-/aws-lambda-8.10.98.tgz#2936975c19529011b8b5c08850d42157711c690d"
-  integrity sha512-dJ/R9qamtI2nNpxhNwPBTwsfYwbcCWsYBJxhpgGyMLCD0HxKpORcMpPpSrFP/FIceNEYfnS3R5EfjSZJmX2oJg==
+  version "8.10.99"
+  resolved "https://registry.yarnpkg.com/@types/aws-lambda/-/aws-lambda-8.10.99.tgz#14fb91e5ee54d517f5b3209b027edddee9900ba6"
+  integrity sha512-BLlr4HGGF9Ga5vvZumpuXuyFUIhnCZsOdjPWy/iCJi+NIYAw30jA3XC5tyVf2RfaXm5thMR2SC3DosDVIMhM5g==
 
 "@types/babel__core@^7.0.0", "@types/babel__core@^7.1.14":
   version "7.1.19"
