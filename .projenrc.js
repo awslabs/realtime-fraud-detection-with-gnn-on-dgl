@@ -291,6 +291,8 @@ reactPrj.addFields({
 });
 reactPrj.package.addField('resolutions',
   Object.assign({}, reactPrj.package.manifest.resolutions ? reactPrj.package.manifest.resolutions : {}, {
+    'got': '^11.8.5',
+    'shell-quote': '^1.7.3',
     'trim-newlines': '^3.0.1',
     'glob-parent': '^5.1.2',
     'normalize-url': '^4.5.1',
