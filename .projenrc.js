@@ -104,6 +104,7 @@ const project = new awscdk.AwsCdkTypeScriptApp({
     'cdk.context.json',
     '.DS_Store',
     'docs/site/',
+    'frontend/amplify',
   ] /* Additional entries to .gitignore. */,
   // jest: true,                                                               /* Setup jest unit tests. */
   // jestOptions: {

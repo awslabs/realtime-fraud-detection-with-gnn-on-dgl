@@ -11,7 +11,6 @@ import Tooltip from '@material-ui/core/Tooltip';
 import Typography from '@material-ui/core/Typography';
 
 
-// import { momentFormatData } from '../../../assets/js/const';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 import 'moment/locale/zh-cn';
@@ -54,8 +53,6 @@ const StyledTableCell = withStyles((theme: Theme) =>
     head: {
       backgroundColor: theme.palette.common.black,
       color: theme.palette.common.white,
-      // backgroundColor: '#fefefe',
-      // color: '#444',
     },
     body: {
       fontSize: 14,
@@ -73,14 +70,12 @@ const TransactionList: React.FC<Props> = (props: Props) => {
   const { t } = useTranslation();
   const { transList } = props;
   const classes = useStyles();
-  // const [tableHeight, settableHeight] = useState(100);
   const [curMomentLang, setCurMomentLang] = useState('');
 
   const size = useWindowSize();
 
   useEffect(() => {
     console.info('size:', size);
-    // settableHeight(size.height - size.height * 0.5);
   }, [size]);
 
   useEffect(() => {
@@ -120,7 +115,6 @@ const TransactionList: React.FC<Props> = (props: Props) => {
           </TableHead>
           <TableBody>
             {transList.map((row, index) => (
-              // <StyledTableRow key={index} className={row.isNew ? 'active' : ''}>
               <StyledTableRow key={index}>
                 <TableCell component="th" scope="row">
                   <HtmlTooltip
@@ -156,7 +150,6 @@ const TransactionList: React.FC<Props> = (props: Props) => {
                       <b>{row.id}</b> {row.isNew && <span className="new new-active">NEW</span>}
                     </span>
                   </HtmlTooltip>
-                  {/* {row.id} */}
                 </TableCell>
                 <TableCell align="right">{row.productCD}</TableCell>
                 <TableCell align="right">{row.card4}</TableCell>
