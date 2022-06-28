@@ -3,7 +3,6 @@ import React from 'react';
 interface CardProps {
   classIndex: string;
   title: string;
-  // bgColor: string;
   value: string | number;
 }
 

@@ -1,18 +1,13 @@
 /* eslint @typescript-eslint/no-floating-promises: "off" */
 
-// import TimelapseIcon from '@material-ui/icons/Timelapse';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
-// import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
-// import InputLabel from '@material-ui/core/InputLabel';
 import FormControl from '@material-ui/core/FormControl';
 import MenuItem from '@material-ui/core/MenuItem';
-// import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Select from '@material-ui/core/Select';
-// import Switch from '@material-ui/core/Switch';
 import TextField from '@material-ui/core/TextField';
 import WbIncandescentIcon from '@material-ui/icons/WbIncandescent';
 
@@ -38,7 +33,6 @@ import {
 } from '../../assets/js/const';
 import ClientContext from '../../common/ClientContext';
 import { getTransactionStats, getFraudTransactions } from '../../graphql/queries';
-// import useWindowSize from '../../hooks/useWindowSize';
 
 import CountCard from './comps/CountCard';
 import RealtimeChart from './comps/RealtimeChart';
@@ -58,15 +52,12 @@ interface ParamType {
 }
 
 const CHART_INIT_COUNT = 10;
-// const TIME_INTEVAL = 20 * 1000;
 
 const Dashboard: React.FC = () => {
   const { t, i18n } = useTranslation();
   const param: ParamType = useParams();
   const client: any = React.useContext(ClientContext);
   const [transList, setTransList] = useState<FraudType[]>([]);
-  // const [dataHeight, setDataHeight] = useState(300);
-  // const [timeRange, setTimeRange] = useState(5);
   const [fraudCount, setFraudCount] = useState(0);
   const [totalCount, setTotalCount] = useState(0);
   const [fraudAmount, setFraudAmount] = useState(0);
@@ -74,10 +65,8 @@ const Dashboard: React.FC = () => {
   const [fraudCountArr, setFraudCountArr] = useState<number[]>([]);
   const [totalCountArr, setTotalCountArr] = useState<number[]>([]);
   const [dateTimeArr, setDateTimeArr] = useState<string[]>([]);
-  // const [timeInterval, setTimeInterval] = useState(20 * 1000);
   const [hasNew, setHasNew] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
-  // const [disabledSimulate, setDisabledSimulate] = useState(false);
   const [pollingInterval, setPollingInterval] = useState(DEFAULT_PULLING_INTERVAL);
   const [pollingChartInterval, setPollingChartInterval] = useState((DEFAULT_DURATION_TIME * 1000) / CHART_INIT_COUNT);
   const [dataDurationTime, setDataDurationTime] = useState(DEFAULT_DURATION_TIME);
@@ -130,7 +119,6 @@ const Dashboard: React.FC = () => {
           icon: 'success',
           confirmButtonText: t('btn.ok'),
         });
-        // Swal.fire(t('tips.success'), t('tips.wait'), 'success');
       })
       .catch((err) => {
         setLoadingSimulate(false);
@@ -156,9 +144,7 @@ const Dashboard: React.FC = () => {
   const buildQueueList = () => {
     const now = new Date();
     const endTime = now.getTime() / 1000;
-    // console.info('endTime:', endTime);
     const avgTime = dataDurationTime / CHART_INIT_COUNT;
-    // console.info('avgTime:', avgTime);
     const asyncTasks = [];
     for (let i = 1; i <= CHART_INIT_COUNT; i++) {
       asyncTasks.push(getTransStatData(endTime - avgTime * i, endTime - avgTime * (i - 1)));
@@ -168,7 +154,6 @@ const Dashboard: React.FC = () => {
       interval: 1 * 1000,
       recordError: false,
     });
-    // console.info('queue:', queue);
     queue.resume();
     queue.then((result) => {
       let formatStr = TIME_TYPE.SECOND;
@@ -191,12 +176,8 @@ const Dashboard: React.FC = () => {
   };
 
   // Get Chart Data By Interval: durationTime/10
-  // const getChartNextData = async () => {
-
-  // };
   const getChartNextData = useCallback(async () => {
     const now = new Date();
-    // now.setTime(now.getSeconds - )
     const prevChartTime = momentFormatData(new Date(), TIME_TYPE.WITH_YEAR, -pollingChartInterval / 1000);
     const startChartTime = new Date(prevChartTime.replace(/-/g, '/')).getTime();
     const endTime = now.getTime();
@@ -227,16 +208,10 @@ const Dashboard: React.FC = () => {
 
   const getDashboardData = useCallback(async () => {
     const now = new Date();
-    // now.setTime(now.getSeconds - )
-    console.info('dataDurationTime:dataDurationTime:dataDurationTime:', dataDurationTime);
     const prevTime = momentFormatData(new Date(), TIME_TYPE.WITH_YEAR, -dataDurationTime);
-    // const prevChartTime = momentFormatData(new Date(), true, -pollingInterval / 1000);
     const startTime = new Date(prevTime.replace(/-/g, '/')).getTime();
-    // const startChartTime = new Date(prevChartTime).getTime();
     const endTime = now.getTime();
-    console.info('getTransStats: timeTIME:', startTime, endTime);
     const query = gql(getTransactionStats);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const statData: any = await client?.query({
       query: query,
       variables: {
@@ -261,13 +236,7 @@ const Dashboard: React.FC = () => {
         end: Math.round(endTime / 1000),
       },
     });
-    // const fraudList: any = await API.graphql({
-    //   query: getFraudTransactions,
-    //   variables: {
-    //     start: Math.round(startTime / 1000),
-    //     end: Math.round(endTime / 1000),
-    //   },
-    // });
+   
     if (fraudList && fraudList.data && fraudList.data.getFraudTransactions) {
       const tmpTransList = fraudList.data.getFraudTransactions;
       setTransList((prev: FraudType[]) => {
@@ -288,11 +257,6 @@ const Dashboard: React.FC = () => {
       });
     }
   }, [dataDurationTime, client]);
-
-  // Resize window
-  // useEffect(() => {
-  //   setDataHeight(size.height - size.height * 0.42 - 40);
-  // }, [size]);
 
   // Interval to polling Dashboard data
   useEffect(() => {
@@ -368,7 +332,6 @@ const Dashboard: React.FC = () => {
             {DURATION_TIME_LIST.map((element, index) => {
               return (
                 <MenuItem key={index} value={element.value}>
-                  {/* {element.name} */}
                   <Trans i18nKey={`duration.${element.name}`} />
                 </MenuItem>
               );
@@ -386,7 +349,6 @@ const Dashboard: React.FC = () => {
             {POLLING_INTERVAL_LIST.map((element, index) => {
               return (
                 <MenuItem key={index} value={element.value}>
-                  {/* {element.name} */}
                   <Trans i18nKey={`interval.${element.name}`} />
                 </MenuItem>
               );
@@ -395,7 +357,6 @@ const Dashboard: React.FC = () => {
         </div>
         <div className="search">
           <Button
-            // disabled={disabledSimulate}
             onClick={() => {
               handleClickOpen();
             }}
@@ -426,7 +387,6 @@ const Dashboard: React.FC = () => {
         <div className="fds-data-table">
           <div className="fds-linechart">
             <RealtimeChart
-              // height={dataHeight - 10}
               totalData={totalCountArr}
               series={fraudCountArr}
               categories={dateTimeArr}

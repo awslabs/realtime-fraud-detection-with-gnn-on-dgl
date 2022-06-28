@@ -3,7 +3,6 @@ import Chart from 'react-apexcharts';
 import { useTranslation } from 'react-i18next';
 
 interface DataProps {
-  // height: number;
   series: number[];
   totalData: number[];
   categories: string[];

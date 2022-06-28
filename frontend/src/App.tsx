@@ -17,9 +17,6 @@ import DataLoading from './common/Loading';
 import Dashboard from './pages/dashboard/Dashboard';
 import NotFound from './pages/error/NotFound';
 
-
-// Amplify.configure(awsconfig);
-// loading component for suspense fallback
 const Loader = () => (
   <div className="App">
     <div className="app-loading">
@@ -133,9 +130,6 @@ const App: React.FC = () => {
                 </Switch>
               </HashRouter>
             </div>
-            {/* <div className="fs-footer">
-          © 2008 - 2021, Amazon Web Services, Inc. or its affiliates. All rights reserved.
-        </div> */}
           </div>
         </div>
       </LanguageContext.Provider>
