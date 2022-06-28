@@ -38,7 +38,6 @@ import CountCard from './comps/CountCard';
 import RealtimeChart from './comps/RealtimeChart';
 import TransactionList from './comps/TransactionList';
 
-
 interface FraudType {
   id: number;
   amount: number;
@@ -52,7 +51,6 @@ interface ParamType {
 }
 
 const CHART_INIT_COUNT = 10;
-
 const Dashboard: React.FC = () => {
   const { t, i18n } = useTranslation();
   const param: ParamType = useParams();
@@ -236,7 +234,6 @@ const Dashboard: React.FC = () => {
         end: Math.round(endTime / 1000),
       },
     });
-   
     if (fraudList && fraudList.data && fraudList.data.getFraudTransactions) {
       const tmpTransList = fraudList.data.getFraudTransactions;
       setTransList((prev: FraudType[]) => {
