@@ -159,7 +159,7 @@ export class TransactionDashboardStack extends NestedStack {
       storageEncrypted: true,
       instanceType: InstanceType.of(InstanceClass.T3, InstanceSize.MEDIUM),
       vpcSubnets: {
-        subnetType: SubnetType.PRIVATE,
+        subnetType: SubnetType.PRIVATE_WITH_NAT,
       },
       vpc: props.vpc,
       securityGroup: dashboardDBSG,
@@ -248,7 +248,7 @@ export class TransactionDashboardStack extends NestedStack {
       runtime: Runtime.NODEJS_14_X,
       vpc: props.vpc,
       vpcSubnets: props.vpc.selectSubnets({
-        subnetType: SubnetType.PRIVATE,
+        subnetType: SubnetType.PRIVATE_WITH_NAT,
       }),
       securityGroups: [dashboardSG],
       layers: [docDBCertLayer],
@@ -290,7 +290,7 @@ export class TransactionDashboardStack extends NestedStack {
       runtime: Runtime.NODEJS_14_X,
       vpc: props.vpc,
       vpcSubnets: props.vpc.selectSubnets({
-        subnetType: SubnetType.PRIVATE,
+        subnetType: SubnetType.PRIVATE_WITH_NAT,
       }),
       securityGroups: [createIndexSG],
       layers: [docDBCertLayer],
@@ -416,7 +416,7 @@ export class TransactionDashboardStack extends NestedStack {
       runtime: Runtime.NODEJS_14_X,
       vpc: props.vpc,
       vpcSubnets: props.vpc.selectSubnets({
-        subnetType: SubnetType.PRIVATE,
+        subnetType: SubnetType.PRIVATE_WITH_NAT,
       }),
       securityGroups: [dashboardSG],
       layers: [docDBCertLayer],
