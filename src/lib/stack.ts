@@ -218,7 +218,7 @@ export class FraudDetectionStack extends Stack {
       storageEncrypted: true,
       port: clusterPort,
       vpcSubnets: {
-        subnetType: SubnetType.PRIVATE,
+        subnetType: SubnetType.PRIVATE_WITH_NAT,
       },
       instances: 1 + replicaCount,
       removalPolicy: RemovalPolicy.DESTROY,

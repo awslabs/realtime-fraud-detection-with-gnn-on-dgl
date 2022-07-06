@@ -342,7 +342,7 @@ export class TrainingStack extends NestedStack {
       filesystem: LambdaFileSystem.fromEfsAccessPoint(accessPoint, mountPoint),
       vpc: props.vpc,
       vpcSubnets: props.vpc.selectSubnets({
-        subnetType: SubnetType.PRIVATE,
+        subnetType: SubnetType.PRIVATE_WITH_NAT,
       }),
       securityGroups: [modelRepackageSG],
       tracing: Tracing.ACTIVE,
@@ -470,7 +470,7 @@ export class TrainingStack extends NestedStack {
       taskDefinition: loadGraphDataTaskDefinition,
       assignPublicIp: false,
       subnets: {
-        subnetType: SubnetType.PRIVATE,
+        subnetType: SubnetType.PRIVATE_WITH_NAT,
       },
       securityGroups: [loadPropsSG],
       containerOverrides: [{
