@@ -1994,9 +1994,9 @@ at-least-node@^1.0.0:
   integrity sha512-+q/t7Ekv1EDY2l6Gda6LLiX14rU9TV20Wa3ofeQmwPFZbOMo9DXrLbOjFaaclkXKWidIaopwAObQDqwWtGUjqg==
 
 aws-cdk-lib@^2, aws-cdk-lib@^2.0.0:
-  version "2.31.1"
-  resolved "https://registry.yarnpkg.com/aws-cdk-lib/-/aws-cdk-lib-2.31.1.tgz#97b8a21f14b44875d9424e00758b79c7ec2f765f"
-  integrity sha512-1IFgMxr1PpX90KFzTRZKVwfY+qP/UzLsrNgfylvqveOKy3R6qtGAhAx186+Zy2nx+wYoy+hVz89CZSItGDapMA==
+  version "2.31.2"
+  resolved "https://registry.yarnpkg.com/aws-cdk-lib/-/aws-cdk-lib-2.31.2.tgz#bff2f28270d4c1be3b3cf646ed324927c6df92e8"
+  integrity sha512-IVma4LYr8Kr82d9NJj3qvau7kHGiFYX51+7UH7TbQokkal/EKv15Lt0q+Oo1xHDzSCV0hh8q+5k1gS/uhhTWUg==
   dependencies:
     "@balena/dockerignore" "^1.0.2"
     case "1.6.3"
