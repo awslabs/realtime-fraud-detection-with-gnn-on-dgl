@@ -178,7 +178,7 @@
     },
     {
       "name": "moment",
-      "version": "^2.29.2",
+      "version": "^2.29.4",
       "type": "runtime"
     },
     {
