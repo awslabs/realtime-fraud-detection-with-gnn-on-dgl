@@ -232,7 +232,7 @@ const reactPrj = new typescript.TypeScriptAppProject({
     'axios@^0.24.0',
     'aws-amplify@^4.3.12',
     'best-queue@^2.0.1',
-    'moment@^2.29.2',
+    'moment@^2.29.4',
     'react-apexcharts@^1.3.9',
     'react-i18next@^11.11.0',
     'react-loader-spinner@^4.0.0',
