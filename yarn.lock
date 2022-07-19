@@ -45,20 +45,20 @@
   resolved "https://registry.yarnpkg.com/@aws-cdk/aws-neptune-alpha/-/aws-neptune-alpha-2.0.0-alpha.11.tgz#cfede8b1b281ccc85154b2be3039afe0997e3285"
   integrity sha512-8SnsFUBH2WUZgAZTNrAj6jjObKHKJnXMl9WT5FWXUWHTaXNhyMNn0XK07au/l+tGl3vMsPhE4n61x2AMuZ5yIA==
 
-"@aws-cdk/cloud-assembly-schema@2.32.1", "@aws-cdk/cloud-assembly-schema@^2":
-  version "2.32.1"
-  resolved "https://registry.yarnpkg.com/@aws-cdk/cloud-assembly-schema/-/cloud-assembly-schema-2.32.1.tgz#1419202fb3f153ee6010eca0f7fa22849d3f0542"
-  integrity sha512-gBN2eV3WYsA6+QfQzK4dVfyzdVg0+7Jvwsyfz7RFGhYvzlIKQl9G5QuniUGUKOBEOzUzfF/lXpwjtYpPkkxFlg==
+"@aws-cdk/cloud-assembly-schema@2.33.0", "@aws-cdk/cloud-assembly-schema@^2":
+  version "2.33.0"
+  resolved "https://registry.yarnpkg.com/@aws-cdk/cloud-assembly-schema/-/cloud-assembly-schema-2.33.0.tgz#100ee80e34fc9a0d190fe029710f8e217b4a4d54"
+  integrity sha512-v2VywB+zcoz/UOFibP7SKGTPCa1DNJ+URsqQcoH91dI0ubx4D0eh6ohp5V5AzGHCY1mbXdYeeEu2gcHSNcQX5Q==
   dependencies:
     jsonschema "^1.4.1"
     semver "^7.3.7"
 
 "@aws-cdk/cx-api@^2":
-  version "2.32.1"
-  resolved "https://registry.yarnpkg.com/@aws-cdk/cx-api/-/cx-api-2.32.1.tgz#d6a6cc152f670705f8d89941e3b9278e6a24e37f"
-  integrity sha512-YYDvB0+enaCYXZ60s85g8h3YEzM95oBllzJCcz93/eqcEzsxwjLcVkmxUf9fuS2fc4bvG2MgbdcTUvQBnIQaeA==
+  version "2.33.0"
+  resolved "https://registry.yarnpkg.com/@aws-cdk/cx-api/-/cx-api-2.33.0.tgz#679ddd5f54c0c4b842b088102d1e079e73eb8928"
+  integrity sha512-afndoOXEbSXI6XWkwgfrb6D9CjEAoX2WBUHdg7Mlf+0ue7kDsngqdcKkNL1FDi7ZgSU/xwigGALYnNzzOdcyfA==
   dependencies:
-    "@aws-cdk/cloud-assembly-schema" "2.32.1"
+    "@aws-cdk/cloud-assembly-schema" "2.33.0"
     semver "^7.3.7"
 
 "@aws-crypto/ie11-detection@^2.0.0":
