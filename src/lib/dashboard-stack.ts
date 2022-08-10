@@ -833,7 +833,7 @@ export class TransactionDashboardStack extends NestedStack {
           },
         ],
       });
-      
+
       if ((/true/i).test(this.node.tryGetContext('IncludeSCPHeader') ?? 'true')) {
         const addSecurityHeaderSar = new SARDeployment(this, 'AddSecurityHeader', {
           application: 'arn:aws:serverlessrepo:us-east-1:418289889111:applications/add-security-headers',
@@ -867,8 +867,8 @@ export class TransactionDashboardStack extends NestedStack {
           },
         ]);
       }
-      
-      
+
+
       if (!customDomain) {
         (distribution.node.defaultChild as CfnResource)
           .addMetadata('cfn_nag', {
