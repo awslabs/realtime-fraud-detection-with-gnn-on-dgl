@@ -624,8 +624,8 @@ export class TrainingStack extends NestedStack {
         if ((/true/i).test(this.node.tryGetContext('ServerlessInference'))) {
           json.Parameters.ProductionVariants[0].VariantName = 'ServerlessInference';
           json.Parameters.ProductionVariants[0].ServerlessConfig = {
-            MaxConcurrency: this.node.tryGetContext('ServerlessInferenceConcurrency') ?? 50,
-            MemorySizeInMB: this.node.tryGetContext('ServerlessInferenceMemorySizeInMB') ?? 2048,
+            MaxConcurrency: parseInt(this.node.tryGetContext('ServerlessInferenceConcurrency') ?? 50),
+            MemorySizeInMB: parseInt(this.node.tryGetContext('ServerlessInferenceMemorySizeInMB') ?? 2048),
           };
           delete json.Parameters.ProductionVariants[0].InitialInstanceCount;
           delete json.Parameters.ProductionVariants[0].InstanceType;
