@@ -88,7 +88,7 @@
     "node": ">= 14.17.0"
   },
   "license": "UNLICENSED",
-  "version": "2.0.1-mainline",
+  "version": "2.0.2-mainline",
   "jest": {
     "testMatch": [
       "<rootDir>/src/**/__tests__/**/*.ts?(x)",

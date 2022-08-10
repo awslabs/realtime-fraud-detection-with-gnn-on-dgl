@@ -245,7 +245,7 @@ export class TransactionDashboardStack extends NestedStack {
         CA_FILE: rdsCAMapping.findInMap(Aws.PARTITION, caFileKey),
       },
       memorySize: 256,
-      runtime: Runtime.NODEJS_14_X,
+      runtime: Runtime.NODEJS_16_X,
       vpc: props.vpc,
       vpcSubnets: props.vpc.selectSubnets({
         subnetType: SubnetType.PRIVATE_WITH_NAT,
@@ -287,7 +287,7 @@ export class TransactionDashboardStack extends NestedStack {
         CA_FILE: rdsCAMapping.findInMap(Aws.PARTITION, caFileKey),
       },
       memorySize: 256,
-      runtime: Runtime.NODEJS_14_X,
+      runtime: Runtime.NODEJS_16_X,
       vpc: props.vpc,
       vpcSubnets: props.vpc.selectSubnets({
         subnetType: SubnetType.PRIVATE_WITH_NAT,
@@ -413,7 +413,7 @@ export class TransactionDashboardStack extends NestedStack {
         CA_FILE: rdsCAMapping.findInMap(Aws.PARTITION, caFileKey),
       },
       memorySize: 256,
-      runtime: Runtime.NODEJS_14_X,
+      runtime: Runtime.NODEJS_16_X,
       vpc: props.vpc,
       vpcSubnets: props.vpc.selectSubnets({
         subnetType: SubnetType.PRIVATE_WITH_NAT,
@@ -438,7 +438,7 @@ export class TransactionDashboardStack extends NestedStack {
         new WranglerLayer(this, 'AwsDataWranglerLayer'),
       ],
       index: 'gen.py',
-      runtime: Runtime.PYTHON_3_8,
+      runtime: Runtime.PYTHON_3_9,
       environment: {
         INFERENCE_ARN: props.inferenceArn,
         DATASET_URL: getDatasetMapping(this).findInMap(Aws.PARTITION, IEEE),
@@ -479,7 +479,7 @@ export class TransactionDashboardStack extends NestedStack {
       handler: 'iter',
       timeout: Duration.seconds(30),
       memorySize: 128,
-      runtime: Runtime.NODEJS_14_X,
+      runtime: Runtime.NODEJS_16_X,
       tracing: Tracing.ACTIVE,
     });
     const parameterTask = new (class extends LambdaInvoke {
@@ -583,7 +583,7 @@ export class TransactionDashboardStack extends NestedStack {
       },
       memorySize: 256,
       role: tokenFnRole,
-      runtime: Runtime.NODEJS_14_X,
+      runtime: Runtime.NODEJS_16_X,
       tracing: Tracing.ACTIVE,
     });
     (tokenFnRole.node.findChild('DefaultPolicy').node.defaultChild as CfnResource)
@@ -776,31 +776,6 @@ export class TransactionDashboardStack extends NestedStack {
           ],
         });
     } else {
-      const addSecurityHeaderSar = new SARDeployment(this, 'AddSecurityHeader', {
-        application: 'arn:aws:serverlessrepo:us-east-1:418289889111:applications/add-security-headers',
-        sematicVersion: '1.0.6',
-        region: 'us-east-1',
-        outputAtt: 'AddSecurityHeaderFunction',
-        parameters: [{
-          name: 'SecPolicy',
-          value: `default-src \\\'none\\\'; base-uri \\\'self\\\'; img-src \\\'self\\\'; script-src \\\'self\\\'; style-src \\\'self\\\' \\\'unsafe-inline\\\' https:; object-src \\\'none\\\'; frame-ancestors \\\'none\\\'; font-src \\\'self\\\' https:; form-action \\\'self\\\'; manifest-src \\\'self\\\'; connect-src \\\'self\\\' https://${Fn.select(2, Fn.split('/', graphqlEndpoint))}/`,
-        }],
-      });
-      addSecurityHeaderSar.deployFunc.addToRolePolicy(new PolicyStatement({
-        actions: [
-          'lambda:InvokeFunction',
-        ],
-        resources: [
-          Arn.format({
-            region: 'us-east-1',
-            service: 'lambda',
-            resource: 'function',
-            resourceName: 'serverlessrepo-AddSecurityH-UpdateEdgeCodeFunction-*',
-            arnFormat: ArnFormat.COLON_RESOURCE_NAME,
-          }, Stack.of(this)),
-        ],
-      }));
-
       let cert: Certificate | undefined;
       if (customDomain && hostedZone) {
         cert = new DnsValidatedCertificate(this, 'CustomDomainCertificateForCloudFront', {
@@ -858,13 +833,42 @@ export class TransactionDashboardStack extends NestedStack {
           },
         ],
       });
-      const dist = distribution.node.defaultChild as CfnDistribution;
-      dist.addPropertyOverride('DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations', [
-        {
-          EventType: LambdaEdgeEventType.ORIGIN_RESPONSE,
-          LambdaFunctionARN: addSecurityHeaderSar.funcVersionArn,
-        },
-      ]);
+      
+      if ((/true/i).test(this.node.tryGetContext('IncludeSCPHeader') ?? 'true')) {
+        const addSecurityHeaderSar = new SARDeployment(this, 'AddSecurityHeader', {
+          application: 'arn:aws:serverlessrepo:us-east-1:418289889111:applications/add-security-headers',
+          sematicVersion: '1.0.6',
+          region: 'us-east-1',
+          outputAtt: 'AddSecurityHeaderFunction',
+          parameters: [{
+            name: 'SecPolicy',
+            value: `default-src \\\'none\\\'; base-uri \\\'self\\\'; img-src \\\'self\\\'; script-src \\\'self\\\'; style-src \\\'self\\\' \\\'unsafe-inline\\\' https:; object-src \\\'none\\\'; frame-ancestors \\\'none\\\'; font-src \\\'self\\\' https:; form-action \\\'self\\\'; manifest-src \\\'self\\\'; connect-src \\\'self\\\' https://${Fn.select(2, Fn.split('/', graphqlEndpoint))}/`,
+          }],
+        });
+        addSecurityHeaderSar.deployFunc.addToRolePolicy(new PolicyStatement({
+          actions: [
+            'lambda:InvokeFunction',
+          ],
+          resources: [
+            Arn.format({
+              region: 'us-east-1',
+              service: 'lambda',
+              resource: 'function',
+              resourceName: 'serverlessrepo-AddSecurityH-UpdateEdgeCodeFunction-*',
+              arnFormat: ArnFormat.COLON_RESOURCE_NAME,
+            }, Stack.of(this)),
+          ],
+        }));
+        const dist = distribution.node.defaultChild as CfnDistribution;
+        dist.addPropertyOverride('DistributionConfig.DefaultCacheBehavior.LambdaFunctionAssociations', [
+          {
+            EventType: LambdaEdgeEventType.ORIGIN_RESPONSE,
+            LambdaFunctionARN: addSecurityHeaderSar.funcVersionArn,
+          },
+        ]);
+      }
+      
+      
       if (!customDomain) {
         (distribution.node.defaultChild as CfnResource)
           .addMetadata('cfn_nag', {

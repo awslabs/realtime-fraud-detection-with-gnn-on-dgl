@@ -37,7 +37,7 @@ describe('inference stack', () => {
         },
       ],
       MemorySize: 512,
-      Runtime: 'python3.8',
+      Runtime: 'python3.9',
       Timeout: 120,
       TracingConfig: {
         Mode: 'Active',

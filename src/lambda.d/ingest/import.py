@@ -15,7 +15,7 @@ TRANSACTION_FILE_URL = f'{RAW_DATA_URL}train_transaction.csv'
 IDENTITY_FILE_URL = f'{RAW_DATA_URL}train_identity.csv'
 
 def ingestToS3(url, prefix):
-    chunks = pd.read_table(url,chunksize=150000,sep=',',header=0)
+    chunks = pd.read_table(url,chunksize=100000,sep=',',header=0)
     for i, chunk in enumerate(chunks):
         targetFilePath = f's3://{TargetBucket}/{prefix}/{i}.parquet'
         logger.info(f'Dumping {len(chunk.index)} records to {targetFilePath}.')

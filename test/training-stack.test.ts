@@ -80,7 +80,7 @@ describe('training stack test suite', () => {
 
     Template.fromStack(stack).hasResourceProperties('AWS::Lambda::LayerVersion', {
       CompatibleRuntimes: [
-        'python3.8',
+        'python3.9',
       ],
     });
 
@@ -110,7 +110,7 @@ describe('training stack test suite', () => {
         },
       ],
       MemorySize: 3008,
-      Runtime: 'python3.8',
+      Runtime: 'python3.9',
       Timeout: 900,
       TracingConfig: {
         Mode: 'Active',
@@ -1324,7 +1324,7 @@ describe('training stack test suite', () => {
           Ref: 'TarLayer1AD5AF62',
         },
       ],
-      Runtime: 'python3.7',
+      Runtime: 'python3.9',
       Environment: {
         Variables: {
           CodePackage: {

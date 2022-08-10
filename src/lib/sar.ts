@@ -51,7 +51,7 @@ export class SARDeployment extends Construct {
       handler: 'handler',
       timeout: Duration.minutes(10),
       memorySize: 128,
-      runtime: Runtime.NODEJS_14_X,
+      runtime: Runtime.NODEJS_16_X,
       tracing: Tracing.ACTIVE,
     });
     this.deployFunc.addToRolePolicy(new PolicyStatement({
@@ -89,6 +89,7 @@ export class SARDeployment extends Construct {
         'lambda:CreateFunction',
         'lambda:GetFunction',
         'lambda:PublishVersion',
+        'lambda:TagResource',
       ],
       resources: [
         Arn.format({

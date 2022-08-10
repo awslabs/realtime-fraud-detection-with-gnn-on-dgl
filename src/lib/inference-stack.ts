@@ -37,12 +37,12 @@ export class InferenceStack extends NestedStack {
       layers: [
         new PythonLayerVersion(this, 'InferenceDataLayer', {
           entry: path.join(__dirname, '../lambda.d/inference/layer'),
-          compatibleRuntimes: [Runtime.PYTHON_3_8],
+          compatibleRuntimes: [Runtime.PYTHON_3_9],
         }),
         new NeptuneUtilLayer(this, 'NeptuneUtilLayer'),
       ],
       index: 'inferenceApi.py',
-      runtime: Runtime.PYTHON_3_8,
+      runtime: Runtime.PYTHON_3_9,
       handler: 'handler',
       timeout: Duration.minutes(2),
       memorySize: 512,
