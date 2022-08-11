@@ -65,7 +65,7 @@ export class TrainingStack extends NestedStack {
       handler: 'normalize',
       timeout: Duration.seconds(60),
       memorySize: 128,
-      runtime: Runtime.NODEJS_14_X,
+      runtime: Runtime.NODEJS_16_X,
       tracing: Tracing.ACTIVE,
     });
     const parametersNormalizeTask = new LambdaInvoke(this, 'Parameters normalize', {
@@ -86,7 +86,7 @@ export class TrainingStack extends NestedStack {
         new WranglerLayer(this, 'DataIngestLayer'),
       ],
       index: 'import.py',
-      runtime: Runtime.PYTHON_3_8,
+      runtime: Runtime.PYTHON_3_9,
       environment: {
         TargetBucket: props.bucket.bucketName,
         TransactionPrefix: transactionPrefix,
@@ -115,7 +115,7 @@ export class TrainingStack extends NestedStack {
       handler: 'crawler',
       timeout: stateTimeout,
       memorySize: 128,
-      runtime: Runtime.NODEJS_14_X,
+      runtime: Runtime.NODEJS_16_X,
       tracing: Tracing.ACTIVE,
     });
     const gluePolicy = new Policy(this, 'gluePolicy', {
@@ -189,7 +189,7 @@ export class TrainingStack extends NestedStack {
       handler: 'build',
       timeout: Duration.seconds(60),
       memorySize: 128,
-      runtime: Runtime.NODEJS_14_X,
+      runtime: Runtime.NODEJS_16_X,
       tracing: Tracing.ACTIVE,
       environment: {
         InputDataRoot: props.bucket.urlForObject(etlConstruct.processedOutputPrefix),
@@ -331,7 +331,7 @@ export class TrainingStack extends NestedStack {
         new AwsCliLayer(this, 'AwsCliLayer'),
         new TarLayer(this, 'TarLayer'),
       ],
-      runtime: Runtime.PYTHON_3_7,
+      runtime: Runtime.PYTHON_3_9,
       environment: {
         CodePackage: props.bucket.s3UrlForObject(codePrefix),
         TempFolder: mountPoint,
@@ -653,7 +653,7 @@ export class TrainingStack extends NestedStack {
     const checkEndpointFn = new PythonFunction(this, 'CheckEndpointFunc', {
       entry: path.join(__dirname, '../lambda.d/check-sagemaker-endpoint/'),
       index: 'app.py',
-      runtime: Runtime.PYTHON_3_8,
+      runtime: Runtime.PYTHON_3_9,
       timeout: Duration.seconds(30),
       memorySize: 128,
     });

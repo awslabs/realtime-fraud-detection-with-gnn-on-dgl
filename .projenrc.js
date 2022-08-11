@@ -189,7 +189,7 @@ project.package.addField('resolutions',
     'ansi-regex': '^5.0.1',
   }));
 project.addFields({
-  version: '2.0.1-mainline',
+  version: '2.0.2-mainline',
 });
 
 const tsReactConfig = {

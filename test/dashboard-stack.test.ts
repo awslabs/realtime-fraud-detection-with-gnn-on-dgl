@@ -399,7 +399,7 @@ describe('dashboard stack test suite', () => {
         },
       ],
       MemorySize: 3008,
-      Runtime: 'python3.8',
+      Runtime: 'python3.9',
       Timeout: 900,
       TracingConfig: {
         Mode: 'Active',
@@ -517,7 +517,7 @@ describe('dashboard stack test suite', () => {
         },
       ],
       MemorySize: 256,
-      Runtime: 'nodejs14.x',
+      Runtime: 'nodejs16.x',
       Timeout: 60,
       VpcConfig: {
         SecurityGroupIds: [

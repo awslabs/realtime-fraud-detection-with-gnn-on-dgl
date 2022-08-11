@@ -9,11 +9,11 @@ export interface WranglerLayerProps {
 
 export class WranglerLayer extends LayerVersion {
   constructor(scope: Construct, id: string, props?: WranglerLayerProps) {
-    const version = props?.version ?? '2.7.0';
-    const wranglerLayerZip = `https://github.com/awslabs/aws-data-wrangler/releases/download/${version}/awswrangler-layer-${version}-py3.8.zip`;
+    const version = props?.version ?? '2.16.1';
+    const wranglerLayerZip = `https://github.com/awslabs/aws-data-wrangler/releases/download/${version}/awswrangler-layer-${version}-py3.9.zip`;
 
     super(scope, id, {
-      compatibleRuntimes: [Runtime.PYTHON_3_8],
+      compatibleRuntimes: [Runtime.PYTHON_3_9],
       code: Code.fromAsset(path.join(__dirname, '../lambda.d/layer.d/awswrangler'), {
         bundling: {
           image: new Runtime('busybox', RuntimeFamily.OTHER, {
@@ -39,7 +39,7 @@ export class NeptuneUtilLayer extends LayerVersion {
   constructor(scope: Construct, id: string) {
 
     super(scope, id, {
-      compatibleRuntimes: [Runtime.PYTHON_3_8, Runtime.PYTHON_3_7, Runtime.PYTHON_3_6],
+      compatibleRuntimes: [Runtime.PYTHON_3_9, Runtime.PYTHON_3_8, Runtime.PYTHON_3_7],
       code: Code.fromAsset(path.join(__dirname, '../script-libs/amazon-neptune-tools/neptune-python-utils/target'), {
         bundling: {
           image: new Runtime('busybox', RuntimeFamily.OTHER, {
