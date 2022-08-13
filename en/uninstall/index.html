@@ -373,6 +373,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#deleting-the-endpoint-of-amazon-sagemaker" class="md-nav__link">
+    Deleting the endpoint of Amazon SageMaker
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -426,6 +433,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#deleting-the-endpoint-of-amazon-sagemaker" class="md-nav__link">
+    Deleting the endpoint of Amazon SageMaker
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -471,6 +485,15 @@
 <p>To delete the S3 bucket using AWS CLI, run the following command:</p>
 <pre><code class="language-bash">aws s3 rb s3://&lt;bucket-name&gt; --force
 </code></pre>
+<h3 id="deleting-the-endpoint-of-amazon-sagemaker">Deleting the endpoint of Amazon SageMaker</h3>
+<p>An endpoint of Amazon SageMkaker would be created after you train the model.
+You can remove the endpoint to avoid the recurred cost.</p>
+<ol>
+<li>Sign in to the <a href="https://console.aws.amazon.com/sagemaker/">Amazon SageMaker</a> console.</li>
+<li>Select the <strong>Inference</strong> - <strong>Endpoints</strong> from left sidebar.</li>
+<li>Choose the endpoint with name <code>frauddetection</code>.</li>
+<li>Choose <strong>Actions</strong> - <strong>Delete</strong>.</li>
+</ol>
 
               
             </article>

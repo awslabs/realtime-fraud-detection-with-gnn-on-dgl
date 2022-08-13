@@ -360,6 +360,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#amazon-sagemaker" class="md-nav__link">
+    删除 Amazon SageMaker 实时推理节点
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -413,6 +420,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#amazon-sagemaker" class="md-nav__link">
+    删除 Amazon SageMaker 实时推理节点
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -458,6 +472,14 @@
 <p>要使用 AWS CLI 删除 S3 存储桶，请运行以下命令：</p>
 <pre><code class="language-bash">aws s3 rb s3://&lt;bucket-name&gt; --force
 </code></pre>
+<h3 id="amazon-sagemaker">删除 Amazon SageMaker 实时推理节点</h3>
+<p>Amazon SageMkaker 实时推理终端节点会在您训练模型后被创建。您可以删除该节点避免持续的费用。</p>
+<ol>
+<li>登录到 <a href="https://console.aws.amazon.com/sagemaker/">Amazon SageMaker</a> 控制台。</li>
+<li>从左侧菜单选择 <strong>推理</strong> - <strong>终端节点</strong>。</li>
+<li>选中名为 <code>frauddetection</code> 的节点。</li>
+<li>选择 <strong>操作</strong> - <strong>删除</strong>。</li>
+</ol>
 
               
             </article>
