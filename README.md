@@ -1,6 +1,11 @@
 # Real-time Fraud Detection with Graph Neural Network on DGL
 
-It's a end-to-end solution for **real-time** fraud detection using graph database [Amazon Neptune][neptune], [Amazon SageMaker][sagemaker] and [Deep Graph Library (DGL)][dgl] to construct a heterogeneous graph from tabular data and train a Graph Neural Network(GNN) model to detect fraudulent transactions in the [IEEE-CIS Fraud detection dataset][ieee-fraud-detection].
+It's an end-to-end blueprint architecture for **real-time** fraud detection 
+using graph database [Amazon Neptune][neptune], [Amazon SageMaker][sagemaker] and 
+[Deep Graph Library (DGL)][dgl] to construct a heterogeneous graph from tabular data 
+and train a Graph Neural Network(GNN) model to detect fraudulent transactions 
+in the [IEEE-CIS Fraud detection dataset][ieee-fraud-detection]. 
+See the more detail in [blog post][blog].
 
 ## Architecutre of solution
 
@@ -208,3 +213,4 @@ This project is licensed under the Apache-2.0 License.
 [deployment-guide]: https://awslabs.github.io/realtime-fraud-detection-with-gnn-on-dgl/en/deployment/
 [cloudwatch-logs-limit]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/AWS-logs-and-resource-policy.html#AWS-logs-infrastructure-CWL
 [serverless-inference]: https://docs.aws.amazon.com/sagemaker/latest/dg/serverless-endpoints.html
+[blog]: https://aws.amazon.com/blogs/machine-learning/build-a-gnn-based-real-time-fraud-detection-solution-using-amazon-sagemaker-amazon-neptune-and-the-deep-graph-library/

@@ -32,6 +32,17 @@ To delete the S3 bucket using AWS CLI, run the following command:
 aws s3 rb s3://<bucket-name> --force
 ```
 
+### Deleting the endpoint of Amazon SageMaker
+
+An endpoint of Amazon SageMkaker would be created after you train the model.
+You can remove the endpoint to avoid the recurred cost.
+
+1. Sign in to the [Amazon SageMaker][sagemaker-console] console.
+2. Select the **Inference** - **Endpoints** from left sidebar.
+3. Choose the endpoint with name `frauddetection`.
+4. Choose **Actions** - **Delete**.
+
 [cloudformation-console]: https://console.aws.amazon.com/cloudformation/home
 [aws-cli]: https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html
 [s3-console]: https://console.aws.amazon.com/s3/
+[sagemaker-console]: https://console.aws.amazon.com/sagemaker/
