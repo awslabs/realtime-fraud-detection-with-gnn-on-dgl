@@ -32,6 +32,16 @@ aws cloudformation delete-stack --stack-name <installation-stack-name> --region 
 aws s3 rb s3://<bucket-name> --force
 ```
 
+### 删除 Amazon SageMaker 实时推理节点
+
+Amazon SageMkaker 实时推理终端节点会在您训练模型后被创建。您可以删除该节点避免持续的费用。
+
+1. 登录到 [Amazon SageMaker][sagemaker-console] 控制台。
+2. 从左侧菜单选择 **推理** - **终端节点**。
+3. 选中名为 `frauddetection` 的节点。
+4. 选择 **操作** - **删除**。
+
 [cloudformation-console]: https://console.aws.amazon.com/cloudformation/home
 [aws-cli]: https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html
 [s3-console]: https://console.aws.amazon.com/s3/
+[sagemaker-console]: https://console.aws.amazon.com/sagemaker/
