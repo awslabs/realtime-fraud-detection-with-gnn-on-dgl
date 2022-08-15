@@ -16,6 +16,7 @@
 - 亚太地区（新加坡）区域:   ap-southeast-1
 - 亚太地区（悉尼）区域:   ap-southeast-2
 - 亚太地区（孟买）区域:   ap-south-1
+- 由光环新网运营的亚马逊云科技中国（北京）区域:   cn-north-1
 - 由西云数据运营的亚马逊云科技中国（宁夏）区域:   cn-northwest-1
 
 [neptune]: https://aws.amazon.com/neptune/
