@@ -35,10 +35,6 @@ def train_fg(model, optim, loss, features, labels, train_g, test_g, test_mask,
     A full graph verison of RGCN training
     """
 
-    # get list of indecies for train labels
-    train_mask= th.logical_not(test_mask)
-    train_idx=  th.nonzero(train_mask, as_tuple=True)[0]
-    
     duration = []
     for epoch in range(n_epochs):
         tic = time.time()
@@ -46,9 +42,7 @@ def train_fg(model, optim, loss, features, labels, train_g, test_g, test_mask,
 
         pred = model(train_g, features.to(device))
 
-        # only compute gradient updates for labels in train split
-        l = loss(th.index_select(pred, 0, train_idx), 
-                 th.index_select(labels, 0, train_idx))
+        l = loss(pred, labels)
 
         optim.zero_grad()
         l.backward()
