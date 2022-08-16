@@ -958,7 +958,7 @@ export class DocumentDBCertLayer extends LayerVersion {
     const certPath =
       'https://s3.amazonaws.com/rds-downloads/rds-combined-ca-bundle.pem';
     const certPathForAwsCN =
-      'https://s3.cn-north-1.amazonaws.com.cn/rds-downloads/rds-combined-ca-cn-bundle.pem';
+      'https://rds-truststore.s3.cn-north-1.amazonaws.com.cn/cn-northwest-1/cn-northwest-1-bundle.pem';
     super(scope, id, {
       code: Code.fromAsset(path.join(__dirname, '../lambda.d/dashboard/'), {
         bundling: {
