@@ -73,5 +73,5 @@ You can view the **execution status** of details of execution. You should receiv
 
 [launch-template]: https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=fraud-detection-on-dgl&templateURL=https://aws-gcr-solutions.s3.amazonaws.com/Realtime-fraud-detection-with-gnn-on-dgl-rel/latest/default/realtime-fraud-detection-with-gnn-on-dgl.template.json
 [launch-template-with-custom-domain]: https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=fraud-detection-on-dgl&templateURL=https://aws-gcr-solutions.s3.amazonaws.com/Realtime-fraud-detection-with-gnn-on-dgl-rel/latest/custom-domain/realtime-fraud-detection-with-gnn-on-dgl.template.json
-[template-url]: https://aws-gcr-solutions.s3.amazonaws.com/fraud-detection-on-dgl/latest/default/realtime-fraud-detection-with-gnn-on-dgl.template.json
+[template-url]: https://aws-gcr-solutions.s3.amazonaws.com/Realtime-fraud-detection-with-gnn-on-dgl-rel/latest/default/realtime-fraud-detection-with-gnn-on-dgl.template.json
 [iam-limit]: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_iam-quotas.html
