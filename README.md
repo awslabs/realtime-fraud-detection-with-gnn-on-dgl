@@ -73,9 +73,9 @@ The solution is using graph database [Amazon Neptune][neptune] for real-time fra
 
 Region name | Region code | Launch
 --- | --- | ---
-Global regions(switch to above region you want to deploy) | us-east-1(default) | [Launch](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=fraud-detection-on-dgl&templateURL=https://aws-gcr-solutions.s3.amazonaws.com/Realtime-fraud-detection-with-gnn-on-dgl-rel/latest/realtime-fraud-detection-with-gnn-on-dgl.template.json)
-AWS China(Beijing) Region | cn-north-1 | [Launch](https://cn-north-1.console.amazonaws.cn/cloudformation/home?region=cn-north-1#/stacks/create/template?stackName=fraud-detection-on-dgl&templateURL=https://aws-gcr-solutions.s3.cn-north-1.amazonaws.com.cn/Realtime-fraud-detection-with-gnn-on-dgl-rel/latest/realtime-fraud-detection-with-gnn-on-dgl-aws-cn.template.json)
-AWS China(Ningxia) Region | cn-northwest-1 | [Launch](https://cn-northwest-1.console.amazonaws.cn/cloudformation/home?region=cn-northwest-1#/stacks/create/template?stackName=fraud-detection-on-dgl&templateURL=https://aws-gcr-solutions.s3.cn-north-1.amazonaws.com.cn/Realtime-fraud-detection-with-gnn-on-dgl-rel/latest/realtime-fraud-detection-with-gnn-on-dgl-aws-cn.template.json)
+Global regions(switch to above region you want to deploy) | us-east-1(default) | [Launch](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=fraud-detection-on-dgl&templateURL=https://aws-gcr-solutions.s3.amazonaws.com/Realtime-fraud-detection-with-gnn-on-dgl-rel/latest/default/realtime-fraud-detection-with-gnn-on-dgl.template.json)
+AWS China(Beijing) Region | cn-north-1 | [Launch](https://cn-north-1.console.amazonaws.cn/cloudformation/home?region=cn-north-1#/stacks/create/template?stackName=fraud-detection-on-dgl&templateURL=https://aws-gcr-solutions.s3.cn-north-1.amazonaws.com.cn/Realtime-fraud-detection-with-gnn-on-dgl-rel/latest/cn/realtime-fraud-detection-with-gnn-on-dgl.template.json)
+AWS China(Ningxia) Region | cn-northwest-1 | [Launch](https://cn-northwest-1.console.amazonaws.cn/cloudformation/home?region=cn-northwest-1#/stacks/create/template?stackName=fraud-detection-on-dgl&templateURL=https://aws-gcr-solutions.s3.cn-north-1.amazonaws.com.cn/Realtime-fraud-detection-with-gnn-on-dgl-rel/latest/cn/realtime-fraud-detection-with-gnn-on-dgl.template.json)
 
 See [deployment guide][deployment-guide] for detail steps.
 
