@@ -21,7 +21,7 @@
 
 ## 区域可用性
 
-本解决方案依赖 [Amazon Neptune][neptune] 和 [Amazon DocumentDB][documentdb] 存储图结构化数据和在线交易统计数据，由于服务的可用性区域要求，此解决方案可在亚马逊云科技由西云数据运营的（宁夏）区域中部署，也可部署在亚马逊云科技以下海外区域，
+本解决方案依赖 [Amazon Neptune][neptune] 和 [Amazon DocumentDB][documentdb] 存储图结构化数据和在线交易统计数据，由于服务的可用性区域要求，此解决方案可在由西云数据运营的亚马逊云科技中国（宁夏）区域和由光环新网运营的亚马逊云科技中国（北京）区域中部署，也可部署在亚马逊云科技以下海外区域，
 
 - 美国东部（弗吉尼亚北部）区域:   us-east-1
 - 美国东部（俄亥俄）区域:   us-east-2
@@ -210,8 +210,8 @@ aws s3 rb s3://<bucket-name> --force
 [api-gateway]: https://aws.amazon.com/cn/api-gateway/
 [appsync]: https://aws.amazon.com/cn/appsync/
 [secrets-manager]: https://aws.amazon.com/cn/secrets-manager/
-[deploy-to-zhy]: https://cn-northwest-1.console.amazonaws.cn/cloudformation/home?region=cn-northwest-1#/stacks/create/template?stackName=fraud-detection-on-dgl&templateURL=https://aws-gcr-solutions.s3.cn-north-1.amazonaws.com.cn/Realtime-fraud-detection-with-gnn-on-dgl-rel/latest/realtime-fraud-detection-with-gnn-on-dgl-aws-cn.template.json
-[deploy-to-global]: https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=fraud-detection-on-dgl&templateURL=https://aws-gcr-solutions.s3.amazonaws.com/Realtime-fraud-detection-with-gnn-on-dgl-rel/latest/realtime-fraud-detection-with-gnn-on-dgl.template.json
+[deploy-to-zhy]: https://cn-northwest-1.console.amazonaws.cn/cloudformation/home?region=cn-northwest-1#/stacks/create/template?stackName=fraud-detection-on-dgl&templateURL=https://aws-gcr-solutions.s3.cn-north-1.amazonaws.com.cn/Realtime-fraud-detection-with-gnn-on-dgl-rel/latest/cn/realtime-fraud-detection-with-gnn-on-dgl.template.json
+[deploy-to-global]: https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=fraud-detection-on-dgl&templateURL=https://aws-gcr-solutions.s3.amazonaws.com/Realtime-fraud-detection-with-gnn-on-dgl-rel/latest/default/realtime-fraud-detection-with-gnn-on-dgl.template.json
 [cloudformation-console]: https://cn-northwest-1.console.amazonaws.cn/cloudformation/home?region=cn-northwest-1
 [aws-cli]: https://docs.amazonaws.cn/cli/latest/userguide/cli-chap-welcome.html
 [s3-console]: https://console.amazonaws.cn/s3/home?region=cn-northwest-1#
