@@ -1729,9 +1729,9 @@
   integrity sha512-LJgzOEwWuMTBxHzgBR/fhhBOWrvBjvO+zPteUgbbuQi80rYIZHrk1mNbRUqPZqSLP2H7Rwt1EFLL/tNLD1Xx/w==
 
 "@types/node@^14":
-  version "14.18.23"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.18.23.tgz#70f5f20b0b1b38f696848c1d3647bb95694e615e"
-  integrity sha512-MhbCWN18R4GhO8ewQWAFK4TGQdBpXWByukz7cWyJmXhvRuCIaM/oWytGPqVmDzgEnnaIc9ss6HbU5mUi+vyZPA==
+  version "14.18.25"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.18.25.tgz#57c72455af0a658da5b59aa062b2f89e73df0a61"
+  integrity sha512-9pLfceRSrKIsv/MISN6RoFWTIzka36Uk2Uuf5a8cHyDYhEgl5Hm5dXoe621KULeBjt+cFsY18mILsWWtJeG80w==
 
 "@types/prettier@^2.1.5":
   version "2.7.0"
