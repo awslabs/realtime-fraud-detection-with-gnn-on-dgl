@@ -41,12 +41,6 @@ def train_fg(model, optim, loss, features, labels, train_g, test_g, test_mask,
     print("Train label: {}".format(train_mask.sum()))
     print("Test label: {}".format(test_mask.sum()))
 
-    tr_labels = labels[train_idx]
-    ts_labels = labels[test_idx]
-
-    print("train 0:1 ration: {}: {:4f}".format(1, (tr_labels.shape[0] - tr_labels.sum()) // tr_labels.sum()))
-    print("test 0:1 ration: {}: {:4f}".format(1, (ts_labels.shape[0] - ts_labels.sum()) // ts_labels.sum()))
-
     duration = []
     for epoch in range(n_epochs):
         tic = time.time()
