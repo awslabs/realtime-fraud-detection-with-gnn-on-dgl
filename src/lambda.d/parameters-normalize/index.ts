@@ -55,8 +55,8 @@ function _normalizeTrainingJobHyperparameters(para: Parameters) : {
   hyperparameters['n-hidden'] = para?.trainingJob?.hyperparameters?.['n-hidden'] ?? '16';
   hyperparameters['embedding-size'] = para?.trainingJob?.hyperparameters?.['embedding-size'] ?? '64';
   hyperparameters['n-layers'] = '2';
-  hyperparameters['n-epochs'] = para?.trainingJob?.hyperparameters?.['n-epochs'] ?? '50';
+  hyperparameters['n-epochs'] = para?.trainingJob?.hyperparameters?.['n-epochs'] ?? '100';
   hyperparameters.optimizer = para?.trainingJob?.hyperparameters?.optimizer ?? 'adam';
-  hyperparameters.lr = para?.trainingJob?.hyperparameters?.lr ?? '1e-2';
+  hyperparameters.lr = para?.trainingJob?.hyperparameters?.lr ?? '4e-3';
   return hyperparameters;
 }
