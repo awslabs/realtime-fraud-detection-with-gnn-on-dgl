@@ -115,11 +115,11 @@ s3 = boto3.resource('s3', region_name=args['region'])
 train_data_ratio = 0.8
 # extract out transactions for test/validation
 n_train = int(transactions.count()*train_data_ratio)
-test_ids = transactions.select_fields(TRANSACTION_ID)
+test_ids = ks.DataFrame(transactions.select_fields(TRANSACTION_ID).toDF())[n_train:].to_spark()
 get_fraud_frac = lambda series: 100 * sum(series)/len(series)
 isfraud_df: DynamicFrame = transactions.select_fields("isFraud")
 logger.info("Percent fraud for train transactions: {}".format(sum_col(transactions.toDF(), "isFraud")))
-dump_df_to_s3(test_ids.toDF(), 'test', header=False)
+dump_df_to_s3(test_ids, 'test', header=False)
 
 id_cols = args['id_cols']
 cat_cols = args['cat_cols']
