@@ -53,7 +53,7 @@ export class InferenceStack extends NestedStack {
         CLUSTER_PORT: Token.asString(props.neptune.clusterEndpoint.port),
         CLUSTER_REGION: Aws.REGION,
         ENDPOINT_NAME: props.sagemakerEndpointName,
-        MODEL_BTW: '0.2',
+        MODEL_BTW: '0.8',
         QUEUE_URL: props.queue.queueUrl,
         TRANSACTION_ID_COLS: props.dataColumnsArg.id_cols,
         TRANSACTION_CAT_COLS: props.dataColumnsArg.cat_cols,

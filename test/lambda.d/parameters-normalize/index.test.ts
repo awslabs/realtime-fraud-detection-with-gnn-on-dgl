@@ -18,9 +18,9 @@ describe('parameters normalize tests', () => {
           hyperparameters: {
             'embedding-size': '64',
             'n-layers': '2',
-            'n-epochs': '50',
+            'n-epochs': '100',
             'optimizer': 'adam',
-            'lr': '1e-2',
+            'lr': '4e-3',
             'n-hidden': '16',
           },
           instanceType: 'ml.c5.4xlarge',

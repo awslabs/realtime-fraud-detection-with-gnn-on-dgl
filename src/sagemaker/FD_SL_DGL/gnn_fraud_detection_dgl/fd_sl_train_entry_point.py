@@ -34,6 +34,12 @@ def train_fg(model, optim, loss, features, labels, train_g, test_g, test_mask,
     """
     A full graph verison of RGCN training
     """
+    train_mask = th.logical_not(test_mask)
+    train_idx = th.nonzero(train_mask, as_tuple=True)[0]
+    test_idx = th.nonzero(test_mask, as_tuple=True)[0]
+
+    print("Train label: {}".format(train_mask.sum()))
+    print("Test label: {}".format(test_mask.sum()))
 
     duration = []
     for epoch in range(n_epochs):
@@ -42,7 +48,8 @@ def train_fg(model, optim, loss, features, labels, train_g, test_g, test_mask,
 
         pred = model(train_g, features.to(device))
 
-        l = loss(pred, labels)
+        l = loss(th.index_select(pred, 0, train_idx),
+                 th.index_select(labels, 0, train_idx))
 
         optim.zero_grad()
         l.backward()
@@ -243,7 +250,7 @@ if __name__ == '__main__':
     labels = labels.long().to(device)
     test_mask = test_mask.to(device)
 
-    loss = th.nn.CrossEntropyLoss()
+    loss = th.nn.CrossEntropyLoss(th.tensor([1, 12.]))
 
     # print(model)
     optim = th.optim.Adam(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
