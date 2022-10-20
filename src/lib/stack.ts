@@ -157,7 +157,7 @@ export class FraudDetectionStack extends Stack {
         ParameterGroups: interParameterGroups,
       },
     };
-    this.templateOptions.description = `(SO8013) - Real-time Fraud Detection with Graph Neural Network on DGL. Template version ${pjson.version}`;
+    this.templateOptions.description = `(SO9076) - Real-time Fraud Detection with Graph Neural Network on DGL. Template version ${pjson.version}`;
 
     new CfnOutput(this, 'DashboardWebsiteUrl', {
       value: customDomain ?? dashboardStack.distribution.distributionDomainName,

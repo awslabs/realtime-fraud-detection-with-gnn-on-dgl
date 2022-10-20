@@ -775,7 +775,7 @@ export class TrainingStack extends NestedStack {
 
     Aspects.of(this).add(new CfnNagWhitelist());
 
-    this.templateOptions.description = '(SO8013) - Real-time Fraud Detection with Graph Neural Network on DGL -- model training and deployment stack.';
+    this.templateOptions.description = '(SO9076) - Real-time Fraud Detection with Graph Neural Network on DGL -- model training and deployment stack.';
   }
 
   _trainingImageAssets(): DockerImageAssetProps {
