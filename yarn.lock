@@ -45,10 +45,18 @@
   resolved "https://registry.yarnpkg.com/@aws-cdk/aws-neptune-alpha/-/aws-neptune-alpha-2.0.0-alpha.11.tgz#cfede8b1b281ccc85154b2be3039afe0997e3285"
   integrity sha512-8SnsFUBH2WUZgAZTNrAj6jjObKHKJnXMl9WT5FWXUWHTaXNhyMNn0XK07au/l+tGl3vMsPhE4n61x2AMuZ5yIA==
 
-"@aws-cdk/cloud-assembly-schema@2.48.0", "@aws-cdk/cloud-assembly-schema@^2":
+"@aws-cdk/cloud-assembly-schema@2.48.0":
   version "2.48.0"
   resolved "https://registry.yarnpkg.com/@aws-cdk/cloud-assembly-schema/-/cloud-assembly-schema-2.48.0.tgz#d10a0f2f77c4714369795dfff48dff3c218fdc6a"
   integrity sha512-1ghTKbtUNHC6hcHuF3ZYxxrcCa7qLBomU3pkHXfFtd2MiHjTSRoveic7dKV5ButZfYiXDSI590RYB98ZOcHkkQ==
+  dependencies:
+    jsonschema "^1.4.1"
+    semver "^7.3.8"
+
+"@aws-cdk/cloud-assembly-schema@^2":
+  version "2.49.0"
+  resolved "https://registry.yarnpkg.com/@aws-cdk/cloud-assembly-schema/-/cloud-assembly-schema-2.49.0.tgz#38bbfebd7658e260a121f9db15b48cf34c0b6385"
+  integrity sha512-TT3+HGf7pmsETn7vGOOSExbw7JqWTsofctB27XW3BkNTLKraeGUVDOW2vGVD/I7bBbyrg6mP9M59jsiTROWRsA==
   dependencies:
     jsonschema "^1.4.1"
     semver "^7.3.8"
