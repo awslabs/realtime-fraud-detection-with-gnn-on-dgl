@@ -93,10 +93,10 @@ describe('fraud detection stack test suite', () => {
         neptune_enable_audit_log: '1',
       },
     });
-    
+
     Template.fromStack(stack).hasResourceProperties('AWS::Neptune::DBParameterGroup', {
       Family: 'neptune1.2',
-    });    
+    });
 
     Template.fromStack(stack).hasResource('AWS::Neptune::DBCluster', {
       Properties: {
