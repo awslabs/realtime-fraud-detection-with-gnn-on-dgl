@@ -25,40 +25,40 @@
   resolved "https://registry.yarnpkg.com/@aws-cdk/asset-node-proxy-agent-v5/-/asset-node-proxy-agent-v5-2.0.18.tgz#8ff6f6b0b1a00fb224e523b4f61bb15722509eb4"
   integrity sha512-hg5b372GnghSykekQI9snoWlDZ9ZF6yYc5iHmKjuAJsTqL6g+c3MP3Jm99uMV5xALLX5KyOhMVN+XUA3b6BN2w==
 
-"@aws-cdk/aws-apigatewayv2-alpha@2.0.0-alpha.11":
-  version "2.0.0-alpha.11"
-  resolved "https://registry.yarnpkg.com/@aws-cdk/aws-apigatewayv2-alpha/-/aws-apigatewayv2-alpha-2.0.0-alpha.11.tgz#6dffab0956a1e1e39f0c7668ed8a0f848f86e67e"
-  integrity sha512-Fyq+/A9/qpU+4XK2mneOp7LrLhldzgHRF74xEMxlGQsDg+jxqTBI+XK0rve6CYcvcL+lq8bGr224LkomNmig6g==
+"@aws-cdk/aws-apigatewayv2-alpha@^2.51.1-alpha.0":
+  version "2.51.1-alpha.0"
+  resolved "https://registry.yarnpkg.com/@aws-cdk/aws-apigatewayv2-alpha/-/aws-apigatewayv2-alpha-2.51.1-alpha.0.tgz#ad4311683794ec79fc10cfe8691467bfd212e1b9"
+  integrity sha512-cgAUGSBa8qLnEdRCjAQMtkVlqK7ML+gep9bTlaxQcb3gExvlPNpFUZNxOGoEb1Bpjyhtn2peN37+GU1bEJ6fbQ==
 
-"@aws-cdk/aws-apigatewayv2-integrations-alpha@2.0.0-alpha.11":
-  version "2.0.0-alpha.11"
-  resolved "https://registry.yarnpkg.com/@aws-cdk/aws-apigatewayv2-integrations-alpha/-/aws-apigatewayv2-integrations-alpha-2.0.0-alpha.11.tgz#0c2811eed4d7f22557ac15e6b4cfa92019ed8dca"
-  integrity sha512-ge7+jg+qTje6NMjeBa/48Q7kwQEJwY0KiWUhAzl0bI5X+vy62uD27zn9N2iCtkwATpl19DrhaqoyirKxpcwKmQ==
+"@aws-cdk/aws-apigatewayv2-integrations-alpha@^2.51.1-alpha.0":
+  version "2.51.1-alpha.0"
+  resolved "https://registry.yarnpkg.com/@aws-cdk/aws-apigatewayv2-integrations-alpha/-/aws-apigatewayv2-integrations-alpha-2.51.1-alpha.0.tgz#1f0651163294882ae61b3577c59a4cf8a403f95d"
+  integrity sha512-x2pmhU/1+bWAm17ORxQ8DyPcwi7Kqhj4RQJ/Zy51fxGUZRJSSdcjLpwa2g8P3nQyKwfrEYU0VsLOV5RNlFKywQ==
 
-"@aws-cdk/aws-appsync-alpha@2.0.0-alpha.11":
-  version "2.0.0-alpha.11"
-  resolved "https://registry.yarnpkg.com/@aws-cdk/aws-appsync-alpha/-/aws-appsync-alpha-2.0.0-alpha.11.tgz#d82edfeaf919c5893e03af2ed53278f9c8dafc9f"
-  integrity sha512-pZVn13X46Pod83sTUC0uZMX8w+O7rKrdPiYO0DijSV1sJwjVhIsMrhee8JoKydQD3rXPyjSulm8xvhejwIYWdQ==
+"@aws-cdk/aws-appsync-alpha@^2.51.1-alpha.0":
+  version "2.51.1-alpha.0"
+  resolved "https://registry.yarnpkg.com/@aws-cdk/aws-appsync-alpha/-/aws-appsync-alpha-2.51.1-alpha.0.tgz#97ef1b288015607316beed9da9cf42dfdf84cb57"
+  integrity sha512-DZYJwiuGWUgMo1rUTRGryw9hUaxFTSFkKV6zTOf7xmQkzk9pRWSjjXsh+o7IbKEyDJao1izU6Ob8ndSqUsH5GA==
 
 "@aws-cdk/aws-batch-alpha@^2.8.0-alpha.0":
   version "2.8.0-alpha.0"
   resolved "https://registry.yarnpkg.com/@aws-cdk/aws-batch-alpha/-/aws-batch-alpha-2.8.0-alpha.0.tgz#b00ab374b92906bc5fc4b82ad7d82ba360c35399"
   integrity sha512-cZa/2BJ5R7QxEoyC5DlhixxLsvV6QppjgS8dluMzNASwofgvyq4elt3ukBaOv/3riKBg/irYVFZuvaSSsxVTOg==
 
-"@aws-cdk/aws-glue-alpha@2.0.0-alpha.11":
-  version "2.0.0-alpha.11"
-  resolved "https://registry.yarnpkg.com/@aws-cdk/aws-glue-alpha/-/aws-glue-alpha-2.0.0-alpha.11.tgz#d811185c14bc863c5938b2ec18596fc1db99bb7f"
-  integrity sha512-+Jwkl182uaYwcGisWi5WKCIHTgsVef26bg/keJLsyNC/2KFKgiLdfjxHW0tRP3j/FeJTzKBWKv0RGEG+bxskIg==
+"@aws-cdk/aws-glue-alpha@^2.51.1-alpha.0":
+  version "2.51.1-alpha.0"
+  resolved "https://registry.yarnpkg.com/@aws-cdk/aws-glue-alpha/-/aws-glue-alpha-2.51.1-alpha.0.tgz#55176d6709f985f61c187833436da5babe1589f1"
+  integrity sha512-4V+lGSEK4/C7ipiRS1sRnxEMgvoHMs8OSifrMscUtxHO/ezqYgapOt9ntwTCbs5QXyiH7sQN2cKWI0AjJchlqA==
 
-"@aws-cdk/aws-lambda-python-alpha@2.0.0-alpha.11":
-  version "2.0.0-alpha.11"
-  resolved "https://registry.yarnpkg.com/@aws-cdk/aws-lambda-python-alpha/-/aws-lambda-python-alpha-2.0.0-alpha.11.tgz#2b4c812baec052b3ff5242c65b7f0c6ac8b9123b"
-  integrity sha512-dyKaqsLFQJLq6ATh6YWZG8dHahRd8ujnFR1fjBb5NAIu7/AM+wlcavaYQZVTUk5KAkkpVoeUNYU/z2nnlVGcVg==
+"@aws-cdk/aws-lambda-python-alpha@^2.51.1-alpha.0":
+  version "2.51.1-alpha.0"
+  resolved "https://registry.yarnpkg.com/@aws-cdk/aws-lambda-python-alpha/-/aws-lambda-python-alpha-2.51.1-alpha.0.tgz#f8cb424cf4768780dc8a044eb72c49c0d2936882"
+  integrity sha512-81gJdO5R7SOtv2v3Fy8dzAOJyUdd2lO4kXc2xhwq0bU5nM5CvYy7WED2xRLaDsvLfDTIWQFf6Imsl4o6OS25tA==
 
-"@aws-cdk/aws-neptune-alpha@2.0.0-alpha.11":
-  version "2.0.0-alpha.11"
-  resolved "https://registry.yarnpkg.com/@aws-cdk/aws-neptune-alpha/-/aws-neptune-alpha-2.0.0-alpha.11.tgz#cfede8b1b281ccc85154b2be3039afe0997e3285"
-  integrity sha512-8SnsFUBH2WUZgAZTNrAj6jjObKHKJnXMl9WT5FWXUWHTaXNhyMNn0XK07au/l+tGl3vMsPhE4n61x2AMuZ5yIA==
+"@aws-cdk/aws-neptune-alpha@^2.51.1-alpha.0":
+  version "2.51.1-alpha.0"
+  resolved "https://registry.yarnpkg.com/@aws-cdk/aws-neptune-alpha/-/aws-neptune-alpha-2.51.1-alpha.0.tgz#aa5f3d0376213017586eebbb49e89898463a4b25"
+  integrity sha512-9TDKEEW6kd4ueqMhfaiWQlgD0fZXH8cWszSZpMAcVWWCi/vn/2+JWI6DaaDaYtLmlHhUz5a+NQ4KVI0ivv/h4A==
 
 "@aws-cdk/cloud-assembly-schema@2.51.1", "@aws-cdk/cloud-assembly-schema@^2":
   version "2.51.1"
