@@ -107,32 +107,32 @@
     },
     {
       "name": "@aws-cdk/aws-apigatewayv2-alpha",
-      "version": "2.0.0-alpha.11",
+      "version": "^2.51.1-alpha.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-apigatewayv2-integrations-alpha",
-      "version": "2.0.0-alpha.11",
+      "version": "^2.51.1-alpha.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-appsync-alpha",
-      "version": "2.0.0-alpha.11",
+      "version": "^2.51.1-alpha.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-glue-alpha",
-      "version": "2.0.0-alpha.11",
+      "version": "^2.51.1-alpha.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-lambda-python-alpha",
-      "version": "2.0.0-alpha.11",
+      "version": "^2.51.1-alpha.0",
       "type": "runtime"
     },
     {
       "name": "@aws-cdk/aws-neptune-alpha",
-      "version": "2.0.0-alpha.11",
+      "version": "^2.51.1-alpha.0",
       "type": "runtime"
     },
     {

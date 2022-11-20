@@ -216,19 +216,19 @@
           "exec": "yarn upgrade npm-check-updates"
         },
         {
-          "exec": "npm-check-updates --dep dev --upgrade --target=minor --reject='typescript,@aws-cdk/aws-apigatewayv2-alpha,@aws-cdk/aws-apigatewayv2-integrations-alpha,@aws-cdk/aws-appsync-alpha,@aws-cdk/aws-glue-alpha,@aws-cdk/aws-lambda-python-alpha,@aws-cdk/aws-neptune-alpha'"
+          "exec": "npm-check-updates --dep dev --upgrade --target=minor --reject='typescript'"
         },
         {
-          "exec": "npm-check-updates --dep optional --upgrade --target=minor --reject='typescript,@aws-cdk/aws-apigatewayv2-alpha,@aws-cdk/aws-apigatewayv2-integrations-alpha,@aws-cdk/aws-appsync-alpha,@aws-cdk/aws-glue-alpha,@aws-cdk/aws-lambda-python-alpha,@aws-cdk/aws-neptune-alpha'"
+          "exec": "npm-check-updates --dep optional --upgrade --target=minor --reject='typescript'"
         },
         {
-          "exec": "npm-check-updates --dep peer --upgrade --target=minor --reject='typescript,@aws-cdk/aws-apigatewayv2-alpha,@aws-cdk/aws-apigatewayv2-integrations-alpha,@aws-cdk/aws-appsync-alpha,@aws-cdk/aws-glue-alpha,@aws-cdk/aws-lambda-python-alpha,@aws-cdk/aws-neptune-alpha'"
+          "exec": "npm-check-updates --dep peer --upgrade --target=minor --reject='typescript'"
         },
         {
-          "exec": "npm-check-updates --dep prod --upgrade --target=minor --reject='typescript,@aws-cdk/aws-apigatewayv2-alpha,@aws-cdk/aws-apigatewayv2-integrations-alpha,@aws-cdk/aws-appsync-alpha,@aws-cdk/aws-glue-alpha,@aws-cdk/aws-lambda-python-alpha,@aws-cdk/aws-neptune-alpha'"
+          "exec": "npm-check-updates --dep prod --upgrade --target=minor --reject='typescript'"
         },
         {
-          "exec": "npm-check-updates --dep bundle --upgrade --target=minor --reject='typescript,@aws-cdk/aws-apigatewayv2-alpha,@aws-cdk/aws-apigatewayv2-integrations-alpha,@aws-cdk/aws-appsync-alpha,@aws-cdk/aws-glue-alpha,@aws-cdk/aws-lambda-python-alpha,@aws-cdk/aws-neptune-alpha'"
+          "exec": "npm-check-updates --dep bundle --upgrade --target=minor --reject='typescript'"
         },
         {
           "exec": "yarn install --check-files"

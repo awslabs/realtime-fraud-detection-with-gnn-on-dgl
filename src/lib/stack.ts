@@ -1,4 +1,4 @@
-import { ClusterParameterGroup, ParameterGroup, DatabaseCluster, InstanceType, IDatabaseCluster } from '@aws-cdk/aws-neptune-alpha';
+import { ClusterParameterGroup, ParameterGroup, DatabaseCluster, InstanceType, IDatabaseCluster, EngineVersion, ParameterGroupFamily } from '@aws-cdk/aws-neptune-alpha';
 import { RemovalPolicy, Stack, StackProps, Duration, CfnParameter, CfnOutput, CfnResource } from 'aws-cdk-lib';
 import { GatewayVpcEndpointAwsService, Vpc, FlowLogDestination, SubnetType, IVpc, SecurityGroup } from 'aws-cdk-lib/aws-ec2';
 import { Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
@@ -177,6 +177,7 @@ export class FraudDetectionStack extends Stack {
         neptune_enable_audit_log: '1',
         neptune_streams: '1',
       },
+      family: ParameterGroupFamily.NEPTUNE_1_2,
     });
 
     const dbParams = new ParameterGroup(this, 'DBParamGroup', {
@@ -184,6 +185,7 @@ export class FraudDetectionStack extends Stack {
       parameters: {
         neptune_query_timeout: '600000',
       },
+      family: ParameterGroupFamily.NEPTUNE_1_2,
     });
 
     const neptuneRole = new Role(this, 'NeptuneBulkLoadRole', {
@@ -224,6 +226,7 @@ export class FraudDetectionStack extends Stack {
       removalPolicy: RemovalPolicy.DESTROY,
       backupRetention: Duration.days(7),
       securityGroups: [graphDBSG],
+      engineVersion: new EngineVersion('1.2.0.1'),
     });
     graphDBCluster.node.findAll().filter(c => (c as CfnDBInstance).cfnOptions)
       .forEach(c => (c as CfnDBInstance).autoMinorVersionUpgrade = true);

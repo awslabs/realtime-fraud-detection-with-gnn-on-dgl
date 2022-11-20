@@ -7,7 +7,7 @@ import {
   HttpMethod,
   HttpStage,
 } from '@aws-cdk/aws-apigatewayv2-alpha';
-import { LambdaProxyIntegration } from '@aws-cdk/aws-apigatewayv2-integrations-alpha';
+import { HttpLambdaIntegration } from '@aws-cdk/aws-apigatewayv2-integrations-alpha';
 import {
   GraphqlApi,
   Schema,
@@ -538,7 +538,7 @@ export class TransactionDashboardStack extends NestedStack {
       'GeneratorStartIntegration',
       {
         apiId: httpApi.httpApiId,
-        integrationType: HttpIntegrationType.LAMBDA_PROXY,
+        integrationType: HttpIntegrationType.AWS_PROXY,
         integrationSubtype: 'StepFunctions-StartExecution',
         connectionType: HttpConnectionType.INTERNET,
         credentialsArn: apiRole.roleArn,
@@ -595,8 +595,7 @@ export class TransactionDashboardStack extends NestedStack {
           },
         ],
       });
-    const tokenFnIntegration = new LambdaProxyIntegration({
-      handler: tokenFn,
+    const tokenFnIntegration = new HttpLambdaIntegration('TokenInteg', tokenFn, {
       payloadFormatVersion: PayloadFormatVersion.VERSION_2_0,
     });
     httpApi.addRoutes({

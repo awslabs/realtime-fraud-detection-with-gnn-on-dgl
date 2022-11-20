@@ -16,7 +16,7 @@ const cdkAlphaDeps = [
   '@aws-cdk/aws-glue-alpha',
   '@aws-cdk/aws-lambda-python-alpha',
   '@aws-cdk/aws-neptune-alpha',
-].map(dep => `${dep}@2.0.0-alpha.11`);
+].map(dep => `${dep}@^2.51.1-alpha.0`);
 const awsSDKDeps = [
   '@aws-sdk/client-glue',
   '@aws-sdk/client-secrets-manager',

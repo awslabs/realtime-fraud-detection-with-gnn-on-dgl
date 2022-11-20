@@ -628,7 +628,6 @@ describe('training stack test suite', () => {
         Statement: [
           {
             Action: [
-              'glue:BatchDeletePartition',
               'glue:BatchGetPartition',
               'glue:GetPartition',
               'glue:GetPartitions',
@@ -692,7 +691,6 @@ describe('training stack test suite', () => {
           },
           {
             Action: [
-              'glue:BatchDeletePartition',
               'glue:BatchGetPartition',
               'glue:GetPartition',
               'glue:GetPartitions',

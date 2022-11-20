@@ -88,11 +88,15 @@ describe('fraud detection stack test suite', () => {
   test('Neptune cluster and dbs created', () => {
 
     Template.fromStack(stack).hasResourceProperties('AWS::Neptune::DBClusterParameterGroup', {
-      Family: 'neptune1',
+      Family: 'neptune1.2',
       Parameters: {
         neptune_enable_audit_log: '1',
       },
     });
+    
+    Template.fromStack(stack).hasResourceProperties('AWS::Neptune::DBParameterGroup', {
+      Family: 'neptune1.2',
+    });    
 
     Template.fromStack(stack).hasResource('AWS::Neptune::DBCluster', {
       Properties: {
@@ -116,6 +120,7 @@ describe('fraud detection stack test suite', () => {
         Port: 8182,
         BackupRetentionPeriod: 7,
         StorageEncrypted: true,
+        EngineVersion: '1.2.0.1',
         VpcSecurityGroupIds: [
           {
             'Fn::GetAtt': [
