@@ -2265,9 +2265,9 @@ at-least-node@^1.0.0:
   integrity sha512-+q/t7Ekv1EDY2l6Gda6LLiX14rU9TV20Wa3ofeQmwPFZbOMo9DXrLbOjFaaclkXKWidIaopwAObQDqwWtGUjqg==
 
 aws-cdk-lib@^2, aws-cdk-lib@^2.0.0:
-  version "2.55.0"
-  resolved "https://registry.yarnpkg.com/aws-cdk-lib/-/aws-cdk-lib-2.55.0.tgz#9a59439f4e0f866cd57ed7019ef7bfd68413064a"
-  integrity sha512-YCtfmMiITU5ncrrQmq5wls2EeCUOLOBDLWO2ZkaUozIS+VbEDChK8rT66OmgQSPwFntKNSJq0P65tR7kN5/i8g==
+  version "2.58.0"
+  resolved "https://registry.yarnpkg.com/aws-cdk-lib/-/aws-cdk-lib-2.58.0.tgz#83ab3b145db3c13d833b79c23dd98c71c0b7f23d"
+  integrity sha512-L5l5KvTO15ENhjB1aYi+Bl0CnWsOBN3ARb9E5qjXnaWQNMta0vWpSz/CjpkfHtJGXpyRXEg99vXOY5ocVMKrmw==
   dependencies:
     "@aws-cdk/asset-awscli-v1" "^2.2.30"
     "@aws-cdk/asset-kubectl-v20" "^2.1.1"
