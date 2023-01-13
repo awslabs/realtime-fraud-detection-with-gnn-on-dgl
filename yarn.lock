@@ -10,7 +10,7 @@
     "@jridgewell/gen-mapping" "^0.1.0"
     "@jridgewell/trace-mapping" "^0.3.9"
 
-"@aws-cdk/asset-awscli-v1@^2.2.30":
+"@aws-cdk/asset-awscli-v1@^2.2.49":
   version "2.2.49"
   resolved "https://registry.yarnpkg.com/@aws-cdk/asset-awscli-v1/-/asset-awscli-v1-2.2.49.tgz#af7618a3a39bf103f82d7aa396efa50e6ae79092"
   integrity sha512-Qd5bdLlC/sphWQQPNn7etKXWCh+fij7DWxtkIwvhhZ+LM6UEApGLS8sBLBQcRO2ZQdEuNb+zeClUy+3DNojfeg==
@@ -2273,17 +2273,17 @@ available-typed-arrays@^1.0.5:
   integrity sha512-DMD0KiN46eipeziST1LPP/STfDU0sufISXmjSgvVsoU2tqxctQeASejWcfNtxYKqETM1UxQ8sp2OrSBWpHY6sw==
 
 aws-cdk-lib@^2, aws-cdk-lib@^2.0.0:
-  version "2.59.0"
-  resolved "https://registry.yarnpkg.com/aws-cdk-lib/-/aws-cdk-lib-2.59.0.tgz#488967569bfe937dd64102a4131831f1b24e34df"
-  integrity sha512-FT6QRsou8TibQcz/TqI3rEkB9EBVF5Om5lv9MXz/5qiKehWRbKZVX0I0l/SSAvGSmdTU5Pfr+WRBTk51oNMAdw==
+  version "2.60.0"
+  resolved "https://registry.yarnpkg.com/aws-cdk-lib/-/aws-cdk-lib-2.60.0.tgz#e96400640aca6cf326bd01b02866a157110e6432"
+  integrity sha512-AttvwGmS1TDiOgkskrRw4lQoDwoyzjb+M0iMzHEa75xDz7hkykudNVEvWOfcbid+rzkgfLQyElwtf/oz6m+O9A==
   dependencies:
-    "@aws-cdk/asset-awscli-v1" "^2.2.30"
+    "@aws-cdk/asset-awscli-v1" "^2.2.49"
     "@aws-cdk/asset-kubectl-v20" "^2.1.1"
     "@aws-cdk/asset-node-proxy-agent-v5" "^2.0.38"
     "@balena/dockerignore" "^1.0.2"
     case "1.6.3"
     fs-extra "^9.1.0"
-    ignore "^5.2.1"
+    ignore "^5.2.4"
     jsonschema "^1.4.1"
     minimatch "^3.1.2"
     punycode "^2.1.1"
@@ -3946,7 +3946,7 @@ ignore-walk@^6.0.0:
   dependencies:
     minimatch "^5.0.1"
 
-ignore@^5.2.0, ignore@^5.2.1:
+ignore@^5.2.0, ignore@^5.2.4:
   version "5.2.4"
   resolved "https://registry.yarnpkg.com/ignore/-/ignore-5.2.4.tgz#a291c0c6178ff1b960befe47fcdec301674a6324"
   integrity sha512-MAb38BcSbH0eHNBxn7ql2NH/kX33OkB3lZ1BNdh7ENeRChHTYsTvWrMubiIAMNS2llXEEgZ1MUOBtXChP3kaFQ==
