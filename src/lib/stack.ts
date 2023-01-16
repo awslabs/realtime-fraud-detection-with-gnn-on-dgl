@@ -6,10 +6,10 @@ import { CfnDBInstance } from 'aws-cdk-lib/aws-neptune';
 import { Bucket, BucketEncryption, IBucket } from 'aws-cdk-lib/aws-s3';
 import { Queue, QueueEncryption } from 'aws-cdk-lib/aws-sqs';
 import { Construct } from 'constructs';
-import * as pjson from '../../package.json';
 import { TransactionDashboardStack } from './dashboard-stack';
 import { InferenceStack } from './inference-stack';
 import { TrainingStack } from './training-stack';
+import * as pjson from '../../package.json';
 
 export class FraudDetectionStack extends Stack {
   constructor(scope: Construct, id: string, props: StackProps = {}) {

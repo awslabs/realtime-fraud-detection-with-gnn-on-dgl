@@ -2,8 +2,8 @@ import * as cxapi from '@aws-cdk/cx-api';
 import { App, Stack, GetContextValueOptions, GetContextValueResult, Tags } from 'aws-cdk-lib';
 import { Template } from 'aws-cdk-lib/assertions';
 import { Construct } from 'constructs';
-import { FraudDetectionStack } from '../src/lib/stack';
 import * as mock from './context-provider-mock';
+import { FraudDetectionStack } from '../src/lib/stack';
 
 describe('fraud detection stack test suite', () => {
   let app: App;
