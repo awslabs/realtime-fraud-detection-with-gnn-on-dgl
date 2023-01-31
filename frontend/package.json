@@ -37,7 +37,6 @@
     "eventsource": "^2.0.2",
     "jest": "^27",
     "jest-junit": "^13",
-    "json-schema": "^0.4.0",
     "npm-check-updates": "^16",
     "projen": "^0.17.30",
     "ts-jest": "^27",
