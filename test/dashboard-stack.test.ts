@@ -422,7 +422,7 @@ describe('dashboard stack test suite', () => {
                 'Arn',
               ],
             },
-            '","Payload.$":"$"},"ResultSelector":{"parameters.$":"$.Payload"}},"Concurrent simulation":{"Type":"Map","End":true,"InputPath":"$.parameters","Iterator":{"StartAt":"Generate live transactions","States":{"Generate live transactions":{"End":true,"Retry":[{"ErrorEquals":["Lambda.ServiceException","Lambda.AWSLambdaException","Lambda.SdkClientException"],"IntervalSeconds":2,"MaxAttempts":6,"BackoffRate":2}],"Catch":[{"ErrorEquals":["States.Timeout"],"ResultPath":null,"Next":"Stop generation"}],"Type":"Task","Resource":"arn:',
+            '","Payload.$":"$"},"ResultSelector":{"parameters.$":"$.Payload"}},"Concurrent simulation":{"Type":"Map","End":true,"InputPath":"$.parameters","Iterator":{"StartAt":"Generate live transactions","States":{"Generate live transactions":{"End":true,"Retry":[{"ErrorEquals":["Lambda.ServiceException","Lambda.AWSLambdaException","Lambda.SdkClientException"],"IntervalSeconds":2,"MaxAttempts":6,"BackoffRate":2}],"Catch":[{"ErrorEquals":["States.Timeout"],"ResultPath":null,"Next":"Stop generation"}],"Type":"Task","TimeoutSecondsPath":"$.duration","Resource":"arn:',
             {
               Ref: 'AWS::Partition',
             },
@@ -433,7 +433,7 @@ describe('dashboard stack test suite', () => {
                 'Arn',
               ],
             },
-            '","Payload.$":"$"},"TimeoutSecondsPath":"$.duration"},"Stop generation":{"Type":"Pass","End":true}}},"ItemsPath":"$.iter","MaxConcurrency":0}}}',
+            '","Payload.$":"$"}},"Stop generation":{"Type":"Pass","End":true}}},"ItemsPath":"$.iter","MaxConcurrency":0}}}',
           ],
         ],
       },
