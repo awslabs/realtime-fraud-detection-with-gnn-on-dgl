@@ -735,6 +735,27 @@ export class TrainingStack extends NestedStack {
       tracingEnabled: true,
     });
 
+    pipeline.role.addToPrincipalPolicy(new PolicyStatement({
+      actions: ['sagemaker:AddTags'],
+      resources: [
+        Arn.format({
+          service: 'sagemaker',
+          resource: 'training-job',
+          resourceName: 'fraud-detection-model-*',
+        }, Stack.of(this)),
+        Arn.format({
+          service: 'sagemaker',
+          resource: 'model',
+          resourceName: 'fraud-detection-model-*',
+        }, Stack.of(this)),
+        Arn.format({
+          service: 'sagemaker',
+          resource: 'endpoint',
+          resourceName: this.endpointName,
+        }, Stack.of(this)),
+      ],
+    }));
+
     (pipeline.role.node.findChild('DefaultPolicy').node.defaultChild as CfnResource)
       .addMetadata('cfn_nag', {
         rules_to_suppress: [
