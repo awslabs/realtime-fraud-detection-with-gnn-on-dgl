@@ -3,7 +3,7 @@ import { RemovalPolicy, Stack, StackProps, Duration, CfnParameter, CfnOutput, Cf
 import { GatewayVpcEndpointAwsService, Vpc, FlowLogDestination, SubnetType, IVpc, SecurityGroup } from 'aws-cdk-lib/aws-ec2';
 import { Role, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 import { CfnDBInstance } from 'aws-cdk-lib/aws-neptune';
-import { Bucket, BucketEncryption, IBucket } from 'aws-cdk-lib/aws-s3';
+import { Bucket, BucketEncryption, IBucket, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
 import { Queue, QueueEncryption } from 'aws-cdk-lib/aws-sqs';
 import { Construct } from 'constructs';
 import { TransactionDashboardStack } from './dashboard-stack';
@@ -19,6 +19,7 @@ export class FraudDetectionStack extends Stack {
       encryption: BucketEncryption.S3_MANAGED,
       removalPolicy: RemovalPolicy.RETAIN,
       serverAccessLogsPrefix: 'accessLogBucketAccessLog',
+      objectOwnership: ObjectOwnership.OBJECT_WRITER,
     });
 
     const vpcId = this.node.tryGetContext('vpcId');
