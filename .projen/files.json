@@ -9,6 +9,7 @@
     ".gitignore",
     ".mergify.yml",
     ".npmignore",
+    ".npmrc",
     ".projen/deps.json",
     ".projen/files.json",
     ".projen/tasks.json",
